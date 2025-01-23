@@ -737,6 +737,9 @@ write.csv(HER42PB_xrf_calib_Ti,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output
 
 theme_set(theme_classic(12))
 
+Site_title = "HER42PB"
+Element_title = "Ti"
+
 # Depth plot - XRF-CS
 p1_Ti <- 
   ggplot() +
@@ -744,11 +747,17 @@ p1_Ti <-
   geom_lineh(data = HER42PB_xrf_calib_Ti, aes(x=Ti_upper_RMSE, y=depth), color = "lightblue") +
   geom_lineh(data = HER42PB_xrf_calib_Ti, aes(x=Ti_ppm, y=depth), color = "blue") +
   geom_lineh(data = ACE_ICP_ppm_Ti, aes(x=Ti_ICP, y=depth), color = "red") +
-  geom_errorbarh(data = ACE_ICP_ppm_Ti, aes(x=Ti_ICP, y=depth, xmin=Ti_ICP-Ti_ICP_sd, xmax=Ti_ICP+Ti_ICP_sd), color = "red", height=0) +
+  geom_errorbarh(data = ACE_ICP_ppm_Ti, aes(x=Ti_ICP, y=depth, xmin=Ti_ICP-Ti_ICP_sd, xmax=Ti_ICP+Ti_ICP_sd), 
+                 color = "red", height=0) +
   geom_point(data = ACE_ICP_ppm_Ti, aes(x=Ti_ICP, y=depth), fill = "white", color = "red", shape = 21, size = 2) +
   scale_y_reverse() +
   ylim(410, 0) +
-  xlim(0,7000)
+  xlim(0,7000) +
+  labs(x = paste(Element_title, "(ppm)") , y = paste0("Depth (cm)")) +
+  ggtitle(paste(Site_title, ": ", Element_title)) +
+  theme(axis.text=element_text(size=12, colour = "black"), 
+        axis.title=element_text(size=12, colour = "black"),
+        title = element_text(size=12, colour = "black")) 
 p1_Ti
 ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.1_ICPMS_Ti.pdf",
         height = c(24), width = c(8), dpi = 600, units = "cm")
@@ -760,7 +769,12 @@ p2_Den_MSCL <-
   geom_point(data = HER42PB_MSCL, aes(x=Den1_SAT, y=depth), fill = "grey", color = "grey", shape = 21, size = 1) +
   scale_y_reverse() +
   ylim(410, 0) +
-  xlim(1.2,1.5)
+  xlim(1.2,1.5) +
+  labs(x = paste("Wet GRD (g cm-3)") , y = paste0("Depth (cm)")) +
+  ggtitle(paste(Site_title, ": MSCL")) +
+  theme(axis.text=element_text(size=12, colour = "black"), 
+        axis.title=element_text(size=12, colour = "black"),
+        title = element_text(size=12, colour = "black")) 
 p2_Den_MSCL
 ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.2_Den_MSCL.pdf",
        height = c(24), width = c(8), dpi = 600, units = "cm")
@@ -772,25 +786,38 @@ p3_DCMS1_SAT_MSCL <-
   geom_point(data = HER42PB_MSCL, aes(x=DCMS1_SAT, y=depth), fill = "black", color = "black", shape = 21, size = 1) +
   scale_y_reverse() +
   ylim(410, 0) +
-  xlim(-2,10)
+  xlim(-2,10) +
+  labs(x = paste("DC-MS (MSχ [κ/ρ]) x10-8 (m3 kg-1)") , y = paste0("Depth (cm)")) +
+  ggtitle(paste(Site_title, ": MSCL")) +
+  theme(axis.text=element_text(size=12, colour = "black"), 
+        axis.title=element_text(size=12, colour = "black"),
+        title = element_text(size=12, colour = "black")) 
 p3_DCMS1_SAT_MSCL
 ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.3_DCMS_MSCL.pdf",
        height = c(24), width = c(8), dpi = 600, units = "cm")
 
 # Depth plot - MSCl GRD and Subsample Density plot
-p4_Den_Subsample <- 
+p4_Den_Subsample <-
   ggplot() +
   geom_lineh(data = HER42PB_DEN, aes(x=Dry_density_g_cm3, y=depth), color = "black") +
   geom_point(data = HER42PB_DEN, aes(x=Dry_density_g_cm3, y=depth), fill = "white", color = "black", shape = 21, size = 2) +
   #geom_errorbarh(data = HER42PB_DEN, aes(x=Dry_density_g_cm3, y=depth, xmin=Dry_density_g_cm3-DD_sd, xmax=Dry_density_g_cm3+DD_sd), color = "red", height=0) +
   scale_y_reverse() +
   ylim(410, 0) +
-  xlim(0,1)
+  xlim(0,1) +
+  labs(x = paste("Dry density (g cm-3)") , y = paste0("Depth (cm)")) +
+  ggtitle(paste(Site_title, ": Subsample")) +
+  theme(axis.text=element_text(size=12, colour = "black"), 
+        axis.title=element_text(size=12, colour = "black"),
+        title = element_text(size=12, colour = "black")) 
 p4_Den_Subsample
 ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.4_Den_subsample.pdf",
        height = c(24), width = c(8), dpi = 600, units = "cm")
 
-
+ggarrange(p2_Den_MSCL, p4_Den_Subsample, p1_Ti, p3_DCMS1_SAT_MSCL,
+          ncol = 4, nrow = 1, common.legend = TRUE)
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.pdf",
+       height = c(15), width = c(40), dpi = 600, units = "cm")
 
 
 # Other Plots -------------------------------------------------------------------
