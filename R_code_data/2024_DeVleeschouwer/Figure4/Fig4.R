@@ -89,7 +89,7 @@ xrf_icp_elements1 <- c("K", "K_ICP", "Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "Mn_I
                       "Zr", "Zr_ICP", "Mo_inc",  "Mo_coh") # Mo_inc included
 
 # MSCL
-mscl_param  <- c("Den1_SAT", "MS1_SAT", "DCMS1_SAT", "Imp_SAT", "FP_SAT", "RES_SAT")
+mscl_param  <- c("Den1_SAT", "MS1_SAT", "DCMS1_SAT", "Impedance_SAT", "Fract_Porosity_SAT", "Resistivity_SAT")
 
 # Subsample
 subsample_param <- c("Water_Content_pc", "Dry_mass", "Wet_density_g_cm3", "Dry_density_g_cm3",	"DMAR_g_cm2_yr")
@@ -116,13 +116,13 @@ write.csv(ACE_xrf_cps,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_xrf_
 # cps - convert to long format for facet plotting
 acf_icp_Elements_key3 <- c("K", "Ca", "Ti", "Fe", "Sr", "Zr", "Mo_coh") #no Zn, Mn for plotting
 ACE_xrf_cps_long <- ACE_xrf_cps %>% 
-  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_age)) %>%
+  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`acf_icp_Elements_key3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_xrf_cps_long
 
 ACE_xrf_cps_long <- ACE_xrf_cps %>% 
-  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_age)) %>%
+  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`acf_icp_Elements_key3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_xrf_cps_long
@@ -155,25 +155,25 @@ write.csv(HER42PB_xrf_log_inc_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Outpu
 # log_inc - convert to long format for facet plotting
 acf_icp_Elements_key3 <- c("K", "Ca", "Ti", "Fe", "Sr", "Zr", "Mo_coh") #no Zn, Mn for plotting
 ACE_xrf_log_inc_long <- ACE_xrf_log_inc %>% 
-  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_age)) %>%
+  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`acf_icp_Elements_key3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_xrf_log_inc_long
 
 ACE_xrf_log_inc_Z_long <- ACE_xrf_log_inc_Z %>% 
-  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_age)) %>%
+  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`acf_icp_Elements_key3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_xrf_log_inc_Z_long
 
 HER42PB_xrf_log_inc_long <- HER42PB_xrf_log_inc %>% 
-  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_age)) %>%
+  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`acf_icp_Elements_key3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 HER42PB_xrf_log_inc_long
 
 HER42PB_xrf_log_inc_Z_long <- HER42PB_xrf_log_inc_Z %>% 
-  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_age)) %>%
+  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`acf_icp_Elements_key3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 HER42PB_xrf_log_inc_Z_long
@@ -222,25 +222,25 @@ write.csv(HER42PB_xrf_clr_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/HE
 # clr - convert to long format for facet plotting
 acf_icp_Elements_key3 <- c("K", "Ca", "Ti", "Fe", "Sr", "Zr") #no "Mo_coh" for plotting - not included in clr elements
 ACE_xrf_clr_long <- ACE_xrf_clr %>% 
-  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_age)) %>%
+  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`acf_icp_Elements_key3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_xrf_clr_long
 
 ACE_xrf_clr_Z_long <- ACE_xrf_clr_Z %>% 
-  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_age)) %>%
+  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`acf_icp_Elements_key3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_xrf_clr_Z_long
 
 HER42PB_xrf_clr_long <- HER42PB_xrf_clr %>% 
-  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_age)) %>%
+  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`acf_icp_Elements_key3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 HER42PB_xrf_clr_long
 
 HER42PB_xrf_clr_Z_long <- HER42PB_xrf_clr_Z %>% 
-  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_age)) %>%
+  select(c(all_of(acf_icp_Elements_key3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`acf_icp_Elements_key3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 HER42PB_xrf_clr_Z_long
@@ -288,37 +288,37 @@ xrf_icp_elements3_xrf <- c("K", "Ca", "Ti", "Fe", "Sr", "Zr", "Mo_coh")
 xrf_icp_elements3_icp <- c("K_ICP", "Ca_ICP", "Ti_ICP","Fe_ICP", "Sr_ICP", "Zr_ICP", "Mo_coh")
 
 ACE_matched_xrf_icp_log_inc_long <- ACE_matched_xrf_icp_log_inc %>% 
-  select(c(all_of(xrf_icp_elements3), Site, depth, SH20_age)) %>%
+  select(c(all_of(xrf_icp_elements3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`xrf_icp_elements3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_matched_xrf_icp_log_inc_long
 
 ACE_matched_xrf_icp_log_inc_Z_long <- ACE_matched_xrf_icp_log_inc_Z %>% 
-  select(c(all_of(xrf_icp_elements3), Site, depth, SH20_age)) %>%
+  select(c(all_of(xrf_icp_elements3), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`xrf_icp_elements3`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_matched_xrf_icp_log_inc_Z_long
 
 ACE_matched_xrf_icp_log_inc_long_xrf <- ACE_matched_xrf_icp_log_inc %>% 
-  select(c(all_of(xrf_icp_elements3_xrf), Site, depth, SH20_age)) %>%
+  select(c(all_of(xrf_icp_elements3_xrf), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`xrf_icp_elements3_xrf`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_matched_xrf_icp_log_inc_long_xrf
 
 ACE_matched_xrf_icp_log_inc_Z_long_xrf <- ACE_matched_xrf_icp_log_inc_Z %>% 
-  select(c(all_of(xrf_icp_elements3_xrf), Site, depth, SH20_age)) %>%
+  select(c(all_of(xrf_icp_elements3_xrf), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`xrf_icp_elements3_xrf`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_matched_xrf_icp_log_inc_Z_long_xrf
 
 ACE_matched_xrf_icp_log_inc_long_icp <- ACE_matched_xrf_icp_log_inc %>% 
-  select(c(all_of(xrf_icp_elements3_icp), Site, depth, SH20_age)) %>%
+  select(c(all_of(xrf_icp_elements3_icp), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`xrf_icp_elements3_icp`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_matched_xrf_icp_log_inc_long_icp
 
 ACE_matched_xrf_icp_log_inc_Z_long_icp <- ACE_matched_xrf_icp_log_inc_Z %>% 
-  select(c(all_of(xrf_icp_elements3_icp), Site, depth, SH20_age)) %>%
+  select(c(all_of(xrf_icp_elements3_icp), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`xrf_icp_elements3_icp`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_matched_xrf_icp_log_inc_Z_long_icp
@@ -435,7 +435,7 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.4_Matched_log_ic
 
 
 # Age plot - log_inc
-p4_Matched_log_inc_age <- ggplot(Matched_reorder_log_inc, aes(x = SH20_age, y = value)) +
+p4_Matched_log_inc_age <- ggplot(Matched_reorder_log_inc, aes(x = SH20_mean_age, y = value)) +
   geom_line(colour = "darkgrey") +
   #geom_point(shape =".") +
   #scale_y_reverse() +
@@ -457,7 +457,7 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.5_Matched_log_in
        height = c(36), width = c(24), dpi = 600, units = "cm")
 
 # Age plot - log_inc Z-scores
-p5_Matched_log_inc_age_Z <- ggplot(Matched_reorder_log_inc_Z, aes(x = SH20_age, y = value)) +
+p5_Matched_log_inc_age_Z <- ggplot(Matched_reorder_log_inc_Z, aes(x = SH20_mean_age, y = value)) +
   geom_line(colour = "darkgrey") +
   #geom_point() +
   #scale_y_reverse() +
@@ -481,7 +481,7 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.6_Matched_log_in
 
 
 # Age plot - log icpms
-p4_Matched_log_icpms_age <- ggplot(Matched_reorder_log_icpms, aes(x = SH20_age, y = value)) +
+p4_Matched_log_icpms_age <- ggplot(Matched_reorder_log_icpms, aes(x = SH20_mean_age, y = value)) +
   geom_line(colour = "darkgreen") +
   geom_point(shape = 21, fill = "white", color = "darkgreen", size = 2) +
   #scale_y_reverse() +
@@ -503,7 +503,7 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.7_Matched_log_ic
        height = c(36), width = c(24), dpi = 600, units = "cm")
 
 # Age plot - log ICPMS Z-scores
-p5_Matched_log_icpms_age_Z <- ggplot(Matched_reorder_log_icpms_Z, aes(x = SH20_age, y = value)) +
+p5_Matched_log_icpms_age_Z <- ggplot(Matched_reorder_log_icpms_Z, aes(x = SH20_mean_age, y = value)) +
   geom_line(colour = "darkgreen") +
   geom_point(shape = 21, fill = "white", color = "darkgreen", size = 2) +
   #scale_y_reverse() +
@@ -529,7 +529,8 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.8_Matched_log_ic
 
 # MSCL data ---------------------------------------------------------------
 
-HER_MSCL <- read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/HER_MSCL_comp.csv")
+HER_MSCL <- read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_SHW_MSCL_Composite.csv") %>% 
+  filter(Location=="Isla Hermite")
 HER_MSCL
 # Standardise and centre dataframe - Z-scores
 HER_MSCL_Z <- HER_MSCL
@@ -546,13 +547,13 @@ HER42PB_MSCL_Z <- HER_MSCL_Z %>%
 HER42PB_MSCL_Z
 
 HER42PB_MSCL_long <- HER42PB_MSCL %>% 
-  select(c(all_of(mscl_param), Site, depth, SH20_age)) %>%
+  select(all_of(mscl_param), Site, depth, SH20_mean_age) %>%
   pivot_longer(c(`mscl_param`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 HER42PB_MSCL_long
 
 HER42PB_MSCL_long_Z <- HER42PB_MSCL_Z %>% 
-  select(c(all_of(mscl_param), Site, depth, SH20_age)) %>%
+  select(all_of(mscl_param), Site, depth, SH20_mean_age) %>%
   pivot_longer(c(`mscl_param`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 HER42PB_MSCL_long_Z
@@ -598,13 +599,13 @@ ACE_DEN_Z
 write.csv(ACE_DEN_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_Den_comp_Z.csv", row.names = FALSE)
 
 ACE_DEN_long <- ACE_DEN %>% 
-  select(c(all_of(subsample_param), Site, depth, SH20_age)) %>%
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_DEN_long
 
 ACE_DEN_long_Z <- ACE_DEN_Z %>% 
-  select(c(all_of(subsample_param), Site, depth, SH20_age)) %>%
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
 ACE_DEN_long_Z
@@ -708,14 +709,14 @@ write.csv(ACE_ICP_ppm,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_matc
 
 # Input ICPMS data for comparison / overlay
 ACE_ICP_ppm_Ti <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_matched_xrf_icp_cps.csv") %>%
-  select(Site, depth, SH20_age, Ti, Ti_sd, Ti_ICP, Ti_ICP_sd) %>%
+  select(Site, depth, SH20_mean_age, Ti, Ti_sd, Ti_ICP, Ti_ICP_sd) %>%
   filter(Site == "HER42PB")  
 ACE_ICP_ppm_Ti
 
 # Ti XRF-CS as ppm with RMSE errors
 
 ACE_xrf_calib_Ti <- ACE_xrf_log_inc %>%
-  select(Site, depth, SH20_age, Ti) %>%
+  select(Site, depth, SH20_mean_age, Ti) %>%
   mutate(Ti_convert = 11+0.67*Ti) %>% # Ti Ln equation: y = 11+0.67 x  where y = Ln(Ti_ICP) and x = Ln(Ti_XRF)
   mutate(Ti_ppm = exp(Ti_convert)) %>% 
   mutate(Ti_upper = Ti+0.663) %>% # RMSE = 0.663
@@ -724,13 +725,14 @@ ACE_xrf_calib_Ti <- ACE_xrf_log_inc %>%
   mutate(Ti_lower = Ti-0.663) %>% 
   mutate(Ti_convert_lower = 11+0.67*Ti_lower) %>%
   mutate(Ti_lower_RMSE = exp(Ti_convert_lower)) %>% 
-  select(Site, depth, SH20_age, Ti, Ti_ppm, Ti_lower_RMSE, Ti_upper_RMSE)
+  select(Site, depth, SH20_mean_age, Ti, Ti_ppm, Ti_lower_RMSE, Ti_upper_RMSE)
 ACE_xrf_calib_Ti
 write.csv(ACE_xrf_calib_Ti,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_xrf_calib_Ti.csv", row.names = FALSE)
 
 HER42PB_xrf_calib_Ti <- ACE_xrf_calib_Ti %>% 
   filter(Site == "HER42PB")
 write.csv(HER42PB_xrf_calib_Ti,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/HER42PB_xrf_calib_Ti.csv", row.names = FALSE)
+
 
 
 # Final Plot -------------------------------------------------------------------------
@@ -820,6 +822,8 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.pdf",
        height = c(15), width = c(40), dpi = 600, units = "cm")
 
 
+
+
 # Other Plots -------------------------------------------------------------------
 # ITRAX log_inc -----------------------------------------------------------
 
@@ -880,7 +884,7 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4.2_ITRAX__log_inc_depth_Z
 
 # Add CONISS & save
 coniss_ITRAX_log_inc_Z <- ITRAX_reorder_log_inc_Z %>%
-  nested_data(qualifiers = c(SH20_age, depth), key = param, value = value, trans = scale) %>%
+  nested_data(qualifiers = c(SH20_mean_age, depth), key = param, value = value, trans = scale) %>%
   nested_chclust_coniss()
 p3_ITRAX__log_inc_Z_depth_coniss <- p2_ITRAX_log_inc_depth_Z +
   layer_dendrogram(coniss_ITRAX_log_inc_Z, aes(y = depth), param = "CONISS") +
@@ -890,7 +894,7 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4.3_ITRAX__log_inc_depth_Z
        height = c(24), width = c(36), dpi = 600, units = "cm")
 
 # Age plot - log_inc
-p4_ITRAX_log_inc_age <- ggplot(ITRAX_reorder_log_inc, aes(x = SH20_age, y = value)) +
+p4_ITRAX_log_inc_age <- ggplot(ITRAX_reorder_log_inc, aes(x = SH20_mean_age, y = value)) +
   geom_line(colour = "lightgrey") +
   #geom_point(shape =".") +
   #scale_y_reverse() +
@@ -912,7 +916,7 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4.4_ITRAX_log_inc_age.pdf"
        height = c(36), width = c(24), dpi = 600, units = "cm")
 
 # Age plot - log_inc Z-scores + CONISS
-p5_ITRAX_log_inc_age_Z <- ggplot(ITRAX_reorder_log_inc_Z, aes(x = SH20_age, y = value)) +
+p5_ITRAX_log_inc_age_Z <- ggplot(ITRAX_reorder_log_inc_Z, aes(x = SH20_mean_age, y = value)) +
   geom_line(colour = "lightgrey") +
   #geom_point() +
   #scale_y_reverse() +
@@ -936,11 +940,11 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4.5_ITRAX_log_inc_age_Z.pd
 
 # Add CONISS & save
 coniss_ITRAX_log_inc_age_Z <- ITRAX_reorder_log_inc_Z %>%
-  nested_data(qualifiers = c(SH20_age, depth), key = param, value = value, trans = scale) %>%
+  nested_data(qualifiers = c(SH20_mean_age, depth), key = param, value = value, trans = scale) %>%
   nested_chclust_coniss()
 p6_ITRAX_log_inc_age_Z_coniss <- p5_ITRAX_log_inc_age_Z +
-  layer_dendrogram(coniss_ITRAX_log_inc_age_Z, aes(x = SH20_age), param = "CONISS") +
-  layer_zone_boundaries(coniss_ITRAX_log_inc_age_Z, aes(x = SH20_age))
+  layer_dendrogram(coniss_ITRAX_log_inc_age_Z, aes(x = SH20_mean_age), param = "CONISS") +
+  layer_zone_boundaries(coniss_ITRAX_log_inc_age_Z, aes(x = SH20_mean_age))
 p6_ITRAX_log_inc_age_Z_coniss
 ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4.6_ITRAX_log_inc_age_Z_coniss.pdf",
        height = c(36), width = c(24), dpi = 600, units = "cm")
@@ -976,7 +980,7 @@ theme_set(theme_bw(base_size=12))
 # HER42PB
 H42PB_xrf <- ACE_xrf_log_inc %>%
   filter(Site == "HER42PB") %>% 
-  select(all_of(acf_icp_Elements_key), MSE,  depth, SH20_age, label) %>% 
+  select(all_of(acf_icp_Elements_key), MSE,  depth, SH20_mean_age, label) %>% 
   select(-c(Zn, Mn)) # remove elements don't want to plot
 # plotting the running mean stratigraphically - and add onto XRF plot for each Site
 # with ACF elements only
@@ -995,7 +999,7 @@ H42PB_xrf_smooth <- full_join(y = H42PB_xrf %>%
 
 Fig4a <- H42PB_xrf_smooth %>% 
   select(all_of(acf_icp_Elements_key2), depth, label, type) %>%
-  tidyr::pivot_longer(!c("depth", "SH20_age", "label", "type"), names_to = "elements", values_to = "peakarea") %>% 
+  tidyr::pivot_longer(!c("depth", "SH20_mean_age", "label", "type"), names_to = "elements", values_to = "peakarea") %>% 
   tidyr::drop_na() %>%
   mutate(elements = factor(elements, levels = c(all_of(acf_icp_Elements_key2)))) %>%
   mutate(label = as_factor(label),
@@ -1077,10 +1081,10 @@ theme_set(theme_bw(base_size=7) + theme(
   axis.title.x = element_text(color="black", size=7),
   axis.title.y = element_text(color="black", size=7)
 ))
-HER42PB_xrf_icp_age <- ggplot(data = ACE_xrf_log_inc, aes(SH20_age, Ti)) + 
+HER42PB_xrf_icp_age <- ggplot(data = ACE_xrf_log_inc, aes(SH20_mean_age, Ti)) + 
   geom_line(colour = "#74C476", alpha = 1, linewidth = 0.5) +
-  geom_point(data = ACE_xrf_icp , aes(SH20_age, Ti_ICP), colour = "#006D2C", fill = "blue", size = 0.5) + 
-  geom_line(data = ACE_xrf_icp , aes(SH20_age, Ti_ICP), colour = "#006D2C", linewidth = 0.5) +
+  geom_point(data = ACE_xrf_icp , aes(SH20_mean_age, Ti_ICP), colour = "#006D2C", fill = "blue", size = 0.5) + 
+  geom_line(data = ACE_xrf_icp , aes(SH20_mean_age, Ti_ICP), colour = "#006D2C", linewidth = 0.5) +
   expand_limits(x = -100, y = -3) +
   scale_x_continuous(breaks=seq(0,5000,500), minor_breaks = seq(NULL), expand = c(0.05,0)) +
   scale_y_continuous(breaks=seq(-4,6,2), minor_breaks = seq(NULL), expand = c(0,0)) +
@@ -1090,10 +1094,10 @@ HER42PB_xrf_icp_age <- ggplot(data = ACE_xrf_log_inc, aes(SH20_age, Ti)) +
   #           linewidth = 0.5, colour = "red", lty = "dotted", alpha = 0.5)
 HER42PB_age
 
-YAN_age <- ggplot(data = YAN_Ln_Ti_norm.Z_nonmarine, aes(SH20_age, Ca)) + 
+YAN_age <- ggplot(data = YAN_Ln_Ti_norm.Z_nonmarine, aes(SH20_mean_age, Ca)) + 
   geom_line(colour = "#969696", alpha = 1, size = 0.5) +
-  geom_point(data = db_YAN.Z, aes(SH20_age, Ca_Ti), colour = "#252525", fill = "#252525", size = 0.5) + 
-  geom_line(data = db_YAN.Z, aes(SH20_age, Ca_Ti), colour = "#252525", size = 0.5) + 
+  geom_point(data = db_YAN.Z, aes(SH20_mean_age, Ca_Ti), colour = "#252525", fill = "#252525", size = 0.5) + 
+  geom_line(data = db_YAN.Z, aes(SH20_mean_age, Ca_Ti), colour = "#252525", size = 0.5) + 
   expand_limits(x = -100, y = -3) +
   scale_x_continuous(breaks=seq(0,9000,1000), minor_breaks = seq(NULL), expand = c(0.05,0)) +
   scale_y_continuous(breaks=seq(-4,6,2), minor_breaks = seq(NULL), expand = c(0,0)) +
