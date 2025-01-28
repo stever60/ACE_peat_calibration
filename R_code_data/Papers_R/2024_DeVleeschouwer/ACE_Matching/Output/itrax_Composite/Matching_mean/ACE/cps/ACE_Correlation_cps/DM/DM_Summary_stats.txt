@@ -1,0 +1,168 @@
+# A tibble: 6 × 2
+  Site         r
+  <fct>    <dbl>
+1 BI10     0.303
+2 HER42PB  0.750
+3 KER1     0.856
+4 KER3     0.859
+5 PB1     -0.346
+6 POB4     0.751
+
+	Pearson's product-moment correlation
+
+data:  ACE_all$coh_inc and ACE_all$dry_mass_pc
+t = 8.7609, df = 300, p-value < 0.00000000000000022
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.3566595 0.5368707
+sample estimates:
+      cor 
+0.4513553 
+
+
+	Pearson's product-moment correlation
+
+data:  ACE_LM1$coh_inc and ACE_LM1$dry_mass_pc
+t = 8.7437, df = 272, p-value = 0.0000000000000002388
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.3704706 0.5560432
+sample estimates:
+      cor 
+0.4684071 
+
+
+	Pearson's product-moment correlation
+
+data:  ACE_LM2$coh_inc and ACE_LM2$dry_mass_pc
+t = 16.036, df = 241, p-value < 0.00000000000000022
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.6515556 0.7743201
+sample estimates:
+      cor 
+0.7184879 
+
+
+Call:
+lm(formula = y_all.reg ~ x_all.reg, data = ACE_all)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-22.447  -5.188  -1.742   3.522  52.397 
+
+Coefficients:
+            Estimate Std. Error t value             Pr(>|t|)    
+(Intercept)  -10.420      3.737  -2.789              0.00563 ** 
+x_all.reg    192.134     21.931   8.761 < 0.0000000000000002 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 9.788 on 300 degrees of freedom
+Multiple R-squared:  0.2037,	Adjusted R-squared:  0.2011 
+F-statistic: 76.75 on 1 and 300 DF,  p-value: < 0.00000000000000022
+
+                2.5 %     97.5 %
+(Intercept) -17.77337  -3.066835
+x_all.reg   148.97562 235.291382
+
+Call:
+lm(formula = y1.reg ~ x1.reg, data = ACE_LM1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-23.137  -5.402  -2.092   3.353  51.513 
+
+Coefficients:
+            Estimate Std. Error t value             Pr(>|t|)    
+(Intercept)   -9.245      3.705  -2.495               0.0132 *  
+x1.reg       190.173     21.750   8.744 0.000000000000000239 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 9.666 on 272 degrees of freedom
+Multiple R-squared:  0.2194,	Adjusted R-squared:  0.2165 
+F-statistic: 76.45 on 1 and 272 DF,  p-value: 0.0000000000000002388
+
+                2.5 %     97.5 %
+(Intercept) -16.54005  -1.950899
+x1.reg      147.35398 232.992478
+
+Call:
+lm(formula = y2.reg ~ x2.reg, data = ACE_LM2)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-19.746  -3.978  -1.295   1.487  43.084 
+
+Coefficients:
+            Estimate Std. Error t value            Pr(>|t|)    
+(Intercept)   -45.47       4.23  -10.75 <0.0000000000000002 ***
+x2.reg        413.40      25.78   16.04 <0.0000000000000002 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 7.377 on 241 degrees of freedom
+Multiple R-squared:  0.5162,	Adjusted R-squared:  0.5142 
+F-statistic: 257.2 on 1 and 241 DF,  p-value: < 0.00000000000000022
+
+                2.5 %    97.5 %
+(Intercept) -53.79709 -37.13296
+x2.reg      362.62223 464.18448
+
+	Durbin-Watson test
+
+data:  model_all
+DW = 1.1801, p-value = 0.000000000000316
+alternative hypothesis: true autocorrelation is greater than 0
+
+
+	Durbin-Watson test
+
+data:  model_1
+DW = 1.2688, p-value = 0.0000000004602
+alternative hypothesis: true autocorrelation is greater than 0
+
+
+	Durbin-Watson test
+
+data:  model_2
+DW = 1.9424, p-value = 0.3148
+alternative hypothesis: true autocorrelation is greater than 0
+
+
+	Shapiro-Wilk normality test
+
+data:  x_all.reg
+W = 0.77742, p-value < 0.00000000000000022
+
+
+	Shapiro-Wilk normality test
+
+data:  y_all.reg
+W = 0.86422, p-value = 0.000000000000001239
+
+
+	Shapiro-Wilk normality test
+
+data:  x1.reg
+W = 0.7665, p-value < 0.00000000000000022
+
+
+	Shapiro-Wilk normality test
+
+data:  y1.reg
+W = 0.84075, p-value = 0.0000000000000004177
+
+
+	Shapiro-Wilk normality test
+
+data:  x2.reg
+W = 0.81508, p-value = 0.0000000000000002678
+
+
+	Shapiro-Wilk normality test
+
+data:  y2.reg
+W = 0.82589, p-value = 0.0000000000000008378
+

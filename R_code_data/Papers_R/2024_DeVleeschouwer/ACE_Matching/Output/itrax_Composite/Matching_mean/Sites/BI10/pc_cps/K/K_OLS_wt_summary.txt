@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = K_ICP ~ K, data = BI10_xrf_icp_matched, weights = 1/(K_sd)^2)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-917036 -292475 -156491  -44888 4654219 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)   
+(Intercept)     6715       2165   3.102   0.0028 **
+K             -21268      78703  -0.270   0.7878   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 697600 on 68 degrees of freedom
+Multiple R-squared:  0.001073,	Adjusted R-squared:  -0.01362 
+F-statistic: 0.07303 on 1 and 68 DF,  p-value: 0.7878
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared   sigma statistic p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl>   <dbl>     <dbl>   <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1   0.00107       -0.0136 697605.    0.0730   0.788     1  -763. 1533. 1540.  3.31e13          68    70
+# Indices of model performance
+
+AIC      |     AICc |      BIC |    R2 | R2 (adj.) |     RMSE |     Sigma
+-------------------------------------------------------------------------
+1532.970 | 1533.334 | 1539.716 | 0.001 |    -0.014 | 9047.162 | 6.976e+05
+
+	studentized Breusch-Pagan test
+
+data:  BI10_K_wlm
+BP = 275732, df = 1, p-value < 2.2e-16
+
+Warning: Heteroscedasticity (non-constant error variance) detected (p = 0.017).
+NULL

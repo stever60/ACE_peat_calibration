@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = K_ICP ~ K, data = KER3_xrf_icp_matched, weights = KER3_K_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.8637 -0.6052 -0.4767 -0.2625  9.4663 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)    2449.6      855.7   2.863  0.00616 ** 
+K           1479391.8   342883.9   4.315 7.73e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.979 on 49 degrees of freedom
+Multiple R-squared:  0.2753,	Adjusted R-squared:  0.2605 
+F-statistic: 18.62 on 1 and 49 DF,  p-value: 7.731e-05
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic   p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>     <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.275         0.261  1.98      18.6 0.0000773     1  -513. 1032. 1037.     192.          49    51
+# Indices of model performance
+
+AIC      |     AICc |      BIC |    R2 | R2 (adj.) |     RMSE | Sigma
+---------------------------------------------------------------------
+1031.620 | 1032.131 | 1037.415 | 0.275 |     0.261 | 5895.176 | 1.979
+
+	studentized Breusch-Pagan test
+
+data:  KER3_K_wls
+BP = 4.2964e-07, df = 1, p-value = 0.9995
+
+OK: Error variance appears to be homoscedastic (p = 0.295).
+NULL

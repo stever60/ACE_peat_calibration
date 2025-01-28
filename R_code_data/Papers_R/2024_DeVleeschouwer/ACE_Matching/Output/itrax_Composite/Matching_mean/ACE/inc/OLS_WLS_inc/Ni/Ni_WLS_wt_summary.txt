@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Ni_ICP ~ Ni, data = ACE_dataset, weights = ACE_Ni_wt_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.5840 -0.9225 -0.2698  0.5480  6.2191 
+
+Coefficients:
+            Estimate Std. Error t value            Pr(>|t|)    
+(Intercept)  -27.480      2.854  -9.629 <0.0000000000000002 ***
+Ni          6753.397    532.646  12.679 <0.0000000000000002 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.349 on 272 degrees of freedom
+Multiple R-squared:  0.3715,	Adjusted R-squared:  0.3692 
+F-statistic: 160.8 on 1 and 272 DF,  p-value: < 0.00000000000000022
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.371         0.369  1.35      161. 2.94e-29     1  -869. 1743. 1754.     495.         272   274
+# Indices of model performance
+
+AIC      |     AICc |      BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+------------------------------------------------------------------
+1743.359 | 1743.448 | 1754.199 | 0.371 |     0.369 | 7.877 | 1.349
+
+	studentized Breusch-Pagan test
+
+data:  ACE_Ni_wls_wt
+BP = 0.5077, df = 1, p-value = 0.4761
+
+OK: Error variance appears to be homoscedastic (p = 0.085).
+NULL

@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Ti_ICP ~ Ti, data = ACE_dataset, weights = ACE_Ti_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.4878 -0.8969 -0.0090  0.8569  4.1246 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 11.05616    0.06171  179.16   <2e-16 ***
+Ti           0.66185    0.01381   47.92   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.256 on 301 degrees of freedom
+Multiple R-squared:  0.8841,	Adjusted R-squared:  0.8837 
+F-statistic:  2297 on 1 and 301 DF,  p-value: < 2.2e-16
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic   p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>     <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.884         0.884  1.26     2297. 6.58e-143     1  -287.  581.  592.     475.         301   303
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+---------------------------------------------------------------
+580.922 | 581.002 | 592.063 | 0.884 |     0.884 | 0.678 | 1.256
+
+	studentized Breusch-Pagan test
+
+data:  ACE_Ti_wls
+BP = 1678.7, df = 1, p-value < 2.2e-16
+
+OK: Error variance appears to be homoscedastic (p = 0.779).
+NULL

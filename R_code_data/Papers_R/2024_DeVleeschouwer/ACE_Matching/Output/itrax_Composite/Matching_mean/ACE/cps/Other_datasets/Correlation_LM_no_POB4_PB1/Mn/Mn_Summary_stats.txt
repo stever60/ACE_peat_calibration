@@ -1,0 +1,168 @@
+# A tibble: 6 × 2
+  Site        r
+  <fct>   <dbl>
+1 BI10    0.186
+2 HER42PB 0.767
+3 KER1    0.839
+4 KER3    0.543
+5 PB1     0.828
+6 POB4    0.842
+
+	Pearson's product-moment correlation
+
+data:  ACE_all$Mn and ACE_all$Mn_ICP
+t = 21.108, df = 300, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.7232906 0.8148201
+sample estimates:
+      cor 
+0.7730483 
+
+
+	Pearson's product-moment correlation
+
+data:  ACE_LM1$Mn and ACE_LM1$Mn_ICP
+t = 14.622, df = 241, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.6126453 0.7470188
+sample estimates:
+      cor 
+0.6856291 
+
+
+	Pearson's product-moment correlation
+
+data:  ACE_LM2$Mn and ACE_LM2$Mn_ICP
+t = 14.241, df = 269, p-value < 2.2e-16
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.5819409 0.7186465
+sample estimates:
+      cor 
+0.6556335 
+
+
+Call:
+lm(formula = y_all.reg ~ x_all.reg, data = ACE_all)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-397.03  -81.49  -48.33   68.23  384.88 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)    94.128      8.436   11.16   <2e-16 ***
+x_all.reg   35900.912   1700.847   21.11   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 120.7 on 300 degrees of freedom
+Multiple R-squared:  0.5976,	Adjusted R-squared:  0.5963 
+F-statistic: 445.5 on 1 and 300 DF,  p-value: < 2.2e-16
+
+                 2.5 %     97.5 %
+(Intercept)    77.5276   110.7288
+x_all.reg   32553.8104 39248.0141
+
+Call:
+lm(formula = y1.reg ~ x1.reg, data = ACE_LM1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-388.35  -67.02  -38.27   55.75  393.94 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)    73.25       9.35   7.834  1.5e-13 ***
+x1.reg      41956.53    2869.49  14.622  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 107.5 on 241 degrees of freedom
+Multiple R-squared:  0.4701,	Adjusted R-squared:  0.4679 
+F-statistic: 213.8 on 1 and 241 DF,  p-value: < 2.2e-16
+
+                  2.5 %      97.5 %
+(Intercept)    54.83248    91.66963
+x1.reg      36304.05623 47609.00308
+
+Call:
+lm(formula = y2.reg ~ x2.reg, data = ACE_LM2)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-394.22  -72.19  -43.85   59.18  388.22 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)    78.96       9.14   8.639 5.11e-16 ***
+x2.reg      41968.90    2947.02  14.241  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 113 on 269 degrees of freedom
+Multiple R-squared:  0.4299,	Adjusted R-squared:  0.4277 
+F-statistic: 202.8 on 1 and 269 DF,  p-value: < 2.2e-16
+
+                  2.5 %      97.5 %
+(Intercept)    60.96788    96.95684
+x2.reg      36166.74790 47771.05679
+
+	Durbin-Watson test
+
+data:  model_all
+DW = 1.2433, p-value = 1.537e-11
+alternative hypothesis: true autocorrelation is greater than 0
+
+
+	Durbin-Watson test
+
+data:  model_1
+DW = 1.591, p-value = 0.0006134
+alternative hypothesis: true autocorrelation is greater than 0
+
+
+	Durbin-Watson test
+
+data:  model_2
+DW = 1.466, p-value = 4.427e-06
+alternative hypothesis: true autocorrelation is greater than 0
+
+
+	Shapiro-Wilk normality test
+
+data:  x_all.reg
+W = 0.57377, p-value < 2.2e-16
+
+
+	Shapiro-Wilk normality test
+
+data:  y_all.reg
+W = 0.82, p-value < 2.2e-16
+
+
+	Shapiro-Wilk normality test
+
+data:  x1.reg
+W = 0.63827, p-value < 2.2e-16
+
+
+	Shapiro-Wilk normality test
+
+data:  y1.reg
+W = 0.8288, p-value = 1.149e-15
+
+
+	Shapiro-Wilk normality test
+
+data:  x2.reg
+W = 0.64429, p-value < 2.2e-16
+
+
+	Shapiro-Wilk normality test
+
+data:  y2.reg
+W = 0.83746, p-value = 3.523e-16
+

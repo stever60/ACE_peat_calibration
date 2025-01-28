@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Zn_ICP ~ Zn, data = KER3_xrf_icp_matched, weights = KER3_Zn_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.3135 -0.8529 -0.5829 -0.1646 13.2474 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)    26.54       7.30   3.635 0.000665 ***
+Zn          24903.42   13537.99   1.840 0.071901 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.161 on 49 degrees of freedom
+Multiple R-squared:  0.0646,	Adjusted R-squared:  0.04551 
+F-statistic: 3.384 on 1 and 49 DF,  p-value: 0.0719
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>   <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1    0.0646        0.0455  2.16      3.38  0.0719     1  -268.  542.  548.     229.          49    51
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |   RMSE | Sigma
+----------------------------------------------------------------
+542.008 | 542.519 | 547.804 | 0.065 |     0.046 | 46.438 | 2.161
+
+	studentized Breusch-Pagan test
+
+data:  KER3_Zn_wls
+BP = 0.0035647, df = 1, p-value = 0.9524
+
+OK: Error variance appears to be homoscedastic (p = 0.389).
+NULL

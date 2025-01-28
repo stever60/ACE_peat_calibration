@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Co_ICP ~ Co, data = PB1_xrf_icp_matched, weights = PB1_Co_wt_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.5089 -0.9073 -0.3435  0.7046  2.6599 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -3.82837    1.72668  -2.217   0.0346 *  
+Co           0.12327    0.01483   8.310 3.68e-09 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.186 on 29 degrees of freedom
+Multiple R-squared:  0.7043,	Adjusted R-squared:  0.6941 
+F-statistic: 69.06 on 1 and 29 DF,  p-value: 3.68e-09
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic       p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>         <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.704         0.694  1.19      69.1 0.00000000368     1  -104.  214.  218.     40.8          29    31
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+---------------------------------------------------------------
+213.976 | 214.865 | 218.278 | 0.704 |     0.694 | 8.869 | 1.186
+
+	studentized Breusch-Pagan test
+
+data:  PB1_Co_wls_wt
+BP = 0.20672, df = 1, p-value = 0.6494
+
+OK: Error variance appears to be homoscedastic (p = 0.257).
+NULL

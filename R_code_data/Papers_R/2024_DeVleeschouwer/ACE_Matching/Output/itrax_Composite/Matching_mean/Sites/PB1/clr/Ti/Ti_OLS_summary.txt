@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Ti_ICP ~ Ti, data = PB1_xrf_icp_matched)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-5143.7 -1665.8   -11.7  1767.9  7453.1 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   7422.5      730.8   10.16 4.64e-11 ***
+Ti            7791.9      508.6   15.32 1.95e-15 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2767 on 29 degrees of freedom
+Multiple R-squared:   0.89,	Adjusted R-squared:  0.8862 
+F-statistic: 234.7 on 1 and 29 DF,  p-value: 1.948e-15
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC   deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>      <dbl>       <int> <int>
+1     0.890         0.886 2767.      235. 1.95e-15     1  -289.  583.  588. 222000548.          29    31
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |     RMSE |    Sigma
+---------------------------------------------------------------------
+583.284 | 584.173 | 587.586 | 0.890 |     0.886 | 2676.062 | 2766.802
+
+	studentized Breusch-Pagan test
+
+data:  PB1_Ti_lm
+BP = 9.4717, df = 1, p-value = 0.002087
+
+Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+NULL

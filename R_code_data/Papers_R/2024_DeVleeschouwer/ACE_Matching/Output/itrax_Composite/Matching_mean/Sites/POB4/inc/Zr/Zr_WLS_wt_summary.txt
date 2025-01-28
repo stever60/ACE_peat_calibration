@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Zr_ICP ~ Zr, data = POB4_xrf_icp_matched, weights = POB4_Zr_wt_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.4459 -0.9575 -0.3156  0.6246  3.2167 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)   
+(Intercept)   -381.5      131.3  -2.906  0.00738 **
+Zr           30045.4     9203.5   3.265  0.00307 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.237 on 26 degrees of freedom
+Multiple R-squared:  0.2907,	Adjusted R-squared:  0.2634 
+F-statistic: 10.66 on 1 and 26 DF,  p-value: 0.003069
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>   <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.291         0.263  1.24      10.7 0.00307     1  -135.  277.  281.     39.8          26    28
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |   RMSE | Sigma
+----------------------------------------------------------------
+276.516 | 277.516 | 280.513 | 0.291 |     0.263 | 30.520 | 1.237
+
+	studentized Breusch-Pagan test
+
+data:  POB4_Zr_wls_wt
+BP = 0.013185, df = 1, p-value = 0.9086
+
+OK: Error variance appears to be homoscedastic (p = 0.381).
+NULL

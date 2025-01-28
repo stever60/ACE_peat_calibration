@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Cu_ICP ~ Cu, data = ACE_dataset, weights = ACE_Cu_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.6451 -1.0500 -0.2595  0.7037  6.2032 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 10.50604    3.11574   3.372 0.000844 ***
+Cu           0.12174    0.02297   5.300 2.25e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.249 on 300 degrees of freedom
+Multiple R-squared:  0.08562,	Adjusted R-squared:  0.08257 
+F-statistic: 28.09 on 1 and 300 DF,  p-value: 2.247e-07
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic     p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>       <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1    0.0856        0.0826  1.25      28.1 0.000000225     1 -1373. 2753. 2764.     468.         300   302
+# Indices of model performance
+
+AIC      |     AICc |      BIC |    R2 | R2 (adj.) |   RMSE | Sigma
+-------------------------------------------------------------------
+2752.686 | 2752.767 | 2763.817 | 0.086 |     0.083 | 27.496 | 1.249
+
+	studentized Breusch-Pagan test
+
+data:  ACE_Cu_wls
+BP = 0.070347, df = 1, p-value = 0.7908
+
+Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+NULL

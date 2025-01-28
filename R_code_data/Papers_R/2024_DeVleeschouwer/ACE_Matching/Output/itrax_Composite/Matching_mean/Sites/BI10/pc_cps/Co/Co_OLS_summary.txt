@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Co_ICP ~ Co, data = BI10_xrf_icp_matched)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-17.915  -6.224  -1.662   4.293  55.235 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   -2.063      3.070  -0.672    0.504    
+Co            51.683     10.758   4.804 8.92e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 10.6 on 68 degrees of freedom
+Multiple R-squared:  0.2534,	Adjusted R-squared:  0.2424 
+F-statistic: 23.08 on 1 and 68 DF,  p-value: 8.925e-06
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic    p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>      <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.253         0.242  10.6      23.1 0.00000892     1  -264.  533.  540.    7642.          68    70
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |   RMSE |  Sigma
+-----------------------------------------------------------------
+533.156 | 533.519 | 539.901 | 0.253 |     0.242 | 10.449 | 10.601
+
+	studentized Breusch-Pagan test
+
+data:  BI10_Co_lm
+BP = 6.3912, df = 1, p-value = 0.01147
+
+Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+NULL

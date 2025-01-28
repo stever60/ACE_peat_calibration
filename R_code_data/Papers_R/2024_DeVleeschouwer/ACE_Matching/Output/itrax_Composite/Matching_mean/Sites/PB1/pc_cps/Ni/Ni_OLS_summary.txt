@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Ni_ICP ~ Ni, data = PB1_xrf_icp_matched)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-18.977 -13.415  -7.344   5.928  67.467 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)    80.26      14.79   5.427 7.74e-06 ***
+Ni           -161.62      50.00  -3.233  0.00305 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 21.08 on 29 degrees of freedom
+Multiple R-squared:  0.2649,	Adjusted R-squared:  0.2395 
+F-statistic: 10.45 on 1 and 29 DF,  p-value: 0.003053
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>   <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.265         0.240  21.1      10.4 0.00305     1  -137.  281.  285.   12889.          29    31
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |   RMSE |  Sigma
+-----------------------------------------------------------------
+280.908 | 281.797 | 285.210 | 0.265 |     0.240 | 20.390 | 21.082
+
+	studentized Breusch-Pagan test
+
+data:  PB1_Ni_lm
+BP = 0.83784, df = 1, p-value = 0.36
+
+OK: Error variance appears to be homoscedastic (p = 0.153).
+NULL

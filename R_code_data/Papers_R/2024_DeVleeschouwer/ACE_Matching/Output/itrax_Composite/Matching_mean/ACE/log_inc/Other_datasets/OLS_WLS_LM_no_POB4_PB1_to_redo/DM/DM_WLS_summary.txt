@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = dry_mass_pc ~ coh_inc, data = ACE_dataset, weights = ACE_DM_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.3721 -0.8490 -0.2940  0.3722 10.8666 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  -48.080      5.386  -8.927   <2e-16 ***
+coh_inc      430.143     34.225  12.568   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.539 on 241 degrees of freedom
+Multiple R-squared:  0.3959,	Adjusted R-squared:  0.3934 
+F-statistic:   158 on 1 and 241 DF,  p-value: < 2.2e-16
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.396         0.393  1.54      158. 3.40e-28     1  -819. 1644. 1655.     571.         241   243
+# Indices of model performance
+
+AIC      |     AICc |      BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+------------------------------------------------------------------
+1644.148 | 1644.249 | 1654.627 | 0.396 |     0.393 | 7.381 | 1.539
+
+	studentized Breusch-Pagan test
+
+data:  ACE_DM_wls
+BP = 0.70239, df = 1, p-value = 0.402
+
+OK: Error variance appears to be homoscedastic (p = 0.749).
+NULL

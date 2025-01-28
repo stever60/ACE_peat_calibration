@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Cu_ICP ~ Cu, data = KER1_xrf_icp_matched)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-11.634  -7.487  -4.147   5.022  24.121 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)  
+(Intercept)  -6.1873     8.5039  -0.728   0.4703  
+Cu            0.1700     0.0785   2.165   0.0352 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 10.38 on 50 degrees of freedom
+Multiple R-squared:  0.08571,	Adjusted R-squared:  0.06743 
+F-statistic: 4.688 on 1 and 50 DF,  p-value: 0.03518
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>   <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1    0.0857        0.0674  10.4      4.69  0.0352     1  -194.  395.  401.    5384.          50    52
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |   RMSE |  Sigma
+-----------------------------------------------------------------
+394.843 | 395.343 | 400.697 | 0.086 |     0.067 | 10.175 | 10.377
+
+	studentized Breusch-Pagan test
+
+data:  KER1_Cu_lm
+BP = 1.2863, df = 1, p-value = 0.2567
+
+OK: Error variance appears to be homoscedastic (p = 0.299).
+NULL

@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Ni_ICP ~ Ni, data = KER1_xrf_icp_matched)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-24.718  -6.915  -1.572   6.301  24.264 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 67.38411   13.81439   4.878 1.13e-05 ***
+Ni          -0.25976    0.06553  -3.964 0.000235 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 10.84 on 50 degrees of freedom
+Multiple R-squared:  0.2391,	Adjusted R-squared:  0.2239 
+F-statistic: 15.71 on 1 and 50 DF,  p-value: 0.0002347
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.239         0.224  10.8      15.7 0.000235     1  -197.  399.  405.    5881.          50    52
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |   RMSE |  Sigma
+-----------------------------------------------------------------
+399.434 | 399.934 | 405.288 | 0.239 |     0.224 | 10.634 | 10.845
+
+	studentized Breusch-Pagan test
+
+data:  KER1_Ni_lm
+BP = 22.701, df = 1, p-value = 1.892e-06
+
+Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+NULL

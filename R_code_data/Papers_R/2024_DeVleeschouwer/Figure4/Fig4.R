@@ -47,7 +47,6 @@ getwd()
 # clear plot window
 dev.off()
 
-
 # Set plotting parameters & universal plot size for base R  --------------------
  
 # cm graph plot size *from* cm *to* inches:
@@ -102,7 +101,7 @@ subsample_param <- c("Water_Content_pc", "Dry_mass", "Wet_density_g_cm3", "Dry_d
 # XRF-CS
 # cps ---------------------------------------------------------------------
 
-ACE_xrf_cps <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_ITRAX_qc_acf_inc.csv") %>% 
+ACE_xrf_cps <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_ITRAX_qc_acf_cps.csv") %>% 
   select(Location:MSE, all_of(acf_icp_Elements_key), Total_scatter, inc_coh, coh_inc)
 ACE_xrf_cps
 write.csv(ACE_xrf_cps,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_xrf_cps.csv", row.names = FALSE)
@@ -824,7 +823,10 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.pdf",
 
 
 
-# Other Plots -------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
+
+# Other Plots
 # ITRAX log_inc -----------------------------------------------------------
 
 # Depth plots

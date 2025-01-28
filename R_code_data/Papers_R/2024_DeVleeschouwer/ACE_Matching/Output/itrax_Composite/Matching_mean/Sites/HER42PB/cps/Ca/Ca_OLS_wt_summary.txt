@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Ca_ICP ~ Ca, data = HER42PB_xrf_icp_matched, weights = 1/(Ca_sd)^2)
+
+Weighted Residuals:
+     Min       1Q   Median       3Q      Max 
+-238.564  -43.644   -3.335   41.924  177.690 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 6753.160   1429.755   4.723 1.20e-05 ***
+Ca            26.217      4.405   5.951 1.03e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 73.61 on 68 degrees of freedom
+Multiple R-squared:  0.3425,	Adjusted R-squared:  0.3328 
+F-statistic: 35.42 on 1 and 68 DF,  p-value: 1.035e-07
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic     p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>       <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.342         0.333  73.6      35.4 0.000000103     1  -678. 1362. 1369.  368442.          68    70
+# Indices of model performance
+
+AIC      |     AICc |      BIC |    R2 | R2 (adj.) |     RMSE |  Sigma
+----------------------------------------------------------------------
+1362.222 | 1362.586 | 1368.968 | 0.342 |     0.333 | 3580.464 | 73.609
+
+	studentized Breusch-Pagan test
+
+data:  HER42PB_Ca_wlm
+BP = 0.008604, df = 1, p-value = 0.9261
+
+OK: Error variance appears to be homoscedastic (p = 0.598).
+NULL

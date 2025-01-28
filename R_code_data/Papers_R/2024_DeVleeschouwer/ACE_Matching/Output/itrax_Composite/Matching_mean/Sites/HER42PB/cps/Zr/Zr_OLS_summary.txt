@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Zr_ICP ~ Zr, data = HER42PB_xrf_icp_matched)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-6.8443 -2.7039 -0.8243  1.7555 14.6730 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 30.963468   4.271299   7.249 5.04e-10 ***
+Zr          -0.029062   0.005733  -5.069 3.28e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 4.378 on 68 degrees of freedom
+Multiple R-squared:  0.2743,	Adjusted R-squared:  0.2636 
+F-statistic:  25.7 on 1 and 68 DF,  p-value: 3.282e-06
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic    p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>      <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.274         0.264  4.38      25.7 0.00000328     1  -202.  409.  416.    1303.          68    70
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+---------------------------------------------------------------
+409.339 | 409.702 | 416.084 | 0.274 |     0.264 | 4.315 | 4.378
+
+	studentized Breusch-Pagan test
+
+data:  HER42PB_Zr_lm
+BP = 0.16929, df = 1, p-value = 0.6807
+
+OK: Error variance appears to be homoscedastic (p = 0.550).
+NULL

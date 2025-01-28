@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Fe_ICP ~ Fe, data = POB4_xrf_icp_matched)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-19457.4  -2636.3  -1450.6    832.1  12670.5 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)     3607       1737   2.076   0.0479 *  
+Fe             69539       9240   7.526 5.45e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 6693 on 26 degrees of freedom
+Multiple R-squared:  0.6854,	Adjusted R-squared:  0.6733 
+F-statistic: 56.64 on 1 and 26 DF,  p-value: 5.454e-08
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic      p.value    df logLik   AIC   BIC    deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>        <dbl> <dbl>  <dbl> <dbl> <dbl>       <dbl>       <int> <int>
+1     0.685         0.673 6693.      56.6 0.0000000545     1  -285.  577.  581. 1164564364.          26    28
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |     RMSE |    Sigma
+---------------------------------------------------------------------
+576.676 | 577.676 | 580.673 | 0.685 |     0.673 | 6449.154 | 6692.603
+
+	studentized Breusch-Pagan test
+
+data:  POB4_Fe_lm
+BP = 8.2653, df = 1, p-value = 0.004041
+
+Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+NULL
