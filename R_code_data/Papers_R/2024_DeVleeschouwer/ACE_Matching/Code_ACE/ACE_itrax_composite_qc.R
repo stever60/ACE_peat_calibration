@@ -2,10 +2,10 @@
 
 # Step 1: ITRAX Quality Control, Element Filtering
 
-# Step 1: ITRAX COMPOSITE data conversion in R (validity filtered cps, %cps sum, inc normalised & as Z-scores, cps filtering for first pass clr)
+# Step 2: ITRAX COMPOSITE data conversion in R (validity filtered cps, %cps sum, inc normalised & as Z-scores, cps filtering for first pass clr)
   
-# Outputs are based on quality control from existing composite data and validity = 1 only - outputs are inthe Output/ITRAX/COMPOSITE folder
-# itrax.R qc process is then carried out on all data except POB4 using this output cps and outputs from that are in the Output/itraxR folder 
+# Outputs are based on quality control from existing composite data and validity = 1 only
+# itrax.R qc process for the ACE_SHW peat bog dataset is carried out on all data except POB4 - measured under different conditions
 
 #clear previous console
 remove (list = ls())
@@ -33,7 +33,7 @@ setwd("/Users/sjro/Dropbox/BAS/Data/R/")
 #check working directory
 getwd() 
 
-# SECTION 2A: IMPORT ALL ACE DATA -----------------------------------------------------
+# SECTION 2A: IMPORT ALL ACE_SHW DATA -----------------------------------------------------
 
 # Assign elements to/from PeriodicTable package to 'elementsList' (then unload package)
 data(periodicTable)
@@ -94,10 +94,12 @@ write.csv(ACE_xrf_stats,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_
 
 # SECTION 3: Quality control & Element Filtering -------------------------------------------------------------------------
 
-# Import ACE cps dataset and remove POB4 data
+# Import ACE cps dataset and remove POB4 and BI5 data
 setwd("/Users/sjro/Dropbox/BAS/Data/R/")
 ACE_xrf <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section2/ACE_xrf_cps.csv") %>% 
-  filter(!(Site =='POB4')) %>% #remove POB4 data which was meausred under different conditions to the rest
+  filter(!(Site =='POB4')) %>% #remove POB4 data which was measured under different conditions
+  #filter(!(Site =='BI5')) %>% #site not in the matched dataset
+  #filter(!(Site =='DRPB')) %>% #site not in the matched dataset
   select(Location:MSE, any_of(ACE_elements), `Fe a*2`, Total_scatter:coh_inc)
 ACE_xrf
 
