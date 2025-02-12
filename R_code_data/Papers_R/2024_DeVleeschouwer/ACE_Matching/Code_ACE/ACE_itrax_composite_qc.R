@@ -57,7 +57,7 @@ ACE_xrf <- ACE_COMP %>%
   mutate(inc_coh = Mo_inc/Mo_coh) %>%
   mutate(coh_inc = Mo_coh/Mo_inc) %>%
   select(-c(filename, position_mm, `accrate_cmyr-1`,
-            comp_depth, SH20_min_age_95CI: SH20_median_age, 
+            strat_depth_top, SH20_min_age_95CI: SH20_median_age, 
             E_gain:F_offset, S1:S3)) %>% 
   rename(`Fe a*2` = D1, SH20_age = SH20_mean_age, label = Section, surface = `sample_surface`) %>% 
   relocate(cps, .before = MSE) %>% 
@@ -98,8 +98,8 @@ write.csv(ACE_xrf_stats,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_
 setwd("/Users/sjro/Dropbox/BAS/Data/R/")
 ACE_xrf <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section2/ACE_xrf_cps.csv") %>% 
   filter(!(Site =='POB4')) %>% #remove POB4 data which was measured under different conditions
-  #filter(!(Site =='BI5')) %>% #site not in the matched dataset
-  #filter(!(Site =='DRPB')) %>% #site not in the matched dataset
+  filter(!(Site =='BI5')) %>% #site not in the matched dataset
+  filter(!(Site =='DRPB')) %>% #site not in the matched dataset
   select(Location:MSE, any_of(ACE_elements), `Fe a*2`, Total_scatter:coh_inc)
 ACE_xrf
 
@@ -219,12 +219,12 @@ ACE_xrf_qc_cps <- ACE_xrf %>%
   filter(qc == TRUE) #to remove from ACE_xrf rows that dont pass QC
 
 # Save QC xrf dataset to use and stats to file
-write.csv(ACE_xrf_Composite_qc,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section3/ACE_xrf_qc_cps.csv", row.names = FALSE)
+write.csv(ACE_xrf_qc_cps,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section3/ACE_xrf_qc_cps.csv", row.names = FALSE)
 
 # Example plots ----------------------------------------------------------
 
 # Use Site == to choose example site as an example - here BI10
-ACE_xrf_qc_BI10 <- ACE_xrf_cps_qc %>% 
+ACE_xrf_qc_BI10 <- ACE_xrf_qc_cps %>% 
   filter(Site == "BI10")
 theme_set(theme_bw(12))
 Fig3.2A <- ggplot(data = ACE_xrf_qc_BI10, aes(y = depth, x = Ti, col = qc)) + 
@@ -274,7 +274,7 @@ ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/
 # SECTION 3B: Select dataset to take forward ------------------------------------------
 
 # load qc dataset from above back in
-ACE_xrf_qc <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section3/ACE_xrf_qc.csv")
+ACE_xrf_qc <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section3/ACE_xrf_qc_cps.csv")
 
 # Create list of elements - can remove REE and/or Zr (matrix effect in peat/organic seds) at this stage 
 ACE_xrf_qc_elements <- select(ACE_xrf_qc, c(Mg:Mo_coh), -c(`Fe a*2`)) %>% #Zr
@@ -2347,7 +2347,7 @@ Fig3.6 <- ACE_xrf_qc %>%
   labs(x = "Peak area [cps]", y = "Depth [cm]") +
   ggtitle("ACE Composite - all sites: cps, elements ACF >0.1")
 print(Fig3.6)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Section3/Figures/Fig3.6_All_Sites_ACFmin.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section3/Figures/Fig3.6_All_Sites_ACFmin.pdf", 
        height = c(15), width = c(30), dpi = 600, units = "cm")
 
 # nested ggarrange to produce split level summary plot with different number of plots per row
@@ -2355,7 +2355,7 @@ ggarrange(Fig3.6, # First row
           ggarrange(Fig3.5a, Fig3.5b, ncol = 2, labels = c("B", "C")), # Second row with two plots
           nrow = 2, 
           labels = "A", common.legend = TRUE)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Section3/Figures/Fig3.7_All_Sites_ACF_min.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section3/Figures/Fig3.7_All_Sites_ACF_min.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 # MAXIMUM ACF threshold element filtering - all sites POB4 included ----------------------------------------
@@ -2397,7 +2397,7 @@ Fig3.8 <- apply(ACE_xrf_qc %>% select(any_of(acfElements_max)),
   theme(legend.position="NULL") +
   geom_dl(aes(label = elements), method = list(dl.trans(x = x + 0.5), "last.points", cex = 0.5)) # adds element labels to end
 print(Fig3.8)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Section3/Figures/Fig3.8_ACFmax_elements.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section3/Figures/Fig3.8_ACFmax_elements.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 # Summary acf element plot vs depth
@@ -2421,7 +2421,7 @@ Fig3.9 <- ACE_xrf_qc %>%
   labs(x = "Peak area [cps]", y = "Depth [cm]") +
   ggtitle("ACE Composite ITRAX dataset: cps (ACF-filtered elements) max ACF >0.5")
 print(Fig3.9)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Section3/Figures/Fig3.9_ACFmax_key_elements.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section3/Figures/Fig3.9_ACFmax_key_elements.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 # nested ggarrange to produce split level summary plot with different number of plots per row
@@ -2429,5 +2429,6 @@ ggarrange(Fig3.9, # First row
           ggarrange(Fig3.5a, Fig3.8, ncol = 2, labels = c("B", "C")), # Second row with two plots
           nrow = 2, 
           labels = "A", common.legend = TRUE)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Section3/Figures/Fig3.10_All_Sites_ACF_max.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/qc_acf/Section3/Figures/Fig3.10_All_Sites_ACF_max.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
+

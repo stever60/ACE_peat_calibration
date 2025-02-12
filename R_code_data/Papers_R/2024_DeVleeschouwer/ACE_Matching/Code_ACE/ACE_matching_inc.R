@@ -45,17 +45,17 @@ dev.off()
 
 # Import matched itrax-ICPMS datafiles from each site -------------------
 
-ACE_itrax_BI10 <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/BI10/inc/BI10_xrf_icp_matched.csv", 
+ACE_itrax_BI10 <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/BI10/inc/BI10_xrf_icp_matched_inc.csv", 
                            col_names = TRUE, skip = 0)
-ACE_itrax_HER42PB <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/inc/HER42PB_xrf_icp_matched.csv", 
+ACE_itrax_HER42PB <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/inc/HER42PB_xrf_icp_matched_inc.csv", 
                               col_names = TRUE, skip = 0)
-ACE_itrax_KER1 <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/KER1/inc/KER1_xrf_icp_matched.csv", 
+ACE_itrax_KER1 <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/KER1/inc/KER1_xrf_icp_matched_inc.csv", 
                            col_names = TRUE, skip = 0)
-ACE_itrax_KER3 <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/KER3/inc/KER3_xrf_icp_matched.csv", 
+ACE_itrax_KER3 <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/KER3/inc/KER3_xrf_icp_matched_inc.csv", 
                            col_names = TRUE, skip = 0)
-ACE_itrax_PB1 <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/PB1/inc/PB1_xrf_icp_matched.csv", 
+ACE_itrax_PB1 <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/PB1/inc/PB1_xrf_icp_matched_inc.csv", 
                           col_names = TRUE, skip = 0)
-#ACE_itrax_POB4 <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/POB4/inc/POB4_xrf_icp_matched.csv", 
+#ACE_itrax_POB4 <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/POB4/inc/POB4_xrf_icp_matched_inc.csv", 
 #                           col_names = TRUE, skip = 0)
 
 # Combine matched output from each site
