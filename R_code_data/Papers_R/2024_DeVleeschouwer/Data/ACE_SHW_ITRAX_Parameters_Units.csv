@@ -1,0 +1,34 @@
+﻿Parameter,Parameter description,Unit,Unit description
+Location ,Location ,NA,
+Site,Site name,NA,
+Section,Core Section ID and number,NA,
+ID,XRFCS spectra ID number,NA,
+filename,filename and location of spectra file within a generic Data folder,NA,
+position,ITRAX XRFCS positional data,mm,
+section_depth,Section Depth (minimum depth - top measurement),cm,
+field_depth_top,Field depth (minimum depth - top measurement),cm,
+strat_depth_top,Stratigraphic depth in final composite record,cm,
+depth,Stratigraphic depth for import into R and for age-depth modelling,cm,
+SH20_min_age_95CI,Southern Hemisphere (ShCal20) radiocarbon calibration minimum age (95% confidence interval),cal a BP,calendar years Before Present 
+SH20_max_age_95CI,Southern Hemisphere (ShCal20) radiocarbon calibration maximum age (95% confidence interval),cal a BP,calendar years Before Present 
+SH20_median_age,Southern Hemisphere (ShCal20) radiocarbon calibration median age,cal a BP,calendar years Before Present 
+SH20_mean_age,Southern Hemisphere (ShCal20) radiocarbon calibration mean age,cal a BP,calendar years Before Present 
+accrate_cmyr-1,Peat accumulation rate,cm a^-1,cm per year
+sample_surface_cm,Height of core samples surface above the detector,cm,
+validity,Spectra validity,NA,
+E_gain,Spectra matching mathematical model parameter,NA,
+E_offset,Spectra matching mathematical model parameter,NA,
+F_slope,Spectra matching mathematical model parameter,NA,
+F_offset,Spectra matching mathematical model parameter,NA,
+kcps,Impedance Saturated calibration,kcps,thousands of counts per second
+cps,Fractional Porosity Saturated calibration,cps,counts per second
+Chemical elements,Mg to U ,cps,counts per second
+D1_cps,Extra lines included in the spectra matching process ,cps,counts per second
+S1_cps,Extra lines included in the spectra matching process ,cps,counts per second
+S2_cps,Extra lines included in the spectra matching process ,cps,counts per second
+S3_cps,Extra lines included in the spectra matching process ,cps,counts per second
+Mo_inc_cps,Molydenum (Mo) X-ray Tube incoherent scatter counts,cps,counts per second
+Mo_coh_cps,Molydenum (Mo) X-ray Tube coherent scatter counts,cps,counts per second
+Total_scatter_cps,Total scatter (incoherent+coherent scatter) counts,cps,counts per second
+inc_coh_ratio,Incoherent/coherent ratio,NA,
+coh_inc_ratio,Coherent/incoherent ratio,NA,

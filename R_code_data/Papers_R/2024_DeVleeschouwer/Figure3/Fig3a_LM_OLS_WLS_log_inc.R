@@ -1,38 +1,6 @@
 # Figure 3a - Linear models, ordinary and weighted least squares regression analysis (OLS, WLS)
-# for Log_inc dataset
 
-# -------------------------------------------------------------------------
-
-# Clear previous console
-remove (list = ls())
-
-# Libraries ---------------------------------------------------------------
-library(ggplot2)
-library(ggrepel)
-library(dplyr)
-library(itraxR)
-library(tidyverse) # all core tidyverse packages
-library(tidypaleo) # Dewey Dunnington's ggplot extensions for palaeo-style plots
-library(readr)
-library(ggpubr) # plotting
-library(GGally) # for correlation and Prob density matrix plotting
-library(PeriodicTable)
-library(errors)
-library(chemometrics)
-library(patchwork)
-library(forecast) # Use autocorrelation function (acf) and plots to explore noise in a time-series
-library(directlabels)
-library(broom)
-library(performance)
-library(lmtest) # linear moedlling parameters
-library(ggpmisc)
-library(compositions)
-library(scales)
-library(see)
-library(ggsci) # colour palettes for publication
-library(cowplot) # graphing arrangement
-library(Hmisc) # various stats tests
-options(scipen = 999)
+# Log_inc
 
 # Set up ------------------------------------------------------------------
 
@@ -43,6 +11,18 @@ setwd("/Users/sjro/Dropbox/BAS/Data/R/")
 getwd()
 # clear plot window
 dev.off()
+
+# Libraries ---------------------------------------------------------------
+packages <- c('tidyverse', 'tidypaleo', 'dplyr', 'readr', 'ggpubr', 'patchwork',
+              'gridExtra', 'cowplot', 'vegan', 'rioja', 'ellipse', 'factoextra',
+              'reshape2', 'GGally', 'ggsci', 'ggdendro', 'dendextend', 'dynamicTreeCut',
+              'colorspace', 'cluster', 'magrittr', 'mgcv', 'gtable', 'repr',
+              'bestNormalize','sjmisc', 'chemometrics', 'compositions', 
+              'RColorBrewer', 'ggsci', 'wesanderson', 'viridis',
+              'ggrepel', 'itraxR', 'PeriodicTable', 'errors', 'forecast', 'broom',
+              'directlabels', 'performance', 'lmtest', 'ggpmisc', 'cowplot', 'Hmisc')
+lapply(packages, library, character.only=TRUE)
+options(scipen = 999)
 
 # Define elements to use ----------------------------------------------------------
 

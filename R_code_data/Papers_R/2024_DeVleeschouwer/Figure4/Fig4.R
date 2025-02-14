@@ -1,40 +1,5 @@
 # Figure 4
 
-# Load libraries ----------------------------------------------------------
-library(tidyverse)
-library(tidypaleo)
-library(dplyr)
-library(readr)
-library(ggpubr)
-library(patchwork)
-library(gridExtra)
-library(cowplot) # for plotting
-library(vegan)
-library(rioja)
-library(ellipse)  # for PCA and cluster
-library(factoextra) # for PCA and cluster
-library(reshape2)
-library(GGally)
-library(ggsci)
-library(ggdendro)
-library(dendextend)
-library(dynamicTreeCut)
-library(colorspace)
-library(cluster)
-library(magrittr) # for piping %>%
-library(mgcv)
-library(gtable)
-library(repr)
-library(bestNormalize)
-library(sjmisc)
-library(chemometrics)
-library(compositions)
-#colour palettes
-library(ggsci) #for npg etc
-library(wesanderson) 
-library(viridis)        
-library(RColorBrewer)
-
 # Set up & clear previous ------------------------------------------------------
 
 #clear previous console
@@ -46,6 +11,15 @@ setwd("/Users/sjro/Dropbox/BAS/Data/R/")
 getwd()
 # clear plot window
 dev.off()
+
+# Load libraries ----------------------------------------------------------
+packages <- c('tidyverse', 'tidypaleo', 'dplyr', 'readr', 'ggpubr', 'patchwork',
+              'gridExtra', 'cowplot', 'vegan', 'rioja', 'ellipse', 'factoextra',
+              'reshape2', 'GGally', 'ggsci', 'ggdendro', 'dendextend', 'dynamicTreeCut',
+              'colorspace', 'cluster', 'magrittr', 'mgcv', 'gtable', 'repr',
+              'bestNormalize','sjmisc', 'chemometrics', 'compositions', 
+              'RColorBrewer', 'ggsci', 'wesanderson', 'viridis' )
+lapply(packages, library, character.only=TRUE)
 
 # Set plotting parameters & universal plot size for base R  --------------------
  

@@ -1,20 +1,6 @@
 # Figure 2 - log_inc plots
 
-# Libraries ---------------------------------------------------------------
-
-library(itraxR)
-library(ggplot2)
-library(ggpubr) # plotting
-library(tidyverse) # all core tidyverse packages
-library(tidypaleo) # Dewey Dunnington's ggplot extensions for palaeo-style plots
-library(compositions)
-library(scales)
-library(ggsci) # colour palettes for publication
-library(GGally) # for correlation and Prob density matrix plotting
-library()
-options(scipen = 999)
-
-# Set up ------------------------------------------------------------------
+# Set up -----------------------------------------------------------------------
 
 # Clear previous console
 remove (list = ls())
@@ -24,6 +10,17 @@ getwd()
 # clear plot window
 dev.off()
 
+# Load libraries ---------------------------------------------------------------
+
+packages <- c('tidyverse', 'tidypaleo', 'dplyr', 'readr', 'ggpubr', 'patchwork',
+              'gridExtra', 'cowplot', 'vegan', 'rioja', 'ellipse', 'factoextra',
+              'reshape2', 'GGally', 'ggsci', 'ggdendro', 'dendextend', 'dynamicTreeCut',
+              'colorspace', 'cluster', 'magrittr', 'mgcv', 'gtable', 'repr',
+              'bestNormalize','sjmisc', 'chemometrics', 'compositions', 
+              'RColorBrewer', 'ggsci', 'wesanderson', 'viridis' )
+lapply(packages, library, character.only=TRUE)
+library()
+options(scipen = 999)
 # see "Papers_R/2024_DeVleeschouwer/Output/itrax_Composite/Matching_mean/ACE/ACE_matching_cps.R" 
 # for all matching, element correlation & linear modelling and plot code
 
