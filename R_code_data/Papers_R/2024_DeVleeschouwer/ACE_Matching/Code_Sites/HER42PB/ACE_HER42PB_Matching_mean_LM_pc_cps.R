@@ -1,33 +1,38 @@
-# ITRAX-ICPMS Matching & Calibration of ACE data 
+# ITRAX-ICPMS Matching of ACE data - HER42PB %cps mean +/- SD
 
-# Libraries ----
-library(itraxR)
-library(tidyverse) # all core tidyverse packages
-library(tidypaleo) # Dewey Dunnington's ggplot extensions for palaeo-style plots
-library(readr)
-library(ggpubr)
-library(GGally) # for correlation and Prob density matrix plotting
-library(PeriodicTable)
-library(errors)
-library(chemometrics)
-library(patchwork)
-library(forecast) # Use autocorrelation function (acf) and plots to explore noise in a time-series
-library(ggrepel)
-library(directlabels)
-library(broom)
-library(performance)
-library(lmtest)
-library(ggpmisc)
-library(scales)
+# Set up -----------------------------------------------------------------------
 
-# Set up & clear ------------------------------------------------------------------
-
-# clear previous console
+# Clear previous console
 remove (list = ls())
+# Set working directory - Macbook Pro M2
+setwd("/Users/sjro/Dropbox/BAS/Data/R/")
+getwd()
 # clear plot window
+dev.off()
 
-# Set working directory
-setwd("/Users/Steve/Dropbox/BAS/Data/R/")
+# Load libraries ---------------------------------------------------------------
+
+packages <- c('tidyverse', 'tidypaleo', 'dplyr', 'readr', 'ggpubr', 'patchwork',
+              'gridExtra', 'cowplot', 'vegan', 'rioja', 'ellipse', 'factoextra',
+              'reshape2', 'GGally', 'ggsci', 'ggdendro', 'dendextend', 'dynamicTreeCut',
+              'colorspace', 'cluster', 'magrittr', 'mgcv', 'gtable', 'repr',
+              'bestNormalize','sjmisc', 'chemometrics', 'compositions', 
+              'RColorBrewer', 'ggsci', 'wesanderson', 'viridis',
+              'ggrepel', 'itraxR','PeriodicTable','errors','patchwork',
+              'forecast','directlabels','broom','performance','lmtest','ggpmisc',
+              'cowplot','Hmisc')
+lapply(packages, library, character.only=TRUE)
+options(scipen = 999)
+
+# Set up ------------------------------------------------------------------
+
+# Set working directory - Macbook Pro 2013
+#setwd("/Users/Steve/Dropbox/BAS/Data/R/")
+# Set working directory - Macbook Pro M2
+setwd("/Users/sjro/Dropbox/BAS/Data/R/")
+getwd()
+# clear plot window
+dev.off()
 
 #  Element lists ----------------------------------------------------------
 
@@ -72,7 +77,8 @@ icp_Elements_min_sd <- c("K_ICP_sd", "Ca_ICP_sd", "Ti_ICP_sd", "Mn_ICP_sd", "Fe_
 # Import ICPMS composite dataframe
 
 ACE_ICP <- read_csv("Papers_R/2024_DeVleeschouwer/Data/ACE_SHW_ICPMS_Composite.csv", 
-                      col_names = TRUE, skip = 0)
+                      col_names = TRUE, skip = 0) %>% 
+  rename(sample = Sample_ID)
 ACE_ICP
 
 # Import HER42PB ICP dataframe - use find/replace for other sites
@@ -84,7 +90,7 @@ ACE_ICP_HER42PB <- ACE_ICP %>%
   rename(bottom = field_depth_bottom) %>%
   rename(mp = field_depth_mid) %>% 
   print()
-write.csv(ACE_ICP_HER42PB,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/ACE_ICP_HER42PB.csv", 
+write.csv(ACE_ICP_HER42PB,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/ACE_ICP_HER42PB.csv", 
           row.names = FALSE)
 
 # Import ITRAX QC & ACF cps dataframe
@@ -101,7 +107,7 @@ ACE_itrax
 #   filter(qc == TRUE) %>%
 #   select(depth:surface, kcps:MSE, all_of(acf_icp_Elements_min), coh_inc) %>% 
 #   print()
-# write.csv(ACE_itrax_HER42PB_cps,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/ACE_itrax_HER42PB_cps.csv", 
+# write.csv(ACE_itrax_HER42PB_cps,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/ACE_itrax_HER42PB_cps.csv", 
 #           row.names = FALSE)
 
 # # ITRAX - Inc normalised --------------------------------------------------
@@ -118,7 +124,7 @@ ACE_itrax
 # # mutate(across(any_of(acf_icp_Elements_min), log))  # natural log of inc normalised values
 # is.na(ACE_itrax_HER42PB_inc)<-sapply(ACE_itrax_HER42PB_inc, is.infinite)
 # ACE_itrax_HER42PB_inc
-# write.csv(ACE_itrax_HER42PB_inc,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/ACE_itrax_HER42PB_inc.csv",
+# write.csv(ACE_itrax_HER42PB_inc,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/ACE_itrax_HER42PB_inc.csv",
 #           row.names = FALSE)
 
 # ITRAX - %cps sum (of all acf defined elements) ----------------------------
@@ -146,7 +152,7 @@ ACE_itrax_HER42PB_pc_cps <- ACE_itrax %>%
 # check sum <100% & write file
 head(ACE_itrax_HER42PB_pc_cps$scatter_sum)
 head(ACE_itrax_HER42PB_pc_cps$sum)
-write.csv(ACE_itrax_HER42PB_pc_cps,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/ACE_itrax_HER42PB_pc_cps.csv", row.names = FALSE)
+write.csv(ACE_itrax_HER42PB_pc_cps,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/ACE_itrax_HER42PB_pc_cps.csv", row.names = FALSE)
 
 # # ITRAX - clr -------------------------------------------------------------
 # 
@@ -174,7 +180,7 @@ write.csv(ACE_itrax_HER42PB_pc_cps,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Ou
 #   relocate(inc_coh, .after = Mo_coh) %>%
 #   relocate(coh_inc, .after = inc_coh) %>% 
 #   print()
-# write.csv(ACE_itrax_HER42PB_clr,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/clr/ACE_itrax_HER42PB_clr.csv",
+# write.csv(ACE_itrax_HER42PB_clr,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/clr/ACE_itrax_HER42PB_clr.csv",
 #           row.names = FALSE)
 
 # MATCHING ----------------------------------------------------------------
@@ -235,11 +241,11 @@ HER42PB_xrf_icp_matched <-  HER42PB_xrf_matched %>%
   #mutate(across(SH20_age:cps, round, 0)) %>% 
   #mutate(across(c(MSE:Mo_coh, K_sd:Mo_coh_sd, water_content_pc:density_gcm3_err), round, 2))
 HER42PB_xrf_icp_matched
-write.csv(HER42PB_xrf_icp_matched,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/HER42PB_xrf_icp_matched.csv", row.names = FALSE)
+write.csv(HER42PB_xrf_icp_matched,"Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/HER42PB_xrf_icp_matched.csv", row.names = FALSE)
 
 # Replace 0 values in each column with half column min to allow lm and log to function
 # Recommended procedure in Bertrand et al. (submitted) to retain dataframe structure
-HER42PB_xrf_icp_matched <-read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/HER42PB_xrf_icp_matched.csv")
+HER42PB_xrf_icp_matched <-read_csv("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/HER42PB_xrf_icp_matched.csv")
 is.na(HER42PB_xrf_icp_matched)<-sapply(HER42PB_xrf_icp_matched, is.infinite) # replace any infinite values with NA
 HER42PB_xrf_icp_matched <- HER42PB_xrf_icp_matched %>% 
   mutate_at(vars(all_of(c(icp_Elements_min, acf_icp_Elements_min))), 
@@ -254,21 +260,21 @@ HER42PB_xrf_icp_matched$Zn
 theme_set(theme_bw(base_size=2))
 ggcorr(HER42PB_xrf_icp_matched[,acf_icp_Elements_min], method = c("everything", "pearson"), 
        size = 5, label = TRUE, label_alpha = TRUE, label_round=2, label_size= 5)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Correlation/HER42PB_itrax_Corr_matrix.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Correlation/HER42PB_itrax_Corr_matrix.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 # ICP
 theme_set(theme_bw(base_size=2))
 ggcorr(HER42PB_xrf_icp_matched[,icp_Elements_min], method = c("everything", "pearson"), 
        size = 5, label = TRUE, label_alpha = TRUE, label_round=2, label_size= 5)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Correlation/HER42PB_ICP_Corr_matrix.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Correlation/HER42PB_ICP_Corr_matrix.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 # ITRAX & ICP
 theme_set(theme_bw(base_size=2))
 ggcorr(HER42PB_xrf_icp_matched[,xrf_icp_Elements_min], method = c("everything", "pearson"), 
        size = 3, label = TRUE, label_alpha = TRUE, label_round=2, label_size= 3)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Correlation/HER42PB_itrax_ICP_Corr_matrix.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Correlation/HER42PB_itrax_ICP_Corr_matrix.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 # Correlation & density matrices ----------------------------------------
@@ -278,7 +284,7 @@ theme_set(theme_bw(base_size=8))
 ggpairs(HER42PB_xrf_icp_matched, columns = acf_icp_Elements_min, upper = list(continuous = wrap("cor", size = 4)),
         lower = list(continuous = wrap("points", alpha = 0.5, size=0.2)),
         title="Correlation-density plot")
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Correlation/HER42PB_itrax_ICP_Corr-den_matrix.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Correlation/HER42PB_itrax_ICP_Corr-den_matrix.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 # ICP
@@ -286,7 +292,7 @@ theme_set(theme_bw(base_size=8))
 ggpairs(HER42PB_xrf_icp_matched, columns = icp_Elements_min, upper = list(continuous = wrap("cor", size = 4)),
         lower = list(continuous = wrap("points", alpha = 0.5, size=0.2)),
         title="Correlation-density plot")
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Correlation/HER42PB_itrax_ICP_Corr-den_matrix.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Correlation/HER42PB_itrax_ICP_Corr-den_matrix.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 # ITRAX & ICP
@@ -294,7 +300,7 @@ theme_set(theme_bw(base_size=8))
 ggpairs(HER42PB_xrf_icp_matched, columns = xrf_icp_Elements_min, upper = list(continuous = wrap("cor", size = 2)),
         lower = list(continuous = wrap("points", alpha = 0.5, size=0.2)),
         title="Correlation-density plot")
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Correlation/HER42PB_itrax_ICP_Corr-den_matrix.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Correlation/HER42PB_itrax_ICP_Corr-den_matrix.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 
@@ -323,10 +329,10 @@ summary(HER42PB_K_lm)
 glance(HER42PB_K_lm)
 model_performance(HER42PB_K_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_K_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/K/K_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/K/K_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/K/K_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/K/K_OLS_summary.txt")
 summary(HER42PB_K_lm)
 glance(HER42PB_K_lm)
 model_performance(HER42PB_K_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -341,10 +347,10 @@ summary(HER42PB_K_wlm)
 glance(HER42PB_K_wlm)
 model_performance(HER42PB_K_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_K_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/K/K_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/K/K_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/K/K_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/K/K_OLS_wt_summary.txt")
 summary(HER42PB_K_wlm)
 glance(HER42PB_K_wlm)
 model_performance(HER42PB_K_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -362,10 +368,10 @@ summary(HER42PB_K_wls) # summary stats
 glance(HER42PB_K_wls) # summary stats including AIC
 model_performance(HER42PB_K_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_K_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/K/K_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/K/K_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/K/K_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/K/K_WLS_summary.txt")
 summary(HER42PB_K_wls)
 glance(HER42PB_K_wls)
 model_performance(HER42PB_K_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -383,10 +389,10 @@ summary(HER42PB_K_wls_wt) # summary stats
 glance(HER42PB_K_wls_wt) # summary stats including AIC
 model_performance(HER42PB_K_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_K_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/K/K_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/K/K_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/K/K_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/K/K_WLS_wt_summary.txt")
 summary(HER42PB_K_wls_wt)
 glance(HER42PB_K_wls_wt)
 model_performance(HER42PB_K_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -518,7 +524,7 @@ HER42PB_K_final <- HER42PB_K +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_K_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_K_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/K/K_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/K/K_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 
@@ -530,10 +536,10 @@ summary(HER42PB_Ca_lm)
 glance(HER42PB_Ca_lm)
 model_performance(HER42PB_Ca_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ca_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ca/Ca_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ca/Ca_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ca/Ca_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ca/Ca_OLS_summary.txt")
 summary(HER42PB_Ca_lm)
 glance(HER42PB_Ca_lm)
 model_performance(HER42PB_Ca_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -548,10 +554,10 @@ summary(HER42PB_Ca_wlm)
 glance(HER42PB_Ca_wlm)
 model_performance(HER42PB_Ca_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ca_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ca/Ca_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ca/Ca_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ca/Ca_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ca/Ca_OLS_wt_summary.txt")
 summary(HER42PB_Ca_wlm)
 glance(HER42PB_Ca_wlm)
 model_performance(HER42PB_Ca_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -569,10 +575,10 @@ summary(HER42PB_Ca_wls) # summary stats
 glance(HER42PB_Ca_wls) # summary stats including AIC
 model_performance(HER42PB_Ca_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ca_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ca/Ca_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ca/Ca_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ca/Ca_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ca/Ca_WLS_summary.txt")
 summary(HER42PB_Ca_wls)
 glance(HER42PB_Ca_wls)
 model_performance(HER42PB_Ca_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -590,10 +596,10 @@ summary(HER42PB_Ca_wls_wt) # summary stats
 glance(HER42PB_Ca_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Ca_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ca_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ca/Ca_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ca/Ca_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ca/Ca_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ca/Ca_WLS_wt_summary.txt")
 summary(HER42PB_Ca_wls_wt)
 glance(HER42PB_Ca_wls_wt)
 model_performance(HER42PB_Ca_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -725,7 +731,7 @@ HER42PB_Ca_final <- HER42PB_Ca +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_Ca_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_Ca_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ca/Ca_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ca/Ca_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 
@@ -737,10 +743,10 @@ summary(HER42PB_Ti_lm)
 glance(HER42PB_Ti_lm)
 model_performance(HER42PB_Ti_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ti_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ti/Ti_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ti/Ti_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ti/Ti_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ti/Ti_OLS_summary.txt")
 summary(HER42PB_Ti_lm)
 glance(HER42PB_Ti_lm)
 model_performance(HER42PB_Ti_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -755,10 +761,10 @@ summary(HER42PB_Ti_wlm)
 glance(HER42PB_Ti_wlm)
 model_performance(HER42PB_Ti_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ti_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ti/Ti_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ti/Ti_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ti/Ti_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ti/Ti_OLS_wt_summary.txt")
 summary(HER42PB_Ti_wlm)
 glance(HER42PB_Ti_wlm)
 model_performance(HER42PB_Ti_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -776,10 +782,10 @@ summary(HER42PB_Ti_wls) # summary stats
 glance(HER42PB_Ti_wls) # summary stats including AIC
 model_performance(HER42PB_Ti_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ti_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ti/Ti_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ti/Ti_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ti/Ti_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ti/Ti_WLS_summary.txt")
 summary(HER42PB_Ti_wls)
 glance(HER42PB_Ti_wls)
 model_performance(HER42PB_Ti_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -797,10 +803,10 @@ summary(HER42PB_Ti_wls_wt) # summary stats
 glance(HER42PB_Ti_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Ti_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ti_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ti/Ti_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ti/Ti_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ti/Ti_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ti/Ti_WLS_wt_summary.txt")
 summary(HER42PB_Ti_wls_wt)
 glance(HER42PB_Ti_wls_wt)
 model_performance(HER42PB_Ti_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -932,7 +938,7 @@ HER42PB_Ti_final <- HER42PB_Ti +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_Ti_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_Ti_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ti/Ti_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ti/Ti_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # HER42PB_Mn -----------------------------------------------------------------------
@@ -943,10 +949,10 @@ summary(HER42PB_Mn_lm)
 glance(HER42PB_Mn_lm)
 model_performance(HER42PB_Mn_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Mn_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Mn/Mn_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Mn/Mn_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Mn/Mn_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Mn/Mn_OLS_summary.txt")
 summary(HER42PB_Mn_lm)
 glance(HER42PB_Mn_lm)
 model_performance(HER42PB_Mn_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -961,10 +967,10 @@ summary(HER42PB_Mn_wlm)
 glance(HER42PB_Mn_wlm)
 model_performance(HER42PB_Mn_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Mn_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Mn/Mn_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Mn/Mn_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Mn/Mn_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Mn/Mn_OLS_wt_summary.txt")
 summary(HER42PB_Mn_wlm)
 glance(HER42PB_Mn_wlm)
 model_performance(HER42PB_Mn_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -982,10 +988,10 @@ summary(HER42PB_Mn_wls) # summary stats
 glance(HER42PB_Mn_wls) # summary stats including AIC
 model_performance(HER42PB_Mn_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Mn_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Mn/Mn_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Mn/Mn_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Mn/Mn_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Mn/Mn_WLS_summary.txt")
 summary(HER42PB_Mn_wls)
 glance(HER42PB_Mn_wls)
 model_performance(HER42PB_Mn_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1003,10 +1009,10 @@ summary(HER42PB_Mn_wls_wt) # summary stats
 glance(HER42PB_Mn_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Mn_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Mn_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Mn/Mn_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Mn/Mn_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Mn/Mn_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Mn/Mn_WLS_wt_summary.txt")
 summary(HER42PB_Mn_wls_wt)
 glance(HER42PB_Mn_wls_wt)
 model_performance(HER42PB_Mn_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1138,7 +1144,7 @@ HER42PB_Mn_final <- HER42PB_Mn +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_Mn_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_Mn_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Mn/Mn_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Mn/Mn_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # HER42PB_Fe -----------------------------------------------------------------------
@@ -1149,10 +1155,10 @@ summary(HER42PB_Fe_lm)
 glance(HER42PB_Fe_lm)
 model_performance(HER42PB_Fe_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Fe_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Fe/Fe_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Fe/Fe_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Fe/Fe_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Fe/Fe_OLS_summary.txt")
 summary(HER42PB_Fe_lm)
 glance(HER42PB_Fe_lm)
 model_performance(HER42PB_Fe_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1167,10 +1173,10 @@ summary(HER42PB_Fe_wlm)
 glance(HER42PB_Fe_wlm)
 model_performance(HER42PB_Fe_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Fe_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Fe/Fe_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Fe/Fe_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Fe/Fe_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Fe/Fe_OLS_wt_summary.txt")
 summary(HER42PB_Fe_wlm)
 glance(HER42PB_Fe_wlm)
 model_performance(HER42PB_Fe_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1188,10 +1194,10 @@ summary(HER42PB_Fe_wls) # summary stats
 glance(HER42PB_Fe_wls) # summary stats including AIC
 model_performance(HER42PB_Fe_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Fe_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Fe/Fe_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Fe/Fe_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Fe/Fe_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Fe/Fe_WLS_summary.txt")
 summary(HER42PB_Fe_wls)
 glance(HER42PB_Fe_wls)
 model_performance(HER42PB_Fe_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1209,10 +1215,10 @@ summary(HER42PB_Fe_wls_wt) # summary stats
 glance(HER42PB_Fe_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Fe_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Fe_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Fe/Fe_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Fe/Fe_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Fe/Fe_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Fe/Fe_WLS_wt_summary.txt")
 summary(HER42PB_Fe_wls_wt)
 glance(HER42PB_Fe_wls_wt)
 model_performance(HER42PB_Fe_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1345,7 +1351,7 @@ HER42PB_Fe_final <- HER42PB_Fe +
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3) %>% 
   print()
 HER42PB_Fe_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Fe/Fe_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Fe/Fe_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # HER42PB_Co -----------------------------------------------------------------------
@@ -1356,10 +1362,10 @@ summary(HER42PB_Co_lm)
 glance(HER42PB_Co_lm)
 model_performance(HER42PB_Co_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Co_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Co/Co_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Co/Co_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Co/Co_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Co/Co_OLS_summary.txt")
 summary(HER42PB_Co_lm)
 glance(HER42PB_Co_lm)
 model_performance(HER42PB_Co_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1374,10 +1380,10 @@ summary(HER42PB_Co_wlm)
 glance(HER42PB_Co_wlm)
 model_performance(HER42PB_Co_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Co_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Co/Co_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Co/Co_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Co/Co_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Co/Co_OLS_wt_summary.txt")
 summary(HER42PB_Co_wlm)
 glance(HER42PB_Co_wlm)
 model_performance(HER42PB_Co_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1395,10 +1401,10 @@ summary(HER42PB_Co_wls) # summary stats
 glance(HER42PB_Co_wls) # summary stats including AIC
 model_performance(HER42PB_Co_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Co_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Co/Co_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Co/Co_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Co/Co_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Co/Co_WLS_summary.txt")
 summary(HER42PB_Co_wls)
 glance(HER42PB_Co_wls)
 model_performance(HER42PB_Co_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1416,10 +1422,10 @@ summary(HER42PB_Co_wls_wt) # summary stats
 glance(HER42PB_Co_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Co_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Co_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Co/Co_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Co/Co_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Co/Co_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Co/Co_WLS_wt_summary.txt")
 summary(HER42PB_Co_wls_wt)
 glance(HER42PB_Co_wls_wt)
 model_performance(HER42PB_Co_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1551,7 +1557,7 @@ HER42PB_Co_final <- HER42PB_Co +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_Co_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_Co_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Co/Co_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Co/Co_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # HER42PB_Ni -----------------------------------------------------------------------
@@ -1562,10 +1568,10 @@ summary(HER42PB_Ni_lm)
 glance(HER42PB_Ni_lm)
 model_performance(HER42PB_Ni_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ni_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ni/Ni_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ni/Ni_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ni/Ni_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ni/Ni_OLS_summary.txt")
 summary(HER42PB_Ni_lm)
 glance(HER42PB_Ni_lm)
 model_performance(HER42PB_Ni_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1580,10 +1586,10 @@ summary(HER42PB_Ni_wlm)
 glance(HER42PB_Ni_wlm)
 model_performance(HER42PB_Ni_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ni_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ni/Ni_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ni/Ni_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ni/Ni_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ni/Ni_OLS_wt_summary.txt")
 summary(HER42PB_Ni_wlm)
 glance(HER42PB_Ni_wlm)
 model_performance(HER42PB_Ni_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1601,10 +1607,10 @@ summary(HER42PB_Ni_wls) # summary stats
 glance(HER42PB_Ni_wls) # summary stats including AIC
 model_performance(HER42PB_Ni_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ni_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ni/Ni_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ni/Ni_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ni/Ni_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ni/Ni_WLS_summary.txt")
 summary(HER42PB_Ni_wls)
 glance(HER42PB_Ni_wls)
 model_performance(HER42PB_Ni_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1622,10 +1628,10 @@ summary(HER42PB_Ni_wls_wt) # summary stats
 glance(HER42PB_Ni_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Ni_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Ni_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ni/Ni_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ni/Ni_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ni/Ni_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ni/Ni_WLS_wt_summary.txt")
 summary(HER42PB_Ni_wls_wt)
 glance(HER42PB_Ni_wls_wt)
 model_performance(HER42PB_Ni_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1757,7 +1763,7 @@ HER42PB_Ni_final <- HER42PB_Ni +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_Ni_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_Ni_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Ni/Ni_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Ni/Ni_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # HER42PB_Cu -----------------------------------------------------------------------
@@ -1768,10 +1774,10 @@ summary(HER42PB_Cu_lm)
 glance(HER42PB_Cu_lm)
 model_performance(HER42PB_Cu_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Cu_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Cu/Cu_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Cu/Cu_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Cu/Cu_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Cu/Cu_OLS_summary.txt")
 summary(HER42PB_Cu_lm)
 glance(HER42PB_Cu_lm)
 model_performance(HER42PB_Cu_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1786,10 +1792,10 @@ summary(HER42PB_Cu_wlm)
 glance(HER42PB_Cu_wlm)
 model_performance(HER42PB_Cu_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Cu_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Cu/Cu_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Cu/Cu_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Cu/Cu_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Cu/Cu_OLS_wt_summary.txt")
 summary(HER42PB_Cu_wlm)
 glance(HER42PB_Cu_wlm)
 model_performance(HER42PB_Cu_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1807,10 +1813,10 @@ summary(HER42PB_Cu_wls) # summary stats
 glance(HER42PB_Cu_wls) # summary stats including AIC
 model_performance(HER42PB_Cu_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Cu_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Cu/Cu_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Cu/Cu_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Cu/Cu_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Cu/Cu_WLS_summary.txt")
 summary(HER42PB_Cu_wls)
 glance(HER42PB_Cu_wls)
 model_performance(HER42PB_Cu_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1828,10 +1834,10 @@ summary(HER42PB_Cu_wls_wt) # summary stats
 glance(HER42PB_Cu_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Cu_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Cu_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Cu/Cu_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Cu/Cu_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Cu/Cu_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Cu/Cu_WLS_wt_summary.txt")
 summary(HER42PB_Cu_wls_wt)
 glance(HER42PB_Cu_wls_wt)
 model_performance(HER42PB_Cu_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1963,7 +1969,7 @@ HER42PB_Cu_final <- HER42PB_Cu +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_Cu_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_Cu_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Cu/Cu_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Cu/Cu_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 
@@ -1975,10 +1981,10 @@ summary(HER42PB_Zn_lm)
 glance(HER42PB_Zn_lm)
 model_performance(HER42PB_Zn_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Zn_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zn/Zn_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zn/Zn_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zn/Zn_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zn/Zn_OLS_summary.txt")
 summary(HER42PB_Zn_lm)
 glance(HER42PB_Zn_lm)
 model_performance(HER42PB_Zn_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -1993,10 +1999,10 @@ summary(HER42PB_Zn_wlm)
 glance(HER42PB_Zn_wlm)
 model_performance(HER42PB_Zn_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Zn_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zn/Zn_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zn/Zn_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zn/Zn_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zn/Zn_OLS_wt_summary.txt")
 summary(HER42PB_Zn_wlm)
 glance(HER42PB_Zn_wlm)
 model_performance(HER42PB_Zn_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2014,10 +2020,10 @@ summary(HER42PB_Zn_wls) # summary stats
 glance(HER42PB_Zn_wls) # summary stats including AIC
 model_performance(HER42PB_Zn_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Zn_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zn/Zn_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zn/Zn_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zn/Zn_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zn/Zn_WLS_summary.txt")
 summary(HER42PB_Zn_wls)
 glance(HER42PB_Zn_wls)
 model_performance(HER42PB_Zn_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2035,10 +2041,10 @@ summary(HER42PB_Zn_wls_wt) # summary stats
 glance(HER42PB_Zn_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Zn_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Zn_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zn/Zn_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zn/Zn_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zn/Zn_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zn/Zn_WLS_wt_summary.txt")
 summary(HER42PB_Zn_wls_wt)
 glance(HER42PB_Zn_wls_wt)
 model_performance(HER42PB_Zn_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2170,7 +2176,7 @@ HER42PB_Zn_final <- HER42PB_Zn +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_Zn_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_Zn_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zn/Zn_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zn/Zn_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 
@@ -2182,10 +2188,10 @@ summary(HER42PB_Rb_lm)
 glance(HER42PB_Rb_lm)
 model_performance(HER42PB_Rb_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Rb_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Rb/Rb_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Rb/Rb_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Rb/Rb_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Rb/Rb_OLS_summary.txt")
 summary(HER42PB_Rb_lm)
 glance(HER42PB_Rb_lm)
 model_performance(HER42PB_Rb_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2200,10 +2206,10 @@ summary(HER42PB_Rb_wlm)
 glance(HER42PB_Rb_wlm)
 model_performance(HER42PB_Rb_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Rb_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Rb/Rb_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Rb/Rb_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Rb/Rb_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Rb/Rb_OLS_wt_summary.txt")
 summary(HER42PB_Rb_wlm)
 glance(HER42PB_Rb_wlm)
 model_performance(HER42PB_Rb_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2221,10 +2227,10 @@ summary(HER42PB_Rb_wls) # summary stats
 glance(HER42PB_Rb_wls) # summary stats including AIC
 model_performance(HER42PB_Rb_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Rb_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Rb/Rb_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Rb/Rb_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Rb/Rb_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Rb/Rb_WLS_summary.txt")
 summary(HER42PB_Rb_wls)
 glance(HER42PB_Rb_wls)
 model_performance(HER42PB_Rb_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2242,10 +2248,10 @@ summary(HER42PB_Rb_wls_wt) # summary stats
 glance(HER42PB_Rb_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Rb_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Rb_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Rb/Rb_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Rb/Rb_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Rb/Rb_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Rb/Rb_WLS_wt_summary.txt")
 summary(HER42PB_Rb_wls_wt)
 glance(HER42PB_Rb_wls_wt)
 model_performance(HER42PB_Rb_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2377,7 +2383,7 @@ HER42PB_Rb_final <- HER42PB_Rb +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_Rb_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_Rb_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Rb/Rb_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Rb/Rb_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 # HER42PB_Sr -----------------------------------------------------------------------
 
@@ -2387,10 +2393,10 @@ summary(HER42PB_Sr_lm)
 glance(HER42PB_Sr_lm)
 model_performance(HER42PB_Sr_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Sr_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Sr/Sr_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Sr/Sr_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Sr/Sr_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Sr/Sr_OLS_summary.txt")
 summary(HER42PB_Sr_lm)
 glance(HER42PB_Sr_lm)
 model_performance(HER42PB_Sr_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2405,10 +2411,10 @@ summary(HER42PB_Sr_wlm)
 glance(HER42PB_Sr_wlm)
 model_performance(HER42PB_Sr_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Sr_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Sr/Sr_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Sr/Sr_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Sr/Sr_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Sr/Sr_OLS_wt_summary.txt")
 summary(HER42PB_Sr_wlm)
 glance(HER42PB_Sr_wlm)
 model_performance(HER42PB_Sr_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2426,10 +2432,10 @@ summary(HER42PB_Sr_wls) # summary stats
 glance(HER42PB_Sr_wls) # summary stats including AIC
 model_performance(HER42PB_Sr_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Sr_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Sr/Sr_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Sr/Sr_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Sr/Sr_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Sr/Sr_WLS_summary.txt")
 summary(HER42PB_Sr_wls)
 glance(HER42PB_Sr_wls)
 model_performance(HER42PB_Sr_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2447,10 +2453,10 @@ summary(HER42PB_Sr_wls_wt) # summary stats
 glance(HER42PB_Sr_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Sr_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Sr_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Sr/Sr_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Sr/Sr_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Sr/Sr_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Sr/Sr_WLS_wt_summary.txt")
 summary(HER42PB_Sr_wls_wt)
 glance(HER42PB_Sr_wls_wt)
 model_performance(HER42PB_Sr_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2582,7 +2588,7 @@ HER42PB_Sr_final <- HER42PB_Sr +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_Sr_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_Sr_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Sr/Sr_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Sr/Sr_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 
@@ -2594,10 +2600,10 @@ summary(HER42PB_Zr_lm)
 glance(HER42PB_Zr_lm)
 model_performance(HER42PB_Zr_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Zr_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zr/Zr_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zr/Zr_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zr/Zr_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zr/Zr_OLS_summary.txt")
 summary(HER42PB_Zr_lm)
 glance(HER42PB_Zr_lm)
 model_performance(HER42PB_Zr_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2612,10 +2618,10 @@ summary(HER42PB_Zr_wlm)
 glance(HER42PB_Zr_wlm)
 model_performance(HER42PB_Zr_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Zr_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zr/Zr_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zr/Zr_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zr/Zr_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zr/Zr_OLS_wt_summary.txt")
 summary(HER42PB_Zr_wlm)
 glance(HER42PB_Zr_wlm)
 model_performance(HER42PB_Zr_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2633,10 +2639,10 @@ summary(HER42PB_Zr_wls) # summary stats
 glance(HER42PB_Zr_wls) # summary stats including AIC
 model_performance(HER42PB_Zr_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Zr_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zr/Zr_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zr/Zr_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zr/Zr_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zr/Zr_WLS_summary.txt")
 summary(HER42PB_Zr_wls)
 glance(HER42PB_Zr_wls)
 model_performance(HER42PB_Zr_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2654,10 +2660,10 @@ summary(HER42PB_Zr_wls_wt) # summary stats
 glance(HER42PB_Zr_wls_wt) # summary stats including AIC
 model_performance(HER42PB_Zr_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_Zr_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zr/Zr_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zr/Zr_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zr/Zr_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zr/Zr_WLS_wt_summary.txt")
 summary(HER42PB_Zr_wls_wt)
 glance(HER42PB_Zr_wls_wt)
 model_performance(HER42PB_Zr_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2789,7 +2795,7 @@ HER42PB_Zr_final <- HER42PB_Zr +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_Zr_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_Zr_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/Zr/Zr_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/Zr/Zr_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # HER42PB_DM -----------------------------------------------------------------------
@@ -2800,10 +2806,10 @@ summary(HER42PB_DM_lm)
 glance(HER42PB_DM_lm)
 model_performance(HER42PB_DM_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_DM_lm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/DM/DM_OLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/DM/DM_OLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/DM/DM_OLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/DM/DM_OLS_summary.txt")
 summary(HER42PB_DM_lm)
 glance(HER42PB_DM_lm)
 model_performance(HER42PB_DM_lm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2818,10 +2824,10 @@ summary(HER42PB_DM_wlm)
 glance(HER42PB_DM_wlm)
 model_performance(HER42PB_DM_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_DM_wlm) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/DM/DM_OLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/DM/DM_OLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/DM/DM_OLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/DM/DM_OLS_wt_summary.txt")
 summary(HER42PB_DM_wlm)
 glance(HER42PB_DM_wlm)
 model_performance(HER42PB_DM_wlm) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2839,10 +2845,10 @@ summary(HER42PB_DM_wls) # summary stats
 glance(HER42PB_DM_wls) # summary stats including AIC
 model_performance(HER42PB_DM_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_DM_wls) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/DM/DM_WLS_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/DM/DM_WLS_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/DM/DM_WLS_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/DM/DM_WLS_summary.txt")
 summary(HER42PB_DM_wls)
 glance(HER42PB_DM_wls)
 model_performance(HER42PB_DM_wls) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2860,10 +2866,10 @@ summary(HER42PB_DM_wls_wt) # summary stats
 glance(HER42PB_DM_wls_wt) # summary stats including AIC
 model_performance(HER42PB_DM_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 check_model(HER42PB_DM_wls_wt) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/DM/DM_WLS_wt_performance.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/DM/DM_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 # Write summary stats/checks to txt file
-sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/DM/DM_WLS_wt_summary.txt")
+sink(file = "Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/DM/DM_WLS_wt_summary.txt")
 summary(HER42PB_DM_wls_wt)
 glance(HER42PB_DM_wls_wt)
 model_performance(HER42PB_DM_wls_wt) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
@@ -2994,7 +3000,7 @@ HER42PB_DM_final <- HER42PB_DM +
   geom_text(data=data.frame(), aes(label=paste("OLS: ", HER42PB_DM_lm_eqn(df)), x = -Inf, y = Inf),
             parse = TRUE, colour = "#FF9999", hjust = -0.1, vjust = 5, size = 3)
 HER42PB_DM_final
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/DM/DM_OLS_WLS_summary.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/DM/DM_OLS_WLS_summary.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # Summary 4x3 matrix plots of ITRAX-ACF matched elements --------
@@ -3005,7 +3011,7 @@ ggarrange(HER42PB_K_final, HER42PB_Ca_final, HER42PB_Ti_final,
           HER42PB_Ni_final, HER42PB_Cu_final, HER42PB_Zn_final,
           HER42PB_Rb_final, HER42PB_Sr_final, HER42PB_DM_final,
           ncol = 3, nrow = 4, common.legend = TRUE)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/HER42PB_OLS_WLS_Summary.pdf",
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/HER42PB_OLS_WLS_Summary.pdf",
        height = c(50), width = c(50), dpi = 600, units = "cm")
 
 
@@ -3042,7 +3048,7 @@ HER42PB_K_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = K, y = K_ICP)) +
   labs(x = "K (XRF-CS) / cps", y = "K (ICPMS) / ppm" ) +
   ggtitle("HER42PB: K (ICP SD weighted = blue; unweighted = black)")
 HER42PB_K_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/K_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/K_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 # Ca unweighted (black) forced through origin ---------------------------
 HER42PB_Ca_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Ca, y = Ca_ICP)) +
@@ -3063,7 +3069,7 @@ HER42PB_Ca_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Ca, y = Ca_ICP)) +
   labs(x = "Ca (XRF-CS) / cps", y = "Ca (ICPMS) / ppm" ) +
   ggtitle("HER42PB: Ca (ICP SD weighted = blue; unweighted = black)")
 HER42PB_Ca_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Ca_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Ca_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # Ti 
@@ -3087,7 +3093,7 @@ HER42PB_Ti_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Ti, y = Ti_ICP)) +
   labs(x = "Ti (XRF-CS) / cps", y = "Ti (ICPMS) / ppm" ) +
   ggtitle("HER42PB: Ti (ICP SD weighted = blue; unweighted = black)")
 HER42PB_Ti_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Ti_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Ti_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # Mn
@@ -3111,7 +3117,7 @@ HER42PB_Mn_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Mn, y = Mn_ICP)) +
   labs(x = "Mn (XRF-CS) / cps", y = "Mn (ICPMS) / ppm" ) +
   ggtitle("HER42PB: Mn (ICP SD weighted = blue; unweighted = black)")
 HER42PB_Mn_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/incorigin//Mn_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/incorigin//Mn_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # Fe unweighted (black) forced through origin ---------------------------
@@ -3133,7 +3139,7 @@ HER42PB_Fe_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Fe, y = Fe_ICP)) +
   labs(x = "Fe (XRF-CS) / cps", y = "Fe (ICPMS) / ppm" ) +
   ggtitle("HER42PB: Fe (ICP SD weighted = blue; unweighted = black)")
 HER42PB_Fe_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Fe_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Fe_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # Co
@@ -3157,7 +3163,7 @@ HER42PB_Co_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Co, y = Co_ICP)) +
   labs(x = "Co (XRF-CS) / cps", y = "Co (ICPMS) / ppm" ) +
   ggtitle("HER42PB: Co (ICP SD weighted = blue; unweighted = black)")
 HER42PB_Co_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Co_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Co_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # Ni
@@ -3181,7 +3187,7 @@ HER42PB_Ni_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Ni, y = Ni_ICP)) +
   labs(x = "Ni (XRF-CS) / cps", y = "Ni (ICPMS) / ppm" ) +
   ggtitle("HER42PB: Ni (ICP SD weighted = blue; unweighted = black)")
 HER42PB_Ni_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Ni_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Ni_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # Cu
@@ -3205,7 +3211,7 @@ HER42PB_Cu_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Cu, y = Cu_ICP)) +
   labs(x = "Cu (XRF-CS) / cps", y = "Cu (ICPMS) / ppm" ) +
   ggtitle("HER42PB: Cu (ICP SD weighted = blue; unweighted = black)")
 HER42PB_Cu_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Cu_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Cu_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # Zn
@@ -3229,7 +3235,7 @@ HER42PB_Zn_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Zn, y = Zn_ICP)) +
   labs(x = "Zn (XRF-CS) / cps", y = "Zn (ICPMS) / ppm" ) +
   ggtitle("HER42PB: Zn (ICP SD weighted = blue; unweighted = black)")
 HER42PB_Zn_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Zn_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Zn_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # Rb
@@ -3253,7 +3259,7 @@ HER42PB_Rb_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Rb, y = Rb_ICP)) +
   labs(x = "Rb (XRF-CS) / cps", y = "Rb (ICPMS) / ppm" ) +
   ggtitle("HER42PB: Rb (ICP SD weighted = blue; unweighted = black)")
 HER42PB_Rb_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Rb_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Rb_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # Sr
@@ -3277,7 +3283,7 @@ HER42PB_Sr_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = Sr, y = Sr_ICP)) +
   labs(x = "Sr (XRF-CS) / cps", y = "Sr (ICPMS) / ppm" ) +
   ggtitle("HER42PB: Sr (ICP SD weighted = blue; unweighted = black)")
 HER42PB_Sr_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Sr_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Sr_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 # DM
@@ -3301,7 +3307,7 @@ HER42PB_DM_origin <- ggplot(HER42PB_xrf_icp_matched, aes(x = coh_inc, y = dry_ma
   labs(x = "coh/inc (XRF-CS) / cps", y = "DM (ICPMS) / ppm" ) +
   ggtitle("HER42PB: DM (ICP SD weighted = blue; unweighted = black)")
 HER42PB_DM_origin
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/DM_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/DM_origin_lm_wlm.pdf", 
        height = c(20), width = c(20), dpi = 600, units = "cm")
 
 
@@ -3317,7 +3323,7 @@ ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matchin
 HER42PB_K_lm_origin <- lm(K_ICP ~ K-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_K_lm_origin) # summary stats
 check_model(HER42PB_K_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/K_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/K_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_K_lm_origin_mp <- model_performance(HER42PB_K_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_K_lm_origin_mp)
@@ -3330,7 +3336,7 @@ HER42PB_K_wlm_origin <- lm(K_ICP ~ K-1, weight = 1/K_ICP_sd, data = HER42PB_xrf_
 summary(HER42PB_K_wlm_origin) # summary stats
 
 check_model(HER42PB_K_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/K_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/K_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_K_wlm_origin_mp <- model_performance(HER42PB_K_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_K_wlm_origin_mp)
@@ -3344,7 +3350,7 @@ icc(HER42PB_K_wlm)
 HER42PB_Ca_lm_origin <- lm(Ca_ICP ~ Ca-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Ca_lm_origin) # summary stats
 check_model(HER42PB_Ca_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Ca_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Ca_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Ca_lm_origin_mp <- model_performance(HER42PB_Ca_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Ca_lm_origin_mp)
@@ -3356,7 +3362,7 @@ icc(HER42PB_Ca_lm)
 HER42PB_Ca_wlm_origin <- lm(Ca_ICP ~ Ca-1, weight = 1/Ca_ICP_sd, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Ca_wlm_origin) # summary stats
 check_model(HER42PB_Ca_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Ca_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Ca_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Ca_wlm_origin_mp <- model_performance(HER42PB_Ca_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Ca_wlm_origin_mp)
@@ -3370,7 +3376,7 @@ icc(HER42PB_Ca_wlm)
 HER42PB_Ti_lm_origin <- lm(Ti_ICP ~ Ti-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Ti_lm_origin) # summary stats
 check_model(HER42PB_Ti_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Ti_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Ti_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Ti_lm_origin_mp <- model_performance(HER42PB_Ti_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Ti_lm_origin_mp)
@@ -3382,7 +3388,7 @@ icc(HER42PB_Ti_lm)
 HER42PB_Ti_wlm_origin <- lm(Ti_ICP ~ Ti-1, weight = 1/Ti_ICP_sd, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Ti_wlm_origin) # summary stats
 check_model(HER42PB_Ti_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Ti_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Ti_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Ti_wlm_origin_mp <- model_performance(HER42PB_Ti_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Ti_wlm_origin_mp)
@@ -3396,7 +3402,7 @@ icc(HER42PB_Ti_wlm)
 HER42PB_Mn_lm_origin <- lm(Mn_ICP ~ Mn-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Mn_lm_origin) # summary stats
 check_model(HER42PB_Mn_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Mn_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Mn_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Mn_lm_origin_mp <- model_performance(HER42PB_Mn_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Mn_lm_origin_mp)
@@ -3408,7 +3414,7 @@ icc(HER42PB_Mn_lm)
 HER42PB_Mn_wlm_origin <- lm(Mn_ICP ~ Mn-1, weight = 1/Mn_ICP_sd, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Mn_wlm_origin) # summary stats
 check_model(HER42PB_Mn_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Mn_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Mn_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Mn_wlm_origin_mp <- model_performance(HER42PB_Mn_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Mn_wlm_origin_mp)
@@ -3422,7 +3428,7 @@ icc(HER42PB_Mn_wlm)
 HER42PB_Fe_lm_origin <- lm(Fe_ICP ~ Fe-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Fe_lm_origin) # summary stats
 check_model(HER42PB_Fe_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Fe_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Fe_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Fe_lm_origin_mp <- model_performance(HER42PB_Fe_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Fe_lm_origin_mp)
@@ -3434,7 +3440,7 @@ icc(HER42PB_Fe_lm)
 HER42PB_Fe_wlm_origin <- lm(Fe_ICP ~ Fe-1, weight = 1/Fe_ICP_sd, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Fe_wlm_origin) # summary stats
 check_model(HER42PB_Fe_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Fe_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Fe_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Fe_wlm_origin_mp <- model_performance(HER42PB_Fe_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Fe_wlm_origin_mp)
@@ -3448,7 +3454,7 @@ icc(HER42PB_Fe_wlm)
 HER42PB_Co_lm_origin <- lm(Co_ICP ~ Co-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Co_lm_origin) # summary stats
 check_model(HER42PB_Co_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Co_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Co_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Co_lm_origin_mp <- model_performance(HER42PB_Co_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Co_lm_origin_mp)
@@ -3460,7 +3466,7 @@ icc(HER42PB_Co_lm)
 HER42PB_Co_wlm_origin <- lm(Co_ICP ~ Co-1, weight = 1/Co_ICP_sd, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Co_wlm_origin) # summary stats
 check_model(HER42PB_Co_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Co_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Co_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Co_wlm_origin_mp <- model_performance(HER42PB_Co_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Co_wlm_origin_mp)
@@ -3474,7 +3480,7 @@ icc(HER42PB_Co_wlm)
 HER42PB_Ni_lm_origin <- lm(Ni_ICP ~ Ni-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Ni_lm_origin) # summary stats
 check_model(HER42PB_Ni_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Ni_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Ni_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Ni_lm_origin_mp <- model_performance(HER42PB_Ni_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Ni_lm_origin_mp)
@@ -3486,7 +3492,7 @@ icc(HER42PB_Ni_lm)
 HER42PB_Ni_wlm_origin <- lm(Ni_ICP ~ Ni-1, weight = 1/Ni_ICP_sd, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Ni_wlm_origin) # summary stats
 check_model(HER42PB_Ni_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Ni_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Ni_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Ni_wlm_origin_mp <- model_performance(HER42PB_Ni_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Ni_wlm_origin_mp)
@@ -3500,7 +3506,7 @@ icc(HER42PB_Ni_wlm)
 HER42PB_Cu_lm_origin <- lm(Cu_ICP ~ Cu-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Cu_lm_origin) # summary stats
 check_model(HER42PB_Cu_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Cu_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Cu_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Cu_lm_origin_mp <- model_performance(HER42PB_Cu_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Cu_lm_origin_mp)
@@ -3512,7 +3518,7 @@ icc(HER42PB_Cu_lm)
 HER42PB_Cu_wlm_origin <- lm(Cu_ICP ~ Cu-1, weight = 1/Cu_ICP_sd, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Cu_wlm_origin) # summary stats
 check_model(HER42PB_Cu_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Cu_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Cu_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Cu_wlm_origin_mp <- model_performance(HER42PB_Cu_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Cu_wlm_origin_mp)
@@ -3526,7 +3532,7 @@ icc(HER42PB_Cu_wlm)
 HER42PB_Zn_lm_origin <- lm(Zn_ICP ~ Zn-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Zn_lm_origin) # summary stats
 check_model(HER42PB_Zn_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Zn_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Zn_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Zn_lm_origin_mp <- model_performance(HER42PB_Zn_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Zn_lm_origin_mp)
@@ -3538,7 +3544,7 @@ icc(HER42PB_Zn_lm)
 HER42PB_Zn_wlm_origin <- lm(Zn_ICP ~ Zn-1, weight = 1/Zn_ICP_sd, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Zn_wlm_origin) # summary stats
 check_model(HER42PB_Zn_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Zn_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Zn_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Zn_wlm_origin_mp <- model_performance(HER42PB_Zn_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Zn_wlm_origin_mp)
@@ -3552,7 +3558,7 @@ icc(HER42PB_Zn_wlm)
 HER42PB_Rb_lm_origin <- lm(Rb_ICP ~ Rb-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Rb_lm_origin) # summary stats
 check_model(HER42PB_Rb_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Rb_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Rb_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Rb_lm_origin_mp <- model_performance(HER42PB_Rb_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Rb_lm_origin_mp)
@@ -3564,7 +3570,7 @@ icc(HER42PB_Rb_lm)
 HER42PB_Rb_wlm_origin <- lm(Rb_ICP ~ Rb-1, weight = 1/Rb_ICP_sd, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Rb_wlm_origin) # summary stats
 check_model(HER42PB_Rb_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Rb_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Rb_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Rb_wlm_origin_mp <- model_performance(HER42PB_Rb_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Rb_wlm_origin_mp)
@@ -3578,7 +3584,7 @@ icc(HER42PB_Rb_wlm)
 HER42PB_Sr_lm_origin <- lm(Sr_ICP ~ Sr-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Sr_lm_origin) # summary stats
 check_model(HER42PB_Sr_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Sr_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Sr_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Sr_lm_origin_mp <- model_performance(HER42PB_Sr_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Sr_lm_origin_mp)
@@ -3590,7 +3596,7 @@ icc(HER42PB_Sr_lm)
 HER42PB_Sr_wlm_origin <- lm(Sr_ICP ~ Sr-1, weight = 1/Sr_ICP_sd, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_Sr_wlm_origin) # summary stats
 check_model(HER42PB_Sr_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/Sr_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/Sr_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_Sr_wlm_origin_mp <- model_performance(HER42PB_Sr_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_Sr_wlm_origin_mp)
@@ -3604,7 +3610,7 @@ icc(HER42PB_Sr_wlm)
 HER42PB_DM_lm_origin <- lm(dry_mass_pc ~ coh_inc-1, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_DM_lm_origin) # summary stats
 check_model(HER42PB_DM_lm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/DM_origin_performance_lm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/DM_origin_performance_lm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_DM_lm_origin_mp <- model_performance(HER42PB_DM_lm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_DM_lm_origin_mp)
@@ -3616,7 +3622,7 @@ icc(HER42PB_DM_lm)
 HER42PB_DM_wlm_origin <- lm(dry_mass_pc ~ coh_inc-1, weight = 1/dry_mass_err, data = HER42PB_xrf_icp_matched)
 summary(HER42PB_DM_wlm_origin) # summary stats
 check_model(HER42PB_DM_wlm_origin) # summary check plots
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/origin/DM_origin_performance_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/origin/DM_origin_performance_wlm.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 HER42PB_DM_wlm_origin_mp <- model_performance(HER42PB_DM_wlm_origin) # AIC - Akaike information criterion; BIC Bayesian IC: lower = better fit for both
 display(HER42PB_DM_wlm_origin_mp)
@@ -3635,7 +3641,7 @@ ggarrange(HER42PB_K_origin, HER42PB_Ca_origin, HER42PB_Ti_origin,
           HER42PB_Ni_origin, HER42PB_Cu_origin, HER42PB_Zn_origin,
           HER42PB_Rb_origin, HER42PB_Sr_origin, HER42PB_DM_origin,
           ncol = 3, nrow = 4, common.legend = TRUE)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/HER42PB_OLS_Summary_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/HER42PB_OLS_Summary_origin_lm_wlm.pdf", 
        height = c(50), width = c(50), dpi = 600, units = "cm")
 
 
@@ -3952,7 +3958,7 @@ ggarrange(HER42PB_K, HER42PB_Ca, HER42PB_Ti,
           HER42PB_Ni, HER42PB_Cu, HER42PB_Zn,
           HER42PB_Rb, HER42PB_Sr, HER42PB_DM,
           ncol = 3, nrow = 4, common.legend = TRUE)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/HER42PB_OLS_Summary_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/HER42PB_OLS_Summary_lm_wlm.pdf", 
        height = c(50), width = c(50), dpi = 600, units = "cm")
 
 # Simple OLS summary - forced through origin - unweighted stats on plot
@@ -3961,7 +3967,7 @@ ggarrange(HER42PB_K_origin, HER42PB_Ca_origin, HER42PB_Ti_origin,
           HER42PB_Ni_origin, HER42PB_Cu_origin, HER42PB_Zn_origin,
           HER42PB_Rb_origin, HER42PB_Sr_origin, HER42PB_DM_origin,
           ncol = 3, nrow = 4, common.legend = TRUE)
-ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/HER42PB/pc_cps/HER42PB_OLS_Summary_origin_lm_wlm.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/ACE_Matching/Output/itrax_Composite/Matching_mean/Sites/HER42PB/pc_cps/HER42PB_OLS_Summary_origin_lm_wlm.pdf", 
        height = c(50), width = c(50), dpi = 600, units = "cm")
 
 
