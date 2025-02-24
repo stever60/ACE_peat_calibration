@@ -46,7 +46,7 @@ icp_Elements_min_sd <- c("K_ICP_sd", "Ca_ICP_sd", "Ti_ICP_sd", "Mn_ICP_sd", "Fe_
 
 # Import original ACE cps matched file ----------------------------------------------
 
-ACE_xrf_icp_matched_input <-read_csv("Papers_R/2024_DeVleeschouwer/Figure3/Data/Input/cpsACE_xrf_icp_matched_cps.csv")
+ACE_xrf_icp_matched_input <-read_csv("Papers_R/2024_DeVleeschouwer/Figure3/Data/Input/cps/ACE_xrf_icp_matched_cps.csv")
 is.na(ACE_xrf_icp_matched_input)<-sapply(ACE_xrf_icp_matched_input, is.infinite) # replace any infinite values with NA
 
 # ICPMS data - change errors supplied by FDV originally to CRM % values in Table 2 
