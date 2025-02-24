@@ -1,39 +1,47 @@
 # ITRAX-ICPMS Calibration
 
-# Step 1: ITRAX Quality Control, Element Filtering
-
+# Step 1: ITRAX Quality Control: Spectra & Element Filtering
 # Step 2: ITRAX COMPOSITE data conversion in R (validity filtered cps, %cps sum, inc normalised & as Z-scores, cps filtering for first pass clr)
   
-# Outputs are based on quality control from existing composite data and validity = 1 only
-# itrax.R qc process for the ACE_SHW peat bog dataset is carried out on all data except POB4 - measured under different conditions
+# SECTION 1: Set up ------------------------------------------------------------
 
-#clear previous console
+# Clear previous console
 remove (list = ls())
-#clear plot window
+# Set working directory - Macbook Pro M2
+setwd("/Users/sjro/Dropbox/BAS/Data/R/")
+getwd()
+# clear plot window
 dev.off()
 
-# SECTION 1: SET UP -------------------------------------------------------
+# Load libraries ---------------------------------------------------------------
 
-library(itraxR)
-library(tidyverse) # all core tidyverse packages
-library(tidypaleo) # Dewey Dunnington's ggplot extensions for palaeo-style plots
-library(readr)
-library(ggpubr)
-library(GGally) # for correlation and Prob density matrix plotting
-library(PeriodicTable)
-library(errors)
-library(chemometrics)
-library(patchwork)
+packages <- c('tidyverse', 'tidypaleo', 'dplyr', 'readr', 'ggpubr', 'patchwork',
+              'gridExtra', 'cowplot', 'vegan', 'rioja', 'ellipse', 'factoextra',
+              'reshape2', 'GGally', 'ggsci', 'ggdendro', 'dendextend', 'dynamicTreeCut',
+              'colorspace', 'cluster', 'magrittr', 'mgcv', 'gtable', 'repr',
+              'bestNormalize','sjmisc', 'chemometrics', 'compositions', 
+              'RColorBrewer', 'ggsci', 'wesanderson', 'viridis',
+              'ggrepel', 'itraxR','PeriodicTable','errors','patchwork',
+              'forecast','directlabels','broom','performance','lmtest','ggpmisc',
+              'cowplot','Hmisc')
+lapply(packages, library, character.only=TRUE)
+options(scipen = 999)
 
-# Set working directory on Macbook 2013
+# Set up ------------------------------------------------------------------
+
+# Set working directory - Macbook Pro 2013
 #setwd("/Users/Steve/Dropbox/BAS/Data/R/")
-
-#set working directory on M2 Macbook
+# Set working directory - Macbook Pro M2
 setwd("/Users/sjro/Dropbox/BAS/Data/R/")
-#check working directory
-getwd() 
+getwd()
+# clear plot window
+dev.off()
+
 
 # SECTION 2A: IMPORT ALL ACE_SHW DATA -----------------------------------------------------
+
+# Import existing composite datasets where validity = 1
+# itrax.R qc is carried out on all data except POB4 (measured under different conditions)
 
 # Assign elements to/from PeriodicTable package to 'elementsList' (then unload package)
 data(periodicTable)

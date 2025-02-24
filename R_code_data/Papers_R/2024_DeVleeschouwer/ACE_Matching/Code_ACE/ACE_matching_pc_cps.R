@@ -1,42 +1,33 @@
-# -------------------------------------------------------------------------
+# ITRAX-ICPMS Data Matching, Correlation & Regression - %cps mean +/- SD
 
-# ITRAX-ICPMS Correlation & Modelling for %cps sum dataset 
-
-# -------------------------------------------------------------------------
-
-# Libraries ---------------------------------------------------------------
-library(ggplot2)
-library(ggrepel)
-library(dplyr)
-library()
-options(scipen = 999)
-library(itraxR)
-library(tidyverse) # all core tidyverse packages
-library(tidypaleo) # Dewey Dunnington's ggplot extensions for palaeo-style plots
-library(readr)
-library(ggpubr) # plotting
-library(GGally) # for correlation and Prob density matrix plotting
-library(PeriodicTable)
-library(errors)
-library(chemometrics)
-library(patchwork)
-library(forecast) # Use autocorrelation function (acf) and plots to explore noise in a time-series
-library(directlabels)
-library(broom)
-library(performance)
-library(lmtest) # linear moedlling parameters
-library(ggpmisc)
-library(scales)
-library(ggsci) # colour palettes for publication
-library(cowplot) # graphing arrangement
-library(Hmisc) # various stats tests
-
-# Set up ------------------------------------------------------------------
+# Set up -----------------------------------------------------------------------
 
 # Clear previous console
 remove (list = ls())
+# Set working directory - Macbook Pro M2
+setwd("/Users/sjro/Dropbox/BAS/Data/R/")
+getwd()
+# clear plot window
+dev.off()
+
+# Load libraries ---------------------------------------------------------------
+
+packages <- c('tidyverse', 'tidypaleo', 'dplyr', 'readr', 'ggpubr', 'patchwork',
+              'gridExtra', 'cowplot', 'vegan', 'rioja', 'ellipse', 'factoextra',
+              'reshape2', 'GGally', 'ggsci', 'ggdendro', 'dendextend', 'dynamicTreeCut',
+              'colorspace', 'cluster', 'magrittr', 'mgcv', 'gtable', 'repr',
+              'bestNormalize','sjmisc', 'chemometrics', 'compositions', 
+              'RColorBrewer', 'ggsci', 'wesanderson', 'viridis',
+              'ggrepel', 'itraxR','PeriodicTable','errors','patchwork',
+              'forecast','directlabels','broom','performance','lmtest','ggpmisc',
+              'cowplot','Hmisc')
+lapply(packages, library, character.only=TRUE)
+options(scipen = 999)
+
+# Set up ------------------------------------------------------------------
+
 # Set working directory - Macbook Pro 2013
-# setwd("/Users/Steve/Dropbox/BAS/Data/R/")
+#setwd("/Users/Steve/Dropbox/BAS/Data/R/")
 # Set working directory - Macbook Pro M2
 setwd("/Users/sjro/Dropbox/BAS/Data/R/")
 getwd()
