@@ -114,7 +114,7 @@ ACE_LM1$Site <- as.factor(ACE_LM1$Site)
 # Fig 2a - ITRAX & ICP correlation matrix - key elements reduced
 theme_set(theme_bw(base_size=2))
 ggcorr(ACE_LM1[,xrf_icp_Elements_key_Fig2], method = c("everything", "pearson"),
-       size = 6, label = TRUE, label_alpha = FALSE, label_round=2, label_size= 6)
+       size = 7, label = TRUE, label_alpha = FALSE, label_round=2, label_size= 7)
 ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig2a_Corr_matrix_key_log_inc.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
