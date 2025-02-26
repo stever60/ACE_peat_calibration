@@ -1,4 +1,4 @@
-# Figure 2 - cps plots
+# Figure 2 - clr plots
 
 # Set up -----------------------------------------------------------------------
 
@@ -24,30 +24,31 @@ options(scipen = 999)
 # see "Papers_R/2024_DeVleeschouwer/Output/itrax_Composite/Matching_mean/ACE/ACE_matching_cps.R" 
 # for all matching, element correlation & linear modelling and plot code
 
-# Make ACE matched dataset -----------------------------------------------------
+# Make ACE matched dataset - import matched itrax-ICPMS datafiles from each site -------------------
 
-ACE_matched_BI10 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/cps/BI10_xrf_icp_matched_cps.csv", 
-                           col_names = TRUE, skip = 0)
-ACE_matched_HER42PB <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/cps/HER42PB_xrf_icp_matched_cps.csv", 
-                              col_names = TRUE, skip = 0)
-ACE_matched_KER1 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/cps/KER1_xrf_icp_matched_cps.csv", 
-                           col_names = TRUE, skip = 0)
-ACE_matched_KER3 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/cps/KER3_xrf_icp_matched_cps.csv", 
-                           col_names = TRUE, skip = 0)
-ACE_matched_PB1 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/cps/PB1_xrf_icp_matched_cps.csv", 
-                          col_names = TRUE, skip = 0)
-ACE_matched_POB4 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/cps/POB4_xrf_icp_matched_cps.csv", 
-                           col_names = TRUE, skip = 0)
+ACE_matched_BI10 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/BI10_xrf_icp_matched_clr.csv", 
+                             col_names = TRUE, skip = 0)
+ACE_matched_HER42PB <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/HER42PB_xrf_icp_matched_clr.csv", 
+                                col_names = TRUE, skip = 0)
+ACE_matched_KER1 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/KER1_xrf_icp_matched_clr.csv", 
+                             col_names = TRUE, skip = 0)
+ACE_matched_KER3 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/KER3_xrf_icp_matched_clr.csv", 
+                             col_names = TRUE, skip = 0)
+ACE_matched_PB1 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/PB1_xrf_icp_matched_clr.csv", 
+                            col_names = TRUE, skip = 0)
+ACE_matched_POB4 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/POB4_xrf_icp_matched_clr.csv", 
+                             col_names = TRUE, skip = 0)
 
 # Combine matched output from each site into ACE matched dataset
-ACE_matched_cps <- bind_rows(ACE_matched_BI10, 
-                                 ACE_matched_HER42PB, 
-                                 ACE_matched_KER1, 
-                                 ACE_matched_KER3, 
-                                 ACE_matched_PB1, 
-                                 ACE_matched_POB4) %>% 
+ACE_matched_clr <- bind_rows(ACE_matched_BI10, 
+                             ACE_matched_HER42PB, 
+                             ACE_matched_KER1, 
+                             ACE_matched_KER3, 
+                             ACE_matched_PB1, 
+                             ACE_matched_POB4) %>% 
   print()
-write.csv(ACE_matched_cps,"Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/cps/ACE_xrf_icp_matched_cps.csv", row.names = FALSE)
+write.csv(ACE_matched_clr,"Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/ACE_xrf_icp_matched_clr.csv", row.names = FALSE)
+
 
 # Define elements to use ----------------------------------------------------------
 
@@ -55,7 +56,7 @@ write.csv(ACE_matched_cps,"Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/cps/A
 icp_Elements_fdv <- c("P_ICP", "K_ICP", "Ca_ICP", "Ti_ICP", "Mn_ICP", "Fe_ICP", "Co_ICP", "Ni_ICP", "Cu_ICP", 
                       "Zn_ICP", "As_ICP", "Rb_ICP", "Sr_ICP", "Zr_ICP", "Pb_ICP", "dry_mass_pc")
 
-# Below were defined by autocorrelation (acf) analysis of ACE09 composite ITRAX dataframe analysis file - see other R files for more info
+# Below were defined by autocorrelation (acf) analysis of ACE09 composite ITRAX dataframe analysis file - see other R files for mor info
 
 # XRF elements defined by ITRAX acf and matched to Francois ICPMS element list above
 acf_icp_Elements_min <- c("K", "Ca", "Ti", "Mn", "Fe", "Co", "Ni", "Cu", 
@@ -73,88 +74,94 @@ icp_Elements_min_sd <- c("K_ICP_sd", "Ca_ICP_sd", "Ti_ICP_sd", "Mn_ICP_sd", "Fe_
 xrf_icp_Elements_key <- c("K", "K_ICP", "Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "Mn_ICP", "Fe", "Fe_ICP",
                           "Sr", "Sr_ICP", "Zr", "Zr_ICP", "coh_inc", "dry_mass_pc")
 
-# key elements_reduced for more simplified plots 
+# key elements_reduced to simplify plotting further  
 xrf_icp_Elements_key_reduced <- c("Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "Mn_ICP", "Sr", "Sr_ICP", "Zr", "Zr_ICP")
 
-# key elements for Figure 2a
-xrf_icp_Elements_key_Fig2 <- c("Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "Mn_ICP", "Fe", "Fe_ICP", 
-                               "Sr", "Sr_ICP", "Zr", "Zr_ICP", "coh_inc", "dry_mass_pc")
 
-# Import existing ACE cps matched file ----------------------------------------------
+# Import existing ACE cps matched file - alternate method for making clr dataset from existing ACE cps dataset ----------------------------------------------
 
-ACE_xrf_icp_matched_input <-read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/cps/ACE_xrf_icp_matched_cps.csv")
-is.na(ACE_xrf_icp_matched_input)<-sapply(ACE_xrf_icp_matched_input, is.infinite) # replace any infinite values with NA
+# Matching code for each site and for are in "Papers_R/2024_DeVleeschouwer/Output/itrax_Composite/Matching_mean/Sites/..."
 
-# ICPMS data - change errors supplied by FDV originally to CRM % values in Table 2 
-ACE_xrf_icp_matched <- ACE_xrf_icp_matched_input %>%
-  rename(K_ICP_sd_FDV2023 = K_ICP_sd) %>% 
-  mutate(K_ICP_sd = K_ICP*0.18) %>%
-  relocate(K_ICP_sd, .after = K_ICP) %>%
-  rename(Ca_ICP_sd_FDV2023 = Ca_ICP_sd) %>% 
-  mutate(Ca_ICP_sd = Ca_ICP*0.13) %>% 
-  relocate(Ca_ICP_sd, .after = Ca_ICP) %>%
-  rename(Ti_ICP_sd_FDV2023 = Ti_ICP_sd) %>% 
-  mutate(Ti_ICP_sd = Ti_ICP*0.14) %>%
-  relocate(Ti_ICP_sd, .after = Ti_ICP) %>%
-  relocate(Ti_ICP_sd, .after = Ti_ICP) %>%
-  rename(Mn_ICP_sd_FDV2023 = Mn_ICP_sd) %>% 
-  mutate(Mn_ICP_sd = Mn_ICP*0.12) %>% 
-  relocate(Mn_ICP_sd, .after = Mn_ICP) %>%
-  rename(Fe_ICP_sd_FDV2023 = Fe_ICP_sd) %>% 
-  mutate(Fe_ICP_sd = Fe_ICP*0.18) %>%
-  relocate(Fe_ICP_sd, .after = Fe_ICP) %>%
-  rename(Co_ICP_sd_FDV2023 = Co_ICP_sd) %>% 
-  mutate(Co_ICP_sd = Co_ICP*0.07) %>%
-  relocate(Co_ICP_sd, .after = Co_ICP) %>%
-  rename(Ni_ICP_sd_FDV2023 = Ni_ICP_sd) %>% 
-  mutate(Ni_ICP_sd = Ni_ICP*0.54) %>%
-  relocate(Ni_ICP_sd, .after = Ni_ICP) %>%
-  rename(Cu_ICP_sd_FDV2023 = Cu_ICP_sd) %>% 
-  mutate(Cu_ICP_sd = Cu_ICP*0.14) %>%
-  relocate(Cu_ICP_sd, .after = Cu_ICP) %>%
-  rename(Zn_ICP_sd_FDV2023 = Zn_ICP_sd) %>% 
-  mutate(Zn_ICP_sd = Zn_ICP*0.09) %>% 
-  relocate(Zn_ICP_sd, .after = Zn_ICP) %>%
-  rename(Rb_ICP_sd_FDV2023 = Rb_ICP_sd) %>% 
-  mutate(Rb_ICP_sd = Rb_ICP*0.16) %>%
-  relocate(Rb_ICP_sd, .after = Rb_ICP) %>%
-  rename(Sr_ICP_sd_FDV2023 = Sr_ICP_sd) %>% 
-  mutate(Sr_ICP_sd = Sr_ICP*0.02) %>% 
-  relocate(Sr_ICP_sd, .after = Sr_ICP)
-write.csv(ACE_xrf_icp_matched,"Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/cps/ACE_matched_xrf_icp_cps.csv", row.names = FALSE)
+# see "Papers_R/2024_DeVleeschouwer/Output/itrax_Composite/Matching_mean/ACE/ACE_matching_clr.R" 
+# for code that creates of matched ACE dataset from individual site matched data
 
-# Define dataset to use for linear modelling
-ACE_LM1 <- ACE_xrf_icp_matched %>%
+ACE_xrf_icp_matched <-read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/ACE_xrf_icp_matched_cps.csv")
+is.na(ACE_xrf_icp_matched)<-sapply(ACE_xrf_icp_matched, is.infinite) # replace any infinite values with NA
+
+# Replace zeros with half minimum value for each element 
+ACE_all0 <- ACE_xrf_icp_matched %>% 
+  mutate(across(all_of(c(icp_Elements_min, icp_Elements_min_sd)), ~ ifelse(.x < 0, 0, .x))) %>%  # replace any ICPMS values <0 with zero
+  #zeroreplace() %>% # replace zeros as outlined in the compositions package
+  mutate_at(vars(all_of(c(icp_Elements_min, acf_icp_Elements_min))), ## replace zeros with half minimum value to allow linear modelling to work
+            ~ (. == 0) * min(.[. != 0])/2 + .) %>% # Recommended procedure from Bertrand et al. (submitted) - retains dataframe structure
+  mutate_at(vars(all_of(c(icp_Elements_min_sd, acf_icp_Elements_min_sd))), 
+            ~ (. == 0) * min(.[. != 0])/2 + .) %>% 
+  select(Location:MSE, all_of(acf_icp_Elements_min), coh_inc, all_of(acf_icp_Elements_min_sd), coh_inc_sd,
+         all_of(icp_Elements_min), dry_mass_pc, all_of(icp_Elements_min_sd), dry_mass_err) %>% 
+  na.omit() %>% #remove rows with NAs - in this case there is only one at the end of CAT1-S1-1F
+  print()
+
+# Make clr file of while dataset after replacing zeros with half min value and using using composition package 
+ACE_all_clr_itrax <- ACE_all0 %>% 
+  select(all_of(acf_icp_Elements_min)) %>%
+  select(-c(Mo_inc, Mo_coh)) %>% 
+    clr() %>% # make centred log ratio dataframe
+  as_tibble()
+
+ACE_all_clr_itrax_sd <- ACE_all_clr_itrax %>% 
+  mutate(across(where(is.numeric), ~ .x * 0.05)) %>% 
+  rename_with(.fn = function(.x){paste0(.x,"_sd")})
+
+ACE_all_clr_icp <- ACE_all0 %>% 
+  select(all_of(icp_Elements_min)) %>%
+  clr() %>% # make centred log ratio dataframe
+  as_tibble()
+
+ACE_all_clr_icp_sd <- ACE_all_clr_icp %>% 
+  mutate(across(where(is.numeric), ~ .x * 0.05)) %>% 
+  rename_with(.fn = function(.x){paste0(.x,"_sd")})
+
+# Make other parameters / variables 
+ACE_all_text <- ACE_all0 %>% 
+  select(Location:MSE)
+ACE_all_rest <- ACE_all0 %>% 
+  select(Mo_inc, Mo_coh, Mo_inc_sd, Mo_coh_sd, coh_inc, coh_inc_sd,
+         dry_mass_pc, dry_mass_err)
+
+# Bind into single file & define dataset to use for linear modelling
+ACE_LM1 <- bind_cols(ACE_all_text, ACE_all_clr_itrax, ACE_all_clr_itrax_sd, 
+                     ACE_all_clr_icp, ACE_all_clr_icp_sd, ACE_all_rest) %>%
   filter(!Site =="POB4") %>% #remove POB4 data
   print()
-write.csv(ACE_LM1,"Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/cps/ACE_xrf_icp_matched_cps_noPOB4.csv", row.names = FALSE)
+write.csv(ACE_LM1,"Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/ACE_xrf_icp_matched_noPOB4_clr.csv", row.names = FALSE)
 
 # Convert Site to use as a grouping variable
 ACE_LM1$Site <- as.factor(ACE_LM1$Site)
+
 
 # Correlation matrices --------------------------------------------------
 
 # Fig 2a - ITRAX & ICP correlation matrix - key elements reduced
 theme_set(theme_bw(base_size=2))
-ggcorr(ACE_LM1[,xrf_icp_Elements_key_Fig2], method = c("everything", "pearson"),
-       size = 6, label = TRUE, label_alpha = FALSE, label_round=2, label_size= 6)
-ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig2a_Corr_matrix_key_cps.pdf", 
+ggcorr(ACE_LM1[,xrf_icp_Elements_key_reduced], method = c("everything", "pearson"),
+       size = 11, label = TRUE, label_alpha = FALSE, label_round=2, label_size= 11)
+ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig 2a_Corr_matrix_key_reduced_clr.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 
 # Correlation & data plots -----------------------------------------------------------
 
 # Define text for titles & labels for plotting
-XRF_title <- " cps XRF-CS"
-ICP_title <- " cps ICPMS"
-correlation_title <- "cps Correlation"
-method_title <- "cps"
+XRF_title <- " clr XRF-CS"
+ICP_title <- " clr ICPMS"
+correlation_title <- "clr Correlation"
+method_title <- "clr"
 palette_set <- "jco" # or "jco", or "npg", "uchicago"
 
 # Individual element plots -----------------------------------------------------------
 
 # Only Ti shown below as shown in Fig 2 - full version of code is:
-# "Papers_R/2024_DeVleeschouwer/Output/itrax_Composite/Matching_mean/ACE/ACE_matching_cps.R"
+# "Papers_R/2024_DeVleeschouwer/Output/itrax_Composite/Matching_mean/ACE/ACE_matching_clr.R"
 
 # Ti ----------------------------------------------------------------------
 element_title <- "Ti"
@@ -178,7 +185,7 @@ Ti_corr1 <- ggscatter(ACE_LM1, x = "Ti", y = "Ti_ICP",
   ggtitle(paste("ACE (OLS): ", element_title, XRF_title)) +
   theme(axis.text = element_text(size=10), axis.title = element_text(size=10), plot.title = element_text(size=10, face="bold"))
 Ti_corr1
-ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig2b_Ti_Linear_reg_cps.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig2b_Ti_Linear_reg_clr.pdf", 
        height = c(16), width = c(16), dpi = 600, units = "cm")
 
 # Fig 2c - Linear regression model - per site
@@ -200,9 +207,6 @@ Ti_corr_sites <- ggscatter(ACE_LM1, x = "Ti", y = "Ti_ICP", size = 1,
   theme(axis.text = element_text(size=8), axis.title = element_text(size=10), plot.title = element_text(size=12, face="bold")) +
   ggtitle(paste("ACE: ", element_title, ICP_title ,"vs", XRF_title))
 Ti_corr_sites
-ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig2c_Linear_reg_per_site_cps.pdf", 
+ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig2c_Linear_reg_per_site.pdf", 
        height = c(16), width = c(16), dpi = 600, units = "cm")
-
-
-
 

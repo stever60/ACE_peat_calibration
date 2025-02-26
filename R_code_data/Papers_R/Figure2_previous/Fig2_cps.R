@@ -76,14 +76,10 @@ xrf_icp_Elements_key <- c("K", "K_ICP", "Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "M
 # key elements_reduced for more simplified plots 
 xrf_icp_Elements_key_reduced <- c("Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "Mn_ICP", "Sr", "Sr_ICP", "Zr", "Zr_ICP")
 
-# key elements for Figure 2a
-xrf_icp_Elements_key_Fig2 <- c("Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "Mn_ICP", "Fe", "Fe_ICP", 
-                               "Sr", "Sr_ICP", "Zr", "Zr_ICP", "coh_inc", "dry_mass_pc")
-
 # Import existing ACE cps matched file ----------------------------------------------
 
 ACE_xrf_icp_matched_input <-read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/cps/ACE_xrf_icp_matched_cps.csv")
-is.na(ACE_xrf_icp_matched_input)<-sapply(ACE_xrf_icp_matched_input, is.infinite) # replace any infinite values with NA
+is.na(ACE_xrf_icp_matched)<-sapply(ACE_xrf_icp_matched, is.infinite) # replace any infinite values with NA
 
 # ICPMS data - change errors supplied by FDV originally to CRM % values in Table 2 
 ACE_xrf_icp_matched <- ACE_xrf_icp_matched_input %>%
@@ -132,13 +128,14 @@ write.csv(ACE_LM1,"Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/cps/ACE_xrf_
 # Convert Site to use as a grouping variable
 ACE_LM1$Site <- as.factor(ACE_LM1$Site)
 
+
 # Correlation matrices --------------------------------------------------
 
 # Fig 2a - ITRAX & ICP correlation matrix - key elements reduced
 theme_set(theme_bw(base_size=2))
-ggcorr(ACE_LM1[,xrf_icp_Elements_key_Fig2], method = c("everything", "pearson"),
-       size = 6, label = TRUE, label_alpha = FALSE, label_round=2, label_size= 6)
-ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig2a_Corr_matrix_key_cps.pdf", 
+ggcorr(ACE_LM1[,xrf_icp_Elements_key_reduced], method = c("everything", "pearson"),
+       size = 10, label = TRUE, label_alpha = FALSE, label_round=2, label_size= 10)
+ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig2a_Corr_matrix_key_reduced_cps.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 

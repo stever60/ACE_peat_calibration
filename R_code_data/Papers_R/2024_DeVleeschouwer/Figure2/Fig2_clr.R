@@ -26,17 +26,17 @@ options(scipen = 999)
 
 # Make ACE matched dataset - import matched itrax-ICPMS datafiles from each site -------------------
 
-ACE_matched_BI10 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/BI10_xrf_icp_matched_clr.csv", 
+ACE_matched_BI10 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/clr/BI10_xrf_icp_matched_clr.csv", 
                              col_names = TRUE, skip = 0)
-ACE_matched_HER42PB <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/HER42PB_xrf_icp_matched_clr.csv", 
+ACE_matched_HER42PB <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/clr/HER42PB_xrf_icp_matched_clr.csv", 
                                 col_names = TRUE, skip = 0)
-ACE_matched_KER1 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/KER1_xrf_icp_matched_clr.csv", 
+ACE_matched_KER1 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/clr/KER1_xrf_icp_matched_clr.csv", 
                              col_names = TRUE, skip = 0)
-ACE_matched_KER3 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/KER3_xrf_icp_matched_clr.csv", 
+ACE_matched_KER3 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/clr/KER3_xrf_icp_matched_clr.csv", 
                              col_names = TRUE, skip = 0)
-ACE_matched_PB1 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/PB1_xrf_icp_matched_clr.csv", 
+ACE_matched_PB1 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/clr/PB1_xrf_icp_matched_clr.csv", 
                             col_names = TRUE, skip = 0)
-ACE_matched_POB4 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/POB4_xrf_icp_matched_clr.csv", 
+ACE_matched_POB4 <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/clr/POB4_xrf_icp_matched_clr.csv", 
                              col_names = TRUE, skip = 0)
 
 # Combine matched output from each site into ACE matched dataset
@@ -47,7 +47,7 @@ ACE_matched_clr <- bind_rows(ACE_matched_BI10,
                              ACE_matched_PB1, 
                              ACE_matched_POB4) %>% 
   print()
-write.csv(ACE_matched_clr,"Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/ACE_xrf_icp_matched_clr.csv", row.names = FALSE)
+write.csv(ACE_matched_clr,"Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/clr/ACE_xrf_icp_matched_clr.csv", row.names = FALSE)
 
 
 # Define elements to use ----------------------------------------------------------
@@ -77,6 +77,9 @@ xrf_icp_Elements_key <- c("K", "K_ICP", "Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "M
 # key elements_reduced to simplify plotting further  
 xrf_icp_Elements_key_reduced <- c("Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "Mn_ICP", "Sr", "Sr_ICP", "Zr", "Zr_ICP")
 
+# key elements for Figure 2a
+xrf_icp_Elements_key_Fig2 <- c("Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "Mn_ICP", "Fe", "Fe_ICP", 
+                               "Sr", "Sr_ICP", "Zr", "Zr_ICP", "coh_inc", "dry_mass_pc")
 
 # Import existing ACE cps matched file - alternate method for making clr dataset from existing ACE cps dataset ----------------------------------------------
 
@@ -85,7 +88,7 @@ xrf_icp_Elements_key_reduced <- c("Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "Mn_ICP"
 # see "Papers_R/2024_DeVleeschouwer/Output/itrax_Composite/Matching_mean/ACE/ACE_matching_clr.R" 
 # for code that creates of matched ACE dataset from individual site matched data
 
-ACE_xrf_icp_matched <-read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/ACE_xrf_icp_matched_cps.csv")
+ACE_xrf_icp_matched <-read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Input/clr/ACE_xrf_icp_matched_cps.csv")
 is.na(ACE_xrf_icp_matched)<-sapply(ACE_xrf_icp_matched, is.infinite) # replace any infinite values with NA
 
 # Replace zeros with half minimum value for each element 
@@ -133,19 +136,18 @@ ACE_LM1 <- bind_cols(ACE_all_text, ACE_all_clr_itrax, ACE_all_clr_itrax_sd,
                      ACE_all_clr_icp, ACE_all_clr_icp_sd, ACE_all_rest) %>%
   filter(!Site =="POB4") %>% #remove POB4 data
   print()
-write.csv(ACE_LM1,"Papers_R/2024_DeVleeschouwer/Figure2/Data/clr/ACE_xrf_icp_matched_noPOB4_clr.csv", row.names = FALSE)
+write.csv(ACE_LM1,"Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/clr/ACE_xrf_icp_matched_noPOB4_clr.csv", row.names = FALSE)
 
 # Convert Site to use as a grouping variable
 ACE_LM1$Site <- as.factor(ACE_LM1$Site)
-
 
 # Correlation matrices --------------------------------------------------
 
 # Fig 2a - ITRAX & ICP correlation matrix - key elements reduced
 theme_set(theme_bw(base_size=2))
-ggcorr(ACE_LM1[,xrf_icp_Elements_key_reduced], method = c("everything", "pearson"),
-       size = 11, label = TRUE, label_alpha = FALSE, label_round=2, label_size= 11)
-ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig 2a_Corr_matrix_key_reduced_clr.pdf", 
+ggcorr(ACE_LM1[,xrf_icp_Elements_key_Fig2], method = c("everything", "pearson"),
+       size = 6, label = TRUE, label_alpha = FALSE, label_round=2, label_size= 6)
+ggsave("Papers_R/2024_DeVleeschouwer/Figure2/Plots/Fig2a_Corr_matrix_key_clr.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
 
