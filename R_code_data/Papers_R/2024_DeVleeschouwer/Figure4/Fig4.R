@@ -62,12 +62,8 @@ xrf_icp_elements1 <- c("K", "K_ICP", "Ca", "Ca_ICP", "Ti", "Ti_ICP", "Mn", "Mn_I
                       "Zr", "Zr_ICP", "Mo_inc",  "Mo_coh") # Mo_inc included
 
 # MSCL
-mscl_param  <- c("Den1_SAT", "MS1_SAT", "DCMS1_SAT", "Impedance_SAT", "Fract_Porosity_SAT", "Resistivity_SAT")
-
-# Subsample
-subsample_param <- c("Water_Content_pc", "Dry_mass", "Wet_density_g_cm3", "Dry_density_g_cm3",	"DMAR_g_cm2_yr")
-#"LOI550",	"C_content",	
-
+mscl_param  <- c("Den1_SAT", "MS1_SAT", "DCMS1_SAT", "Impedance_SAT", 
+                 "Fract_Porosity_SAT", "Resistivity_SAT")
 
 
 # Import datasets, standardise & centre (Z-scores) -----------------------------
@@ -78,13 +74,13 @@ subsample_param <- c("Water_Content_pc", "Dry_mass", "Wet_density_g_cm3", "Dry_d
 ACE_xrf_cps <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_ITRAX_qc_acf_cps.csv") %>% 
   select(Location:MSE, all_of(acf_icp_Elements_key), Total_scatter, inc_coh, coh_inc)
 ACE_xrf_cps
-write.csv(ACE_xrf_cps,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_xrf_cps.csv", row.names = FALSE)
+write.csv(ACE_xrf_cps,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_xrf_cps.csv", row.names = FALSE)
 
 # cps Z-scores
 ACE_xrf_cps <- ACE_xrf_cps 
 ACE_xrf_cps[, acf_icp_Elements_key] <- scale(ACE_xrf_cps[, acf_icp_Elements_key], center = TRUE, scale = TRUE)
 ACE_xrf_cps
-write.csv(ACE_xrf_cps,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_xrf_cps_Z.csv", row.names = FALSE)
+write.csv(ACE_xrf_cps,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_xrf_cps_Z.csv", row.names = FALSE)
 
 # cps - convert to long format for facet plotting
 acf_icp_Elements_key3 <- c("K", "Ca", "Ti", "Fe", "Sr", "Zr", "Mo_coh") #no Zn, Mn for plotting
@@ -111,19 +107,19 @@ ACE_xrf_log_inc <- read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE
   mutate(across(all_of(acf_icp_Elements_key), log)) %>% #log all xrf and icp data
   mutate(across(acf_icp_Elements_key, ~ ifelse(. <=-10, NA, .)))
 ACE_xrf_log_inc
-write.csv(ACE_xrf_log_inc,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_xrf_log_inc.csv", row.names = FALSE)
+write.csv(ACE_xrf_log_inc,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_xrf_log_inc.csv", row.names = FALSE)
 HER42PB_xrf_log_inc <- ACE_xrf_log_inc %>% 
   filter(Site=="HER42PB")
-write.csv(HER42PB_xrf_log_inc,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/HER42PB_xrf_log_inc.csv", row.names = FALSE)
+write.csv(HER42PB_xrf_log_inc,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/HER42PB/HER42PB_xrf_log_inc.csv", row.names = FALSE)
 
 # log_inc Z-scores
 ACE_xrf_log_inc_Z <- ACE_xrf_log_inc 
 ACE_xrf_log_inc_Z[, acf_icp_Elements_key] <- scale(ACE_xrf_log_inc[, acf_icp_Elements_key], center = TRUE, scale = TRUE)
 ACE_xrf_log_inc_Z
-write.csv(ACE_xrf_log_inc_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_xrf_log_inc_Z.csv", row.names = FALSE)
+write.csv(ACE_xrf_log_inc_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_xrf_log_inc_Z.csv", row.names = FALSE)
 HER42PB_xrf_log_inc_Z <- ACE_xrf_log_inc_Z %>% 
   filter(Site=="HER42PB")
-write.csv(HER42PB_xrf_log_inc_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/HER42PB_xrf_log_inc_Z.csv", row.names = FALSE)
+write.csv(HER42PB_xrf_log_inc_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/HER42PB/HER42PB_xrf_log_inc_Z.csv", row.names = FALSE)
 
 # log_inc - convert to long format for facet plotting
 acf_icp_Elements_key3 <- c("K", "Ca", "Ti", "Fe", "Sr", "Zr", "Mo_coh") #no Zn, Mn for plotting
@@ -152,7 +148,7 @@ HER42PB_xrf_log_inc_Z_long <- HER42PB_xrf_log_inc_Z %>%
 HER42PB_xrf_log_inc_Z_long
 
 # Plot vs Depth - key XRF_CS log_inc data
-p1_HER42PB_XRFCS_log_inc_depth <- ggplot(HER42PB_xrf_log_inc_long, aes(x = value, y = depth)) +
+HER42PB_XRFCS_log_inc_depth <- ggplot(HER42PB_xrf_log_inc_long, aes(x = value, y = depth)) +
   geom_lineh(colour = "black") +
   geom_point(shape = 21, fill = "black", color = "black", size = 0.2) +
   ylim(0, 410) +
@@ -168,7 +164,7 @@ p1_HER42PB_XRFCS_log_inc_depth <- ggplot(HER42PB_xrf_log_inc_long, aes(x = value
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
   )
-p1_HER42PB_XRFCS_log_inc_depth
+HER42PB_XRFCS_log_inc_depth
 ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/log_inc/Fig4.1_XRFCS_log_inc_depth.pdf",
        height = c(24), width = c(36), dpi = 600, units = "cm")
 
@@ -177,20 +173,20 @@ ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/log_inc/Fig4.1_XRFCS_log_inc_
 ACE_xrf_clr <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_ITRAX_qc_acf_clr.csv") %>% 
   select(Location:MSE, all_of(acf_icp_Elements_key), Total_scatter, inc_coh, coh_inc)
 ACE_xrf_clr
-write.csv(ACE_xrf_cps,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_xrf_clr.csv", row.names = FALSE)
+write.csv(ACE_xrf_cps,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_xrf_clr.csv", row.names = FALSE)
 HER42PB_xrf_clr <- ACE_xrf_clr %>% 
   filter(Site=="HER42PB")
 HER42PB_xrf_clr
-write.csv(HER42PB_xrf_clr,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/HER42PB_xrf_clr.csv", row.names = FALSE)
+write.csv(HER42PB_xrf_clr,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/HER42PB/HER42PB_xrf_clr.csv", row.names = FALSE)
 
 # clr Z-scores 
 ACE_xrf_clr_Z <- ACE_xrf_clr 
 ACE_xrf_clr_Z[, acf_icp_Elements_key] <- scale(ACE_xrf_clr[, acf_icp_Elements_key], center = TRUE, scale = TRUE)
 ACE_xrf_clr_Z
-write.csv(ACE_xrf_clr_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_xrf_clr_Z.csv", row.names = FALSE)
+write.csv(ACE_xrf_clr_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_xrf_clr_Z.csv", row.names = FALSE)
 HER42PB_xrf_clr_Z <- ACE_xrf_clr_Z %>% 
   filter(Site=="HER42PB")
-write.csv(HER42PB_xrf_clr_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/HER42PB_xrf_clr_Z.csv", row.names = FALSE)
+write.csv(HER42PB_xrf_clr_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/HER42PB/HER42PB_xrf_clr_Z.csv", row.names = FALSE)
 
 # clr - convert to long format for facet plotting
 acf_icp_Elements_key3 <- c("K", "Ca", "Ti", "Fe", "Sr", "Zr") #no "Mo_coh" for plotting - not included in clr elements
@@ -219,7 +215,7 @@ HER42PB_xrf_clr_Z_long <- HER42PB_xrf_clr_Z %>%
 HER42PB_xrf_clr_Z_long
 
 # Plot vs Depth - key XRF_CS clr data
-p1_HER42PB_XRFCS_clr_depth <- ggplot(HER42PB_xrf_clr_long, aes(x = value, y = depth)) +
+HER42PB_XRFCS_clr_depth <- ggplot(HER42PB_xrf_clr_long, aes(x = value, y = depth)) +
   geom_lineh(colour = "black") +
   geom_point(shape = 21, fill = "black", color = "black", size = 0.2) +
   ylim(0, 410) +
@@ -235,23 +231,23 @@ p1_HER42PB_XRFCS_clr_depth <- ggplot(HER42PB_xrf_clr_long, aes(x = value, y = de
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
   )
-p1_HER42PB_XRFCS_clr_depth
+HER42PB_XRFCS_clr_depth
 ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/clr/Fig4.1_XRFCS_clr_depth.pdf",
        height = c(24), width = c(36), dpi = 600, units = "cm")
 
 
-# Matched XRF & ICPMS log dataset used in Figure 2  ----------------------
+# Matched XRF & ICPMS log data (from Figure 2)  ----------------------
 
 ACE_matched_xrf_icp_log_inc <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_matched_xrf_icp_log_inc.csv") 
 is.na(ACE_matched_xrf_icp_log_inc)<-sapply(ACE_matched_xrf_icp_log_inc, is.infinite) # replace any infinite values with NA
 ACE_matched_xrf_icp_log_inc
-write.csv(ACE_matched_xrf_icp_log_inc,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_matched_xrf_icp_log_inc.csv", row.names = FALSE)
+write.csv(ACE_matched_xrf_icp_log_inc,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_matched_xrf_icp_log_inc.csv", row.names = FALSE)
 
 # Standardise and centre dataframe - Z-scores
 ACE_matched_xrf_icp_log_inc_Z <- ACE_matched_xrf_icp_log_inc 
 ACE_matched_xrf_icp_log_inc_Z[, xrf_icp_elements] <- scale(ACE_matched_xrf_icp_log_inc[, xrf_icp_elements], center = TRUE, scale = TRUE)
 ACE_matched_xrf_icp_log_inc_Z
-write.csv(ACE_matched_xrf_icp_log_inc_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_matched_xrf_icp_log_inc_Z.csv", row.names = FALSE)
+write.csv(ACE_matched_xrf_icp_log_inc_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_matched_xrf_icp_log_inc_Z.csv", row.names = FALSE)
 
 # matched - convert to long format for facet plotting
 xrf_icp_elements3 <- c("K", "K_ICP", "Ca", "Ca_ICP", "Ti", "Ti_ICP",
@@ -296,228 +292,46 @@ ACE_matched_xrf_icp_log_inc_Z_long_icp <- ACE_matched_xrf_icp_log_inc_Z %>%
   relocate(param, .before = depth)
 ACE_matched_xrf_icp_log_inc_Z_long_icp
 
-# Depth plots
+# Summary depth plots 
 library(tidypaleo) #https://cran.r-project.org/web/packages/tidypaleo/vignettes/strat_diagrams.html
 theme_set(theme_paleo(12)) #theme_paleo
-
-# xrf matched
-# Select site & order that plots appear in
-Matched_reorder_log_inc <- ACE_matched_xrf_icp_log_inc_long_xrf %>% # define order plots appear in
-  filter(Site =="HER42PB") %>% 
-  mutate(param = fct_relevel(param,"K", "Ca", "Ti", "Fe", "Sr", "Zr", "Mo_coh")) 
-Matched_reorder_log_inc_Z <- ACE_matched_xrf_icp_log_inc_Z_long_xrf %>% 
-  filter(Site =="HER42PB") %>% 
-  mutate(param = fct_relevel(param,"K", "Ca", "Ti", "Fe", "Sr", "Zr", "Mo_coh")) 
-
-# Depth - matched log_inc
-p1_Matched_log_inc_depth <- ggplot(Matched_reorder_log_inc, aes(x = value, y = depth, ymin= 0, ymax = 410)) +
-  geom_lineh(colour = "black") +
-  geom_point(shape = 21, fill = "white", color = "black", size = 2) +
-  #scale_x_reverse() +
-  scale_y_reverse() +
-  ylim(410, 0) +
-  facet_geochem_gridh(vars(param)) +
-  labs(x = "Depth (cm)", y = "Ln(E/inc.)") +
-  labs(title = "HER42PB Matched ITRAX log_inc") +
-  theme(text=element_text(size=12, face = "plain"),
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face="plain"),
-        plot.margin=unit(c(1,1,1,1), "cm"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
-  )
-p1_Matched_log_inc_depth
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.1_Matched_log_inc_depth.pdf",
-       height = c(24), width = c(36), dpi = 600, units = "cm")
-
-# Depth plot - matched log_inc Z-scores
-p2_Matched_log_inc_depth_Z <- ggplot(Matched_reorder_log_inc_Z, aes(x = value, y = depth, ymin= 0, ymax = 410)) +
-  geom_lineh(colour = "black") +
-  #geom_point(shape = 21, fill = "white", color = "black", size = 2) +
-  xlim(-2.5, 2.5) +
-  #scale_x_reverse() +
-  scale_y_reverse() +
-  ylim(410, 0) +
-  facet_geochem_gridh(vars(param)) +
-  labs(x = "Depth (cm)", y = "Ln(E/inc.) Z-score") +
-  labs(title = "HER42PB Matched ITRAX log_inc [Z-score]") +
-  theme(text=element_text(size=12, face = "plain"),
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face="plain"),
-        plot.margin=unit(c(1,1,1,1), "cm"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
-  )
-p2_Matched_log_inc_depth_Z
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.2_Matched_log_inc_depth_Z.pdf",
-       height = c(24), width = c(36), dpi = 600, units = "cm")
-
-
-# ICPMS matched
-
-# Select site & order that plots appear in
-Matched_reorder_log_icpms <- ACE_matched_xrf_icp_log_inc_long_icp %>% # define order plots appear in
-  filter(Site =="HER42PB") %>% 
-  mutate(param = fct_relevel(param,"K_ICP", "Ca_ICP", "Ti_ICP", "Fe_ICP", "Sr_ICP", "Zr_ICP", "Mo_coh")) 
-Matched_reorder_log_icpms_Z <- ACE_matched_xrf_icp_log_inc_Z_long_icp %>% 
-  filter(Site =="HER42PB") %>% 
-  mutate(param = fct_relevel(param,"K_ICP", "Ca_ICP", "Ti_ICP", "Fe_ICP", "Sr_ICP", "Zr_ICP", "Mo_coh")) 
-
-# Depth - matched log
-p1_Matched_log_icpms_depth <- ggplot(Matched_reorder_log_icpms, aes(x = value, y = depth, ymin= 0, ymax = 410)) +
-  geom_lineh(colour = "darkgreen") +
-  geom_point(shape = 21, fill = "white", color = "darkgreen", size = 2) +
-  #scale_x_reverse() +
-  scale_y_reverse() +
-  ylim(410, 0) +
-  facet_geochem_gridh(vars(param)) +
-  labs(x = "Depth (cm)", y = "log (ppm)") +
-  labs(title = "HER42PB Matched log ICPMS") +
-  theme(text=element_text(size=12, face = "plain"),
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face="plain"),
-        plot.margin=unit(c(1,1,1,1), "cm"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
-  )
-p1_Matched_log_icpms_depth
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.3_Matched_log_icpms_depth.pdf",
-       height = c(24), width = c(36), dpi = 600, units = "cm")
-
-# Depth plot - matched log Z-scores + CONISS
-p2_Matched_log_icpms_depth_Z <- ggplot(Matched_reorder_log_icpms_Z, aes(x = value, y = depth, ymin= 0, ymax = 410)) +
-  geom_lineh(colour = "darkgreen") +
-  geom_point(shape = 21, fill = "white", color = "darkgreen", size = 2) +
-  xlim(-2.5, 2.5) +
-  #scale_x_reverse() +
-  scale_y_reverse() +
-  ylim(410, 0) +
-  facet_geochem_gridh(vars(param)) +
-  labs(x = "Depth (cm)", y = "log (ppm) [Z-score]") +
-  labs(title = "HER42PB Matched log ICPMS [Z-score]") +
-  theme(text=element_text(size=12, face = "plain"),
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face="plain"),
-        plot.margin=unit(c(1,1,1,1), "cm"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
-  )
-p2_Matched_log_icpms_depth_Z
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.4_Matched_log_icpms_depth_Z.pdf",
-       height = c(24), width = c(36), dpi = 600, units = "cm")
-
-
-# Age plot - log_inc
-p4_Matched_log_inc_age <- ggplot(Matched_reorder_log_inc, aes(x = SH20_mean_age, y = value)) +
-  geom_line(colour = "darkgrey") +
-  #geom_point(shape =".") +
-  #scale_y_reverse() +
-  scale_x_reverse() +
-  xlim(5000, -500) +
-  facet_geochem_grid(vars(param)) +
-  # scale_colour_manual(values = c("blue", "black"))
-  labs(x = "Age (cal a BP)", y = "Ln(E/inc.)") +
-  labs(title = "HER42PB ITRAX log_inc") +
-  theme(text=element_text(size=12, face = "plain"),
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face="plain"),
-        plot.margin = unit(c(1,1,1,1), "cm"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
-  )
-p4_Matched_log_inc_age
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.5_Matched_log_inc_age.pdf",
-       height = c(36), width = c(24), dpi = 600, units = "cm")
-
-# Age plot - log_inc Z-scores
-p5_Matched_log_inc_age_Z <- ggplot(Matched_reorder_log_inc_Z, aes(x = SH20_mean_age, y = value)) +
-  geom_line(colour = "darkgrey") +
-  #geom_point() +
-  #scale_y_reverse() +
-  ylim(-2.5, 2.5) +
-  scale_x_reverse() +
-  xlim(5000, -500) +
-  facet_geochem_grid(vars(param)) +
-  # scale_colour_manual(values = c("blue", "black"))
-  labs(x = "Age (cal a BP)", y = "Ln(E/inc.) Z-score") +
-  labs(title = "HER42PB ITRAX log_inc [Z-score]") +
-  theme(text=element_text(size=12, face = "plain"),
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face="plain"),
-        plot.margin = unit(c(1,1,1,1), "cm"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
-  )
-p5_Matched_log_inc_age_Z
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.6_Matched_log_inc_age_Z.pdf",
-       height = c(36), width = c(24), dpi = 600, units = "cm")
-
-
-# Age plot - log icpms
-p4_Matched_log_icpms_age <- ggplot(Matched_reorder_log_icpms, aes(x = SH20_mean_age, y = value)) +
-  geom_line(colour = "darkgreen") +
-  geom_point(shape = 21, fill = "white", color = "darkgreen", size = 2) +
-  #scale_y_reverse() +
-  scale_x_reverse() +
-  xlim(5000, -500) +
-  facet_geochem_grid(vars(param)) +
-  # scale_colour_manual(values = c("blue", "black"))
-  labs(x = "Age (cal a BP)", y = "log (ppm)") +
-  labs(title = "HER42PB log ICPMS") +
-  theme(text=element_text(size=12, face = "plain"),
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face="plain"),
-        plot.margin = unit(c(1,1,1,1), "cm"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
-  )
-p4_Matched_log_icpms_age
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.7_Matched_log_icpms_age.pdf",
-       height = c(36), width = c(24), dpi = 600, units = "cm")
-
-# Age plot - log ICPMS Z-scores
-p5_Matched_log_icpms_age_Z <- ggplot(Matched_reorder_log_icpms_Z, aes(x = SH20_mean_age, y = value)) +
-  geom_line(colour = "darkgreen") +
-  geom_point(shape = 21, fill = "white", color = "darkgreen", size = 2) +
-  #scale_y_reverse() +
-  ylim(-2.5, 2.5) +
-  scale_x_reverse() +
-  xlim(5000, -500) +
-  facet_geochem_grid(vars(param)) +
-  # scale_colour_manual(values = c("blue", "black"))
-  labs(x = "Age (cal a BP)", y = "log (ppm) Z-score") +
-  labs(title = "HER42PB log ICPMS [Z-score]") +
-  theme(text=element_text(size=12, face = "plain"),
-        axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face="plain"),
-        plot.margin = unit(c(1,1,1,1), "cm"),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
-  )
-p5_Matched_log_icpms_age_Z
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/matched/Fig4.8_Matched_log_icpms_age_Z.pdf",
-       height = c(36), width = c(24), dpi = 600, units = "cm")
-
 
 
 # MSCL data ---------------------------------------------------------------
 
-HER_MSCL <- read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_SHW_MSCL_Composite.csv") %>% 
-  filter(Location=="Isla Hermite")
-HER_MSCL
-# Standardise and centre dataframe - Z-scores
-HER_MSCL_Z <- HER_MSCL
-HER_MSCL_Z[, mscl_param] <- scale(HER_MSCL[, mscl_param], center = TRUE, scale = TRUE)
-HER_MSCL_Z
-write.csv(HER_MSCL_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/HER_MSCL_Comp_Z.csv", row.names = FALSE)
+ACE_MSCL <- read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_SHW_MSCL_Composite.csv") %>% 
+  filter(Site == "BI10"| Site == "HER42PB" | Site == "KER1" | Site == "KER3" | Site == "PB1")
+ACE_MSCL
+write.csv(ACE_MSCL,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_MSCL.csv", row.names = FALSE)
 
-HER42PB_MSCL <- HER_MSCL %>% 
-  filter(Site == "HER42PB")
+HER42PB_MSCL <- read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_SHW_MSCL_Composite.csv") %>% 
+  filter(Site=="HER42PB")
 HER42PB_MSCL
+write.csv(HER42PB_MSCL,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/HER42PB/HER42PB_MSCL.csv", row.names = FALSE)
 
-HER42PB_MSCL_Z <- HER_MSCL_Z %>% 
-  filter(Site == "HER42PB")
+# Standardise and centre dataframe - Z-scores
+ACE_MSCL_Z <- ACE_MSCL
+ACE_MSCL_Z[, mscl_param] <- scale(ACE_MSCL[, mscl_param], center = TRUE, scale = TRUE)
+ACE_MSCL_Z
+write.csv(ACE_MSCL_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_MSCL_Z.csv", row.names = FALSE)
+
+HER42PB_MSCL_Z <- HER42PB_MSCL
+HER42PB_MSCL_Z[, mscl_param] <- scale(HER42PB_MSCL[, mscl_param], center = TRUE, scale = TRUE)
 HER42PB_MSCL_Z
+write.csv(HER42PB_MSCL_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/HER42PB/HER42PB_MSCL_Z.csv", row.names = FALSE)
+
+# Convert to long format
+ACE_MSCL_long <- ACE_MSCL %>% 
+  select(all_of(mscl_param), Site, depth, SH20_mean_age) %>%
+  pivot_longer(all_of(`mscl_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+ACE_MSCL_long
+
+ACE_MSCL_long_Z <- ACE_MSCL %>% 
+  select(all_of(mscl_param), Site, depth, SH20_mean_age) %>%
+  pivot_longer(all_of(`mscl_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+ACE_MSCL_long
 
 HER42PB_MSCL_long <- HER42PB_MSCL %>% 
   select(all_of(mscl_param), Site, depth, SH20_mean_age) %>%
@@ -535,7 +349,7 @@ library(tidypaleo) #https://cran.r-project.org/web/packages/tidypaleo/vignettes/
 theme_set(theme_paleo(12)) #theme_paleo
 
 # Plot vs Depth - key MSCL data
-p1_HER42PB_MSCL_depth <- ggplot(HER42PB_MSCL_long, aes(x = value, y = depth)) +
+HER42PB_MSCL_depth <- ggplot(HER42PB_MSCL_long, aes(x = value, y = depth)) +
   geom_lineh(colour = "black") +
   geom_point(shape = 21, fill = "white", color = "black", size = 1) +
   ylim(0, 410) +
@@ -551,45 +365,48 @@ p1_HER42PB_MSCL_depth <- ggplot(HER42PB_MSCL_long, aes(x = value, y = depth)) +
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
   )
-p1_HER42PB_MSCL_depth
+HER42PB_MSCL_depth
 ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/MSCL/Fig4.1_MSCL_depth.pdf",
        height = c(24), width = c(36), dpi = 600, units = "cm")
 
 
 # Subsample data ----------------------------------------------------------
 
-ACE_DEN <- read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_Den_comp.csv")
-ACE_DEN
+ACE_Subsample <- read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_Subsample.csv")
+ACE_Subsample
 
-HER42PB_DEN <- ACE_DEN%>% 
+
+HER42PB_Subsample <- ACE_Subsample%>% 
   filter(Site == "HER42PB")
-HER42PB_DEN
+HER42PB_Subsample
+
+subsample_param <- c("Dry_mass","LOI550", "C_org_pc", "Dry_density_g_cm3")
 
 # Standardise and centre dataframe - Z-scores
-ACE_DEN_Z <- ACE_DEN
-ACE_DEN_Z[, subsample_param] <- scale(ACE_DEN[, subsample_param], center = TRUE, scale = TRUE)
-ACE_DEN_Z
-write.csv(ACE_DEN_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_Den_comp_Z.csv", row.names = FALSE)
+HER42PB_Subsample_Z <- HER42PB_Subsample
+HER42PB_Subsample_Z[, subsample_param] <- scale(HER42PB_Subsample[, subsample_param], center = TRUE, scale = TRUE)
+HER42PB_Subsample_Z
+write.csv(HER42PB_Subsample_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/HER42PB/HER42PB_Subsample_comp_Z.csv", row.names = FALSE)
 
-ACE_DEN_long <- ACE_DEN %>% 
+HER42PB_Subsample_long <- HER42PB_Subsample %>% 
   select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
-ACE_DEN_long
+HER42PB_Subsample_long
 
-ACE_DEN_long_Z <- ACE_DEN_Z %>% 
+HER42PB_Subsample_long_Z <- HER42PB_Subsample_Z %>% 
   select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
   pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
   relocate(param, .before = depth)
-ACE_DEN_long_Z
+HER42PB_Subsample_long_Z
 
 library(tidypaleo) #https://cran.r-project.org/web/packages/tidypaleo/vignettes/strat_diagrams.html
 theme_set(theme_paleo(12)) #theme_paleo
 
 # Plot vs Depth - all subsample data
-p1_ACE_DEN_depth <- ggplot(ACE_DEN_long, aes(x = value, y = depth)) +
+p1_HER42PB_Subsample_depth <- ggplot(HER42PB_Subsample_long, aes(x = value, y = depth)) +
   geom_lineh(colour = "black") +
-  geom_point(shape = 21, fill = "white", color = "black", size = 1) +
+  geom_point(shape = 21, fill = "black", color = "black", size = 1) +
   ylim(0, 410) +
   #scale_x_reverse() +
   scale_y_reverse() +
@@ -603,19 +420,13 @@ p1_ACE_DEN_depth <- ggplot(ACE_DEN_long, aes(x = value, y = depth)) +
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
   )
-p1_ACE_DEN_depth
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/MSCL/Fig4.1b_Subsample_depth.pdf",
+p1_HER42PB_Subsample_depth
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Subsample/Fig4.1b_HER42PB_Subsample_depth.pdf",
        height = c(24), width = c(36), dpi = 600, units = "cm")
 
+# XRF as ppm plots ----------------------------------------------------------
 
-
-
-
-# Calibration  ----------------------------------------------------------
-
-# Ti
-
-# ICPMS data - change errors to Table 2 (previously +/-5%)
+# Import ICPMS data - change errors to Table 2 (previously +/-5%)
 ACE_ICP_ppm <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_matched_xrf_icp_cps.csv") %>%
   rename(K_ICP_sd_FDV2023 = K_ICP_sd) %>% 
   mutate(K_ICP_sd = K_ICP*0.18) %>%
@@ -653,7 +464,9 @@ ACE_ICP_ppm <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_matc
   rename(Zr_ICP_sd_FDV2023 = Zr_ICP_sd) %>% 
   mutate(Zr_ICP_sd = Zr_ICP*0.05) %>% 
   relocate(Zr_ICP_sd, .after = Zr_ICP) %>% 
-#calculate error in ITRAX cps data
+  select(Site:Zr_ICP_sd) %>% 
+  
+# Add 10% max error to XRF-CS cps data
   mutate(K_sd = K*0.1) %>%
   relocate(K_sd, .after = K) %>%
   mutate(Ca_sd = Ca*0.1) %>% 
@@ -678,15 +491,15 @@ ACE_ICP_ppm <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Input/ACE_matc
   relocate(Sr_sd, .after = Sr) %>% 
   mutate(Zr_sd = Zr*0.1) %>% 
   relocate(Zr_sd, .after = Zr) 
-write.csv(ACE_ICP_ppm,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_matched_xrf_icp_cps.csv", row.names = FALSE)
+write.csv(ACE_ICP_ppm,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_matched_xrf_icp_cps.csv", row.names = FALSE)
 
 # Input ICPMS data for comparison / overlay
-ACE_ICP_ppm_Ti <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_matched_xrf_icp_cps.csv") %>%
+ACE_ICP_ppm_Ti <-read_csv("Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/ACE/ACE_matched_xrf_icp_cps.csv") %>%
   select(Site, depth, SH20_mean_age, Ti, Ti_sd, Ti_ICP, Ti_ICP_sd) %>%
   filter(Site == "HER42PB")  
 ACE_ICP_ppm_Ti
 
-# Ti XRF-CS as ppm with RMSE errors
+# Import ACE Ti XRF-CS data and convert to ppm with +/- RMSE error
 
 ACE_xrf_calib_Ti <- ACE_xrf_log_inc %>%
   select(Site, depth, SH20_mean_age, Ti) %>%
@@ -700,15 +513,16 @@ ACE_xrf_calib_Ti <- ACE_xrf_log_inc %>%
   mutate(Ti_lower_RMSE = exp(Ti_convert_lower)) %>% 
   select(Site, depth, SH20_mean_age, Ti, Ti_ppm, Ti_lower_RMSE, Ti_upper_RMSE)
 ACE_xrf_calib_Ti
-write.csv(ACE_xrf_calib_Ti,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/ACE_xrf_calib_Ti.csv", row.names = FALSE)
+write.csv(ACE_xrf_calib_Ti,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/HER42PB/HER42PB/ACE_xrf_calib_Ti.csv", row.names = FALSE)
+
+
+# Final Plots ------------------------------------------------------------------
+
+# HER42PB - Ti -----------------------------------------------------------
 
 HER42PB_xrf_calib_Ti <- ACE_xrf_calib_Ti %>% 
   filter(Site == "HER42PB")
-write.csv(HER42PB_xrf_calib_Ti,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/HER42PB_xrf_calib_Ti.csv", row.names = FALSE)
-
-
-
-# Final Plot -------------------------------------------------------------------------
+write.csv(HER42PB_xrf_calib_Ti,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/HER42PB/HER42PB_xrf_calib_Ti.csv", row.names = FALSE)
 
 theme_set(theme_classic(12))
 
@@ -716,7 +530,7 @@ Site_title = "HER42PB"
 Element_title = "Ti"
 
 # Depth plot - XRF-CS
-p1_Ti <- 
+HER42PB_Ti <- 
   ggplot() +
   geom_lineh(data = HER42PB_xrf_calib_Ti, aes(x=Ti_lower_RMSE, y=depth), color = "lightblue") +
   geom_lineh(data = HER42PB_xrf_calib_Ti, aes(x=Ti_upper_RMSE, y=depth), color = "lightblue") +
@@ -733,12 +547,12 @@ p1_Ti <-
   theme(axis.text=element_text(size=12, colour = "black"), 
         axis.title=element_text(size=12, colour = "black"),
         title = element_text(size=12, colour = "black")) 
-p1_Ti
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.1_ICPMS_Ti.pdf",
+HER42PB_Ti
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Sites/HER42PB/Fig4.1_ICPMS_Ti.pdf",
         height = c(24), width = c(8), dpi = 600, units = "cm")
 
-# Depth plot - MSCl GRD and Subsample Density plot
-p2_Den_MSCL <- 
+# Depth plot - MSCl GRD
+HER42PB_Den_MSCL <- 
   ggplot() +
   geom_lineh(data = HER42PB_MSCL, aes(x=Den1_SAT, y=depth), color = "grey") +
   geom_point(data = HER42PB_MSCL, aes(x=Den1_SAT, y=depth), fill = "grey", color = "grey", shape = 21, size = 1) +
@@ -750,12 +564,12 @@ p2_Den_MSCL <-
   theme(axis.text=element_text(size=12, colour = "black"), 
         axis.title=element_text(size=12, colour = "black"),
         title = element_text(size=12, colour = "black")) 
-p2_Den_MSCL
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.2_Den_MSCL.pdf",
+HER42PB_Den_MSCL
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Sites/HER42PB/Fig4.2_Den_MSCL.pdf",
        height = c(24), width = c(8), dpi = 600, units = "cm")
 
 # Depth plot - MSCl DCMS
-p3_DCMS1_SAT_MSCL <- 
+HER42PB_DCMS1_SAT_MSCL <- 
   ggplot() +
   geom_lineh(data = HER42PB_MSCL, aes(x=DCMS1_SAT, y=depth), color = "black") +
   geom_point(data = HER42PB_MSCL, aes(x=DCMS1_SAT, y=depth), fill = "black", color = "black", shape = 21, size = 1) +
@@ -767,16 +581,16 @@ p3_DCMS1_SAT_MSCL <-
   theme(axis.text=element_text(size=12, colour = "black"), 
         axis.title=element_text(size=12, colour = "black"),
         title = element_text(size=12, colour = "black")) 
-p3_DCMS1_SAT_MSCL
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.3_DCMS_MSCL.pdf",
+HER42PB_DCMS1_SAT_MSCL
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Sites/HER42PB/Fig4.3_DCMS_MSCL.pdf",
        height = c(24), width = c(8), dpi = 600, units = "cm")
 
-# Depth plot - MSCl GRD and Subsample Density plot
-p4_Den_Subsample <-
+# Depth plot - Subsample Density plot
+HER42PB_Den_Subsample <-
   ggplot() +
-  geom_lineh(data = HER42PB_DEN, aes(x=Dry_density_g_cm3, y=depth), color = "black") +
-  geom_point(data = HER42PB_DEN, aes(x=Dry_density_g_cm3, y=depth), fill = "white", color = "black", shape = 21, size = 2) +
-  #geom_errorbarh(data = HER42PB_DEN, aes(x=Dry_density_g_cm3, y=depth, xmin=Dry_density_g_cm3-DD_sd, xmax=Dry_density_g_cm3+DD_sd), color = "red", height=0) +
+  geom_lineh(data = HER42PB_Subsample, aes(x=Dry_density_g_cm3, y=depth), color = "black") +
+  geom_point(data = HER42PB_Subsample, aes(x=Dry_density_g_cm3, y=depth), fill = "white", color = "black", shape = 21, size = 2) +
+  #geom_errorbarh(data = HER42PB_Subsample, aes(x=Dry_density_g_cm3, y=depth, xmin=Dry_density_g_cm3-DD_sd, xmax=Dry_density_g_cm3+DD_sd), color = "red", height=0) +
   scale_y_reverse() +
   ylim(410, 0) +
   xlim(0,1) +
@@ -785,22 +599,554 @@ p4_Den_Subsample <-
   theme(axis.text=element_text(size=12, colour = "black"), 
         axis.title=element_text(size=12, colour = "black"),
         title = element_text(size=12, colour = "black")) 
-p4_Den_Subsample
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.4_Den_subsample.pdf",
+HER42PB_Den_Subsample
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Sites/HER42PB/Fig4.4_Den_subsample.pdf",
        height = c(24), width = c(8), dpi = 600, units = "cm")
 
-ggarrange(p2_Den_MSCL, p4_Den_Subsample, p1_Ti, p3_DCMS1_SAT_MSCL,
+ggarrange(HER42PB_Den_MSCL, HER42PB_Den_Subsample, HER42PB_Ti, HER42PB_DCMS1_SAT_MSCL,
           ncol = 4, nrow = 1, common.legend = TRUE)
-ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4/Fig4.pdf",
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Sites/HER42PB/Fig4.pdf",
        height = c(15), width = c(40), dpi = 600, units = "cm")
 
+# Depth plot - Corg plot
+HER42PB_C_Subsample <-
+  ggplot() +
+  geom_lineh(data = HER42PB_Subsample, aes(x=C_org, y=depth), color = "black") +
+  geom_point(data = HER42PB_Subsample, aes(x=C_org, y=depth), fill = 'black', color = "black", shape = 21, size = 1) +
+  #geom_errorbarh(data = HER42PB_Subsample, aes(x=Dry_density_g_cm3, y=depth, xmin=Dry_density_g_cm3-DD_sd, xmax=Dry_density_g_cm3+DD_sd), color = "red", height=0) +
+  scale_y_reverse() +
+  ylim(410, 0) +
+  xlim(0,50) +
+  labs(x = paste("% Carbon") , y = paste0("Depth (cm)")) +
+  ggtitle(paste(Site_title, ": Subsample")) +
+  theme(axis.text=element_text(size=12, colour = "black"), 
+        axis.title=element_text(size=12, colour = "black"),
+        title = element_text(size=12, colour = "black")) 
+HER42PB_C_Subsample
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Sites/HER42PB/Fig4.5_Corg.pdf",
+       height = c(24), width = c(8), dpi = 600, units = "cm")
 
+# Depth plot - inc/coh
+HER42PB_inc_coh <- ACE_xrf_cps %>% 
+  filter(Site == "HER42PB") %>% 
+  ggplot() +
+  geom_lineh(data = HER42PB_xrf, aes(x=inc_coh, y=depth), color = "grey") +
+  #geom_point(data = HER42PB_xrf, aes(x=inc_coh, y=depth), fill = "grey", color = "grey", shape = 21, size = 1) +
+  scale_y_reverse() +
+  ylim(410, 0) +
+  xlim(4,8) +
+  labs(x = paste("XRF inc/coh") , y = paste0("Depth (cm)")) +
+  ggtitle(paste(Site_title, ": inc/coh")) +
+  theme(axis.text=element_text(size=12, colour = "black"), 
+        axis.title=element_text(size=12, colour = "black"),
+        title = element_text(size=12, colour = "black")) 
+HER42PB_inc_coh
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Sites/HER42PB/Fig4.6_inc_coh_XRF.pdf",
+       height = c(24), width = c(8), dpi = 600, units = "cm")
+
+
+# Depth plot - dry mass plot
+HER42PB_DM_Subsample <-
+  ggplot() +
+  geom_lineh(data = HER42PB_Subsample, aes(x=C_org, y=depth), color = "black") +
+  geom_point(data = HER42PB_Subsample, aes(x=C_org, y=depth), fill = 'black', color = "black", shape = 21, size = 1) +
+  #geom_errorbarh(data = HER42PB_Subsample, aes(x=Dry_density_g_cm3, y=depth, xmin=Dry_density_g_cm3-DD_sd, xmax=Dry_density_g_cm3+DD_sd), color = "red", height=0) +
+  scale_y_reverse() +
+  ylim(410, 0) +
+  xlim(0,50) +
+  labs(x = paste("% Carbon") , y = paste0("Depth (cm)")) +
+  ggtitle(paste(Site_title, ": Subsample")) +
+  theme(axis.text=element_text(size=12, colour = "black"), 
+        axis.title=element_text(size=12, colour = "black"),
+        title = element_text(size=12, colour = "black")) 
+HER42PB_C_Subsample
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Sites/HER42PB/Fig4.5_Corg.pdf",
+       height = c(24), width = c(8), dpi = 600, units = "cm")
+
+# Depth plot - coh/inc
+HER42PB_xrf <- ACE_xrf_cps %>% 
+  filter(Site == "HER42PB")
+p6_XRF_inc_coh <- 
+  ggplot() +
+  geom_lineh(data = HER42PB_xrf, aes(x=inc_coh, y=depth), color = "grey") +
+  #geom_point(data = HER42PB_xrf, aes(x=inc_coh, y=depth), fill = "grey", color = "grey", shape = 21, size = 1) +
+  scale_y_reverse() +
+  ylim(410, 0) +
+  xlim(4,8) +
+  labs(x = paste("XRF inc/coh") , y = paste0("Depth (cm)")) +
+  ggtitle(paste(Site_title, ": inc/coh")) +
+  theme(axis.text=element_text(size=12, colour = "black"), 
+        axis.title=element_text(size=12, colour = "black"),
+        title = element_text(size=12, colour = "black")) 
+p6_XRF_inc_coh
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Sites/HER42PB/Fig4.6_inc_coh_XRF.pdf",
+       height = c(24), width = c(8), dpi = 600, units = "cm")
+
+ggarrange(HER42PB_C_Subsample, HER42PB_inc_coh,
+          ncol = 4, nrow = 1, common.legend = TRUE)
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Sites/HER42PB/Fig4_carbon.pdf",
+       height = c(30), width = c(40), dpi = 600, units = "cm")
 
 
 
 # -------------------------------------------------------------------------
 
-# Other Plots
+# ********** END ************
+
+# -------------------------------------------------------------------------
+# Other data Plots to copy 
+# BI10 subsample -------------------------------------------------------
+
+BI10_Subsample <- ACE_Subsample%>% 
+  filter(Site == "BI10")
+BI10_Subsample
+
+subsample_param <- c("Dry_mass","LOI550", "C_org_pc", "Dry_density_g_cm3")
+
+# Standardise and centre dataframe - Z-scores
+BI10_Subsample_Z <- BI10_Subsample
+BI10_Subsample_Z[, subsample_param] <- scale(BI10_Subsample[, subsample_param], center = TRUE, scale = TRUE)
+BI10_Subsample_Z
+write.csv(BI10_Subsample_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/BI10/BI10/BI10_Subsample_comp_Z.csv", row.names = FALSE)
+
+BI10_Subsample_long <- BI10_Subsample %>% 
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
+  pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+BI10_Subsample_long
+
+BI10_Subsample_long_Z <- BI10_Subsample_Z %>% 
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
+  pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+BI10_Subsample_long_Z
+
+library(tidypaleo) #https://cran.r-project.org/web/packages/tidypaleo/vignettes/strat_diagrams.html
+theme_set(theme_paleo(12)) #theme_paleo
+
+# Plot vs Depth - all subsample data
+p1_BI10_Subsample_depth <- ggplot(BI10_Subsample_long, aes(x = value, y = depth)) +
+  geom_lineh(colour = "black") +
+  geom_point(shape = 21, fill = "black", color = "black", size = 1) +
+  ylim(0, 410) +
+  #scale_x_reverse() +
+  scale_y_reverse() +
+  facet_geochem_gridh(vars(param)) +
+  labs(x = "", y = "Depth (cm)") +
+  labs(title = "BI10 Subsample data") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin=unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+p1_BI10_Subsample_depth
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Subsample/Fig4.1b_BI10_Subsample_depth.pdf",
+       height = c(24), width = c(36), dpi = 600, units = "cm")
+
+# KER1 subsample -------------------------------------------------------
+  
+  KER1_Subsample <- ACE_Subsample%>% 
+  filter(Site == "KER1")
+KER1_Subsample
+
+subsample_param <- c("Dry_mass","LOI550", "C_org_pc", "Dry_density_g_cm3")
+
+# Standardise and centre dataframe - Z-scores
+KER1_Subsample_Z <- KER1_Subsample
+KER1_Subsample_Z[, subsample_param] <- scale(KER1_Subsample[, subsample_param], center = TRUE, scale = TRUE)
+KER1_Subsample_Z
+write.csv(KER1_Subsample_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/KER1/KER1_Subsample_comp_Z.csv", row.names = FALSE)
+
+KER1_Subsample_long <- KER1_Subsample %>% 
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
+  pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+KER1_Subsample_long
+
+KER1_Subsample_long_Z <- KER1_Subsample_Z %>% 
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
+  pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+KER1_Subsample_long_Z
+
+library(tidypaleo) #https://cran.r-project.org/web/packages/tidypaleo/vignettes/strat_diagrams.html
+theme_set(theme_paleo(12)) #theme_paleo
+
+# Plot vs Depth - all subsample data
+p1_KER1_Subsample_depth <- ggplot(KER1_Subsample_long, aes(x = value, y = depth)) +
+  geom_lineh(colour = "black") +
+  geom_point(shape = 21, fill = "black", color = "black", size = 1) +
+  ylim(0, 410) +
+  #scale_x_reverse() +
+  scale_y_reverse() +
+  facet_geochem_gridh(vars(param)) +
+  labs(x = "", y = "Depth (cm)") +
+  labs(title = "KER1 Subsample data") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin=unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+p1_KER1_Subsample_depth
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Subsample/Fig4.1b_KER1_Subsample_depth.pdf",
+       height = c(24), width = c(36), dpi = 600, units = "cm")
+
+# KER1 subsample -------------------------------------------------------
+
+KER1_Subsample <- ACE_Subsample%>% 
+  filter(Site == "KER1")
+KER1_Subsample
+
+subsample_param <- c("Dry_mass","LOI550", "C_org_pc", "Dry_density_g_cm3")
+
+# Standardise and centre dataframe - Z-scores
+KER1_Subsample_Z <- KER1_Subsample
+KER1_Subsample_Z[, subsample_param] <- scale(KER1_Subsample[, subsample_param], center = TRUE, scale = TRUE)
+KER1_Subsample_Z
+write.csv(KER1_Subsample_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/KER1/KER1_Subsample_comp_Z.csv", row.names = FALSE)
+
+KER1_Subsample_long <- KER1_Subsample %>% 
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
+  pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+KER1_Subsample_long
+
+KER1_Subsample_long_Z <- KER1_Subsample_Z %>% 
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
+  pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+KER1_Subsample_long_Z
+
+library(tidypaleo) #https://cran.r-project.org/web/packages/tidypaleo/vignettes/strat_diagrams.html
+theme_set(theme_paleo(12)) #theme_paleo
+
+# Plot vs Depth - all subsample data
+p1_KER1_Subsample_depth <- ggplot(KER1_Subsample_long, aes(x = value, y = depth)) +
+  geom_lineh(colour = "black") +
+  geom_point(shape = 21, fill = "black", color = "black", size = 1) +
+  ylim(0, 410) +
+  #scale_x_reverse() +
+  scale_y_reverse() +
+  facet_geochem_gridh(vars(param)) +
+  labs(x = "", y = "Depth (cm)") +
+  labs(title = "KER1 Subsample data") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin=unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+p1_KER1_Subsample_depth
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Subsample/Fig4.1b_KER1_Subsample_depth.pdf",
+       height = c(24), width = c(36), dpi = 600, units = "cm")
+
+# KER3 subsample -------------------------------------------------------
+
+KER3_Subsample <- ACE_Subsample%>% 
+  filter(Site == "KER3")
+KER3_Subsample
+
+subsample_param <- c("Dry_mass","LOI550", "C_org_pc", "Dry_density_g_cm3")
+
+# Standardise and centre dataframe - Z-scores
+KER3_Subsample_Z <- KER3_Subsample
+KER3_Subsample_Z[, subsample_param] <- scale(KER3_Subsample[, subsample_param], center = TRUE, scale = TRUE)
+KER3_Subsample_Z
+write.csv(KER3_Subsample_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/KER3/KER3_Subsample_comp_Z.csv", row.names = FALSE)
+
+KER3_Subsample_long <- KER3_Subsample %>% 
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
+  pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+KER3_Subsample_long
+
+KER3_Subsample_long_Z <- KER3_Subsample_Z %>% 
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
+  pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+KER3_Subsample_long_Z
+
+library(tidypaleo) #https://cran.r-project.org/web/packages/tidypaleo/vignettes/strat_diagrams.html
+theme_set(theme_paleo(12)) #theme_paleo
+
+# Plot vs Depth - all subsample data
+p1_KER3_Subsample_depth <- ggplot(KER3_Subsample_long, aes(x = value, y = depth)) +
+  geom_lineh(colour = "black") +
+  geom_point(shape = 21, fill = "black", color = "black", size = 1) +
+  ylim(0, 410) +
+  #scale_x_reverse() +
+  scale_y_reverse() +
+  facet_geochem_gridh(vars(param)) +
+  labs(x = "", y = "Depth (cm)") +
+  labs(title = "KER3 Subsample data") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin=unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+p1_KER3_Subsample_depth
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Subsample/Fig4.1b_KER3_Subsample_depth.pdf",
+       height = c(24), width = c(36), dpi = 600, units = "cm")
+
+# PB1 subsample -------------------------------------------------------
+
+PB1_Subsample <- ACE_Subsample%>% 
+  filter(Site == "PB1")
+PB1_Subsample
+
+subsample_param <- c("Dry_mass","LOI550", "C_org_pc", "Dry_density_g_cm3")
+
+# Standardise and centre dataframe - Z-scores
+PB1_Subsample_Z <- PB1_Subsample
+PB1_Subsample_Z[, subsample_param] <- scale(PB1_Subsample[, subsample_param], center = TRUE, scale = TRUE)
+PB1_Subsample_Z
+write.csv(PB1_Subsample_Z,"Papers_R/2024_DeVleeschouwer/Figure4/Data/Output/Fig4/PB1/PB1_Subsample_comp_Z.csv", row.names = FALSE)
+
+PB1_Subsample_long <- PB1_Subsample %>% 
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
+  pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+PB1_Subsample_long
+
+PB1_Subsample_long_Z <- PB1_Subsample_Z %>% 
+  select(c(all_of(subsample_param), Site, depth, SH20_mean_age)) %>%
+  pivot_longer(c(`subsample_param`), names_to = "param", values_to = "value") %>% 
+  relocate(param, .before = depth)
+PB1_Subsample_long_Z
+
+library(tidypaleo) #https://cran.r-project.org/web/packages/tidypaleo/vignettes/strat_diagrams.html
+theme_set(theme_paleo(12)) #theme_paleo
+
+# Plot vs Depth - all subsample data
+p1_PB1_Subsample_depth <- ggplot(PB1_Subsample_long, aes(x = value, y = depth)) +
+  geom_lineh(colour = "black") +
+  geom_point(shape = 21, fill = "black", color = "black", size = 1) +
+  ylim(0, 410) +
+  #scale_x_reverse() +
+  scale_y_reverse() +
+  facet_geochem_gridh(vars(param)) +
+  labs(x = "", y = "Depth (cm)") +
+  labs(title = "PB1 Subsample data") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin=unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+p1_PB1_Subsample_depth
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Subsample/Fig4.1b_PB1_Subsample_depth.pdf",
+       height = c(24), width = c(36), dpi = 600, units = "cm")
+
+
+
+
+# Matched summary plots - not much use but code might be useful later ---------------------------------------
+
+# xrf matched
+# Select site & order that plots appear in
+Matched_reorder_log_inc <- ACE_matched_xrf_icp_log_inc_long_xrf %>% # define order plots appear in
+  filter(Site =="HER42PB") %>% 
+  mutate(param = fct_relevel(param,"K", "Ca", "Ti", "Fe", "Sr", "Zr", "Mo_coh")) 
+Matched_reorder_log_inc_Z <- ACE_matched_xrf_icp_log_inc_Z_long_xrf %>% 
+  filter(Site =="HER42PB") %>% 
+  mutate(param = fct_relevel(param,"K", "Ca", "Ti", "Fe", "Sr", "Zr", "Mo_coh")) 
+
+# Depth - matched log_inc
+HER42PB_Matched_log_inc_depth <- ggplot(Matched_reorder_log_inc, aes(x = value, y = depth, ymin= 0, ymax = 410)) +
+  geom_lineh(colour = "black") +
+  geom_point(shape = 21, fill = "white", color = "black", size = 2) +
+  #scale_x_reverse() +
+  scale_y_reverse() +
+  ylim(410, 0) +
+  facet_geochem_gridh(vars(param)) +
+  labs(x = "Depth (cm)", y = "Ln(E/inc.)") +
+  labs(title = "HER42PB Matched ITRAX log_inc") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin=unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+HER42PB_Matched_log_inc_depth
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Matched/HER42PB/Fig4.1_Matched_log_inc_depth.pdf",
+       height = c(24), width = c(36), dpi = 600, units = "cm")
+
+# Depth plot - matched log_inc Z-scores
+HER42PB_Matched_log_inc_depth_Z <- ggplot(Matched_reorder_log_inc_Z, aes(x = value, y = depth, ymin= 0, ymax = 410)) +
+  geom_lineh(colour = "black") +
+  #geom_point(shape = 21, fill = "white", color = "black", size = 2) +
+  xlim(-2.5, 2.5) +
+  #scale_x_reverse() +
+  scale_y_reverse() +
+  ylim(410, 0) +
+  facet_geochem_gridh(vars(param)) +
+  labs(x = "Depth (cm)", y = "Ln(E/inc.) Z-score") +
+  labs(title = "HER42PB Matched ITRAX log_inc [Z-score]") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin=unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+HER42PB_Matched_log_inc_depth_Z
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Matched/HER42PB/Fig4.2_Matched_log_inc_depth_Z.pdf",
+       height = c(24), width = c(36), dpi = 600, units = "cm")
+
+# ICPMS matched plots
+
+# Select site & order that plots appear in
+Matched_reorder_log_icpms <- ACE_matched_xrf_icp_log_inc_long_icp %>% # define order plots appear in
+  filter(Site =="HER42PB") %>% 
+  mutate(param = fct_relevel(param,"K_ICP", "Ca_ICP", "Ti_ICP", "Fe_ICP", "Sr_ICP", "Zr_ICP", "Mo_coh")) 
+Matched_reorder_log_icpms_Z <- ACE_matched_xrf_icp_log_inc_Z_long_icp %>% 
+  filter(Site =="HER42PB") %>% 
+  mutate(param = fct_relevel(param,"K_ICP", "Ca_ICP", "Ti_ICP", "Fe_ICP", "Sr_ICP", "Zr_ICP", "Mo_coh")) 
+
+# Depth - matched log
+HER42PB_Matched_log_icpms_depth <- ggplot(Matched_reorder_log_icpms, aes(x = value, y = depth, ymin= 0, ymax = 410)) +
+  geom_lineh(colour = "darkgreen") +
+  geom_point(shape = 21, fill = "white", color = "darkgreen", size = 2) +
+  #scale_x_reverse() +
+  scale_y_reverse() +
+  ylim(410, 0) +
+  facet_geochem_gridh(vars(param)) +
+  labs(x = "Depth (cm)", y = "log (ppm)") +
+  labs(title = "HER42PB Matched log ICPMS") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin=unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+HER42PB_Matched_log_icpms_depth
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Matched/HER42PB/Fig4.3_Matched_log_icpms_depth.pdf",
+       height = c(24), width = c(36), dpi = 600, units = "cm")
+
+# Depth plot - matched log Z-scores + CONISS
+HER42PB_Matched_log_icpms_depth_Z <- ggplot(Matched_reorder_log_icpms_Z, aes(x = value, y = depth, ymin= 0, ymax = 410)) +
+  geom_lineh(colour = "darkgreen") +
+  geom_point(shape = 21, fill = "white", color = "darkgreen", size = 2) +
+  xlim(-2.5, 2.5) +
+  #scale_x_reverse() +
+  scale_y_reverse() +
+  ylim(410, 0) +
+  facet_geochem_gridh(vars(param)) +
+  labs(x = "Depth (cm)", y = "log (ppm) [Z-score]") +
+  labs(title = "HER42PB Matched log ICPMS [Z-score]") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin=unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+HER42PB_Matched_log_icpms_depth_Z
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Matched/HER42PB/Fig4.4_Matched_log_icpms_depth_Z.pdf",
+       height = c(24), width = c(36), dpi = 600, units = "cm")
+
+# Age plot - log_inc
+HER42PB_Matched_log_inc_age <- ggplot(Matched_reorder_log_inc, aes(x = SH20_mean_age, y = value)) +
+  geom_line(colour = "darkgrey") +
+  #geom_point(shape =".") +
+  #scale_y_reverse() +
+  scale_x_reverse() +
+  xlim(5000, -500) +
+  facet_geochem_grid(vars(param)) +
+  # scale_colour_manual(values = c("blue", "black"))
+  labs(x = "Age (cal a BP)", y = "Ln(E/inc.)") +
+  labs(title = "HER42PB ITRAX log_inc") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin = unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+HER42PB_Matched_log_inc_age
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Matched/HER42PB/Fig4.5_Matched_log_inc_age.pdf",
+       height = c(36), width = c(24), dpi = 600, units = "cm")
+
+# Age plot - log_inc Z-scores
+HER42PB_Matched_log_inc_age_Z <- ggplot(Matched_reorder_log_inc_Z, aes(x = SH20_mean_age, y = value)) +
+  geom_line(colour = "darkgrey") +
+  #geom_point() +
+  #scale_y_reverse() +
+  ylim(-2.5, 2.5) +
+  scale_x_reverse() +
+  xlim(5000, -500) +
+  facet_geochem_grid(vars(param)) +
+  # scale_colour_manual(values = c("blue", "black"))
+  labs(x = "Age (cal a BP)", y = "Ln(E/inc.) Z-score") +
+  labs(title = "HER42PB ITRAX log_inc [Z-score]") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin = unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+HER42PB_Matched_log_inc_age_Z
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Matched/HER42PB/Fig4.6_Matched_log_inc_age_Z.pdf",
+       height = c(36), width = c(24), dpi = 600, units = "cm")
+
+
+# Age plot - log icpms
+HER42PB_Matched_log_icpms_age <- ggplot(Matched_reorder_log_icpms, aes(x = SH20_mean_age, y = value)) +
+  geom_line(colour = "darkgreen") +
+  geom_point(shape = 21, fill = "white", color = "darkgreen", size = 2) +
+  #scale_y_reverse() +
+  scale_x_reverse() +
+  xlim(5000, -500) +
+  facet_geochem_grid(vars(param)) +
+  # scale_colour_manual(values = c("blue", "black"))
+  labs(x = "Age (cal a BP)", y = "log (ppm)") +
+  labs(title = "HER42PB log ICPMS") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin = unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+HER42PB_Matched_log_icpms_age
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Matched/HER42PB/Fig4.7_Matched_log_icpms_age.pdf",
+       height = c(36), width = c(24), dpi = 600, units = "cm")
+
+# Age plot - log ICPMS Z-scores
+HER42PB_Matched_log_icpms_age_Z <- ggplot(Matched_reorder_log_icpms_Z, aes(x = SH20_mean_age, y = value)) +
+  geom_line(colour = "darkgreen") +
+  geom_point(shape = 21, fill = "white", color = "darkgreen", size = 2) +
+  #scale_y_reverse() +
+  ylim(-2.5, 2.5) +
+  scale_x_reverse() +
+  xlim(5000, -500) +
+  facet_geochem_grid(vars(param)) +
+  # scale_colour_manual(values = c("blue", "black"))
+  labs(x = "Age (cal a BP)", y = "log (ppm) Z-score") +
+  labs(title = "HER42PB log ICPMS [Z-score]") +
+  theme(text=element_text(size=12, face = "plain"),
+        axis.text=element_text(size=12),
+        axis.title=element_text(size=12,face="plain"),
+        plot.margin = unit(c(1,1,1,1), "cm"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank() # remove gridlines from palaeo theme for clarity
+  )
+HER42PB_Matched_log_icpms_age_Z
+ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Matched/HER42PB/Fig4.8_Matched_log_icpms_age_Z.pdf",
+       height = c(36), width = c(24), dpi = 600, units = "cm")
+
+
 # ITRAX log_inc -----------------------------------------------------------
 
 # Depth plots
@@ -925,26 +1271,6 @@ p6_ITRAX_log_inc_age_Z_coniss
 ggsave("Papers_R/2024_DeVleeschouwer/Figure4/Plots/Fig4.6_ITRAX_log_inc_age_Z_coniss.pdf",
        height = c(36), width = c(24), dpi = 600, units = "cm")
 
-
-# Matched log_inc xrf & log icpms  -----------------------------------------------------------
-
-
-
-
-p8 <- p2_ITRAX_log_inc_depth_Z + p2_Matched_log_inc_depth_Z
-
-p8 
-
-
-
-
-
-# EXTRA -------------------------------------------------------------------------
-
-# add units to the graph headers
-#facet_geochem_gridh(
-#  vars(param),
-#  units = c("Shard_Counts" = "n", "Total_Shards" = "no. per g DM", "CONISS" = "SS")) +
 
 # ITRAX with smoothing---------------
 
