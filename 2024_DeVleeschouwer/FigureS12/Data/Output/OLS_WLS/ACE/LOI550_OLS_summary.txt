@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = LOI550 ~ inc_coh, data = ACE_Subsample_xrf_matched_no_PB1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-69.258  -8.271   3.029   8.723  97.356 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -138.4867     5.7067  -24.27   <2e-16 ***
+inc_coh       33.3298     0.9116   36.56   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 15.25 on 1035 degrees of freedom
+Multiple R-squared:  0.5636,	Adjusted R-squared:  0.5632 
+F-statistic:  1337 on 1 and 1035 DF,  p-value: < 2.2e-16
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic   p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>     <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.564         0.563  15.2     1337. 1.37e-188     1 -4296. 8597. 8612.  240629.        1035  1037
+# Indices of model performance
+
+AIC      |     AICc |      BIC |    R2 | R2 (adj.) |   RMSE |  Sigma
+--------------------------------------------------------------------
+8597.339 | 8597.362 | 8612.171 | 0.564 |     0.563 | 15.233 | 15.248
+
+	studentized Breusch-Pagan test
+
+data:  ACE_LOI_lm
+BP = 66.746, df = 1, p-value = 3.088e-16
+
+Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+NULL

@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Zn_ICP ~ Zn, data = ACE_dataset, weights = ACE_Zn_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.8395 -0.7043 -0.0050  0.8404  5.2499 
+
+Coefficients:
+            Estimate Std. Error t value            Pr(>|t|)    
+(Intercept)  6.35148    0.11925   53.26 <0.0000000000000002 ***
+Zn           0.31175    0.01427   21.84 <0.0000000000000002 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.346 on 266 degrees of freedom
+Multiple R-squared:  0.642,	Adjusted R-squared:  0.6406 
+F-statistic:   477 on 1 and 266 DF,  p-value: < 0.00000000000000022
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.642         0.641  1.35      477. 2.83e-61     1  -238.  482.  493.     482.         266   268
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+---------------------------------------------------------------
+481.877 | 481.968 | 492.650 | 0.642 |     0.641 | 0.601 | 1.346
+
+	studentized Breusch-Pagan test
+
+data:  ACE_Zn_wls
+BP = 1255, df = 1, p-value < 0.00000000000000022
+
+OK: Error variance appears to be homoscedastic (p = 0.958).
+NULL

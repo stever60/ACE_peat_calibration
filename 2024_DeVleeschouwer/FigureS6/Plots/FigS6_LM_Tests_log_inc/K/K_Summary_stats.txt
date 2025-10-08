@@ -1,0 +1,61 @@
+# A tibble: 5 × 2
+  Site        r
+  <fct>   <dbl>
+1 BI10    0.140
+2 HER42PB 0.647
+3 KER1    0.735
+4 KER3    0.749
+5 PB1     0.803
+
+	Pearson's product-moment correlation
+
+data:  ACE_LM1$K and ACE_LM1$K_ICP
+t = 11.45, df = 266, p-value < 0.00000000000000022
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.4883951 0.6496829
+sample estimates:
+      cor 
+0.5745912 
+
+
+Call:
+lm(formula = y1.reg ~ x1.reg, data = ACE_LM1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-4.6105 -0.3385  0.0626  0.4089  3.2941 
+
+Coefficients:
+            Estimate Std. Error t value            Pr(>|t|)    
+(Intercept) 11.94790    0.35746   33.42 <0.0000000000000002 ***
+x1.reg       0.56694    0.04951   11.45 <0.0000000000000002 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.9236 on 266 degrees of freedom
+Multiple R-squared:  0.3302,	Adjusted R-squared:  0.3276 
+F-statistic: 131.1 on 1 and 266 DF,  p-value: < 0.00000000000000022
+
+                 2.5 %     97.5 %
+(Intercept) 11.2440899 12.6517088
+x1.reg       0.4694513  0.6644281
+
+	Durbin-Watson test
+
+data:  model_1
+DW = 1.1911, p-value = 0.00000000001142
+alternative hypothesis: true autocorrelation is greater than 0
+
+
+	Shapiro-Wilk normality test
+
+data:  x1.reg
+W = 0.98539, p-value = 0.007789
+
+
+	Shapiro-Wilk normality test
+
+data:  y1.reg
+W = 0.95899, p-value = 0.0000006924
+

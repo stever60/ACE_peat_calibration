@@ -1,0 +1,465 @@
+Optimal number of components LOO: 6 
+Data: 	X dimension: 265 6 
+	Y dimension: 265 1
+Fit method: kernelpls
+Number of components considered: 6
+
+VALIDATION: RMSEP
+Cross-validated using 265 leave-one-out segments.
+       (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+CV            5671     2383     2088     1987     1786     1804     1784
+adjCV         5671     2383     2087     1987     1786     1804     1784
+
+TRAINING: % variance explained
+        1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+X         63.28    83.61    90.16    94.01    98.54   100.00
+Y_test    83.13    87.00    88.80    90.65    91.03    91.21
+Response Y_test (6 comps):
+   Estimate Std. Error  Df t value            Pr(>|t|)    
+Ti  5625.77     688.92 264  8.1660 0.00000000000001322 ***
+Ca -1666.42     596.96 264 -2.7915            0.005629 ** 
+Mn   982.51     344.92 264  2.8485            0.004738 ** 
+Fe   -20.73     192.68 264 -0.1076            0.914404    
+Sr   787.92     401.11 264  1.9644            0.050535 .  
+Zr  -338.32     223.66 264 -1.5126            0.131576    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+       (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+CV            5671     2383     2088     1987     1786     1804     1784
+adjCV         5671     2383     2087     1987     1786     1804     1784
+Optimal number of components CV: 4 
+       (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+CV            5671     2395     2082     1944     1769     1813     1792
+adjCV         5671     2391     2079     1944     1765     1805     1784
+Data: 	X dimension: 265 6 
+	Y dimension: 265 1
+Fit method: kernelpls
+Number of components considered: 6
+
+VALIDATION: RMSEP
+Cross-validated using 10 random segments.
+       (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+CV            5671     2395     2082     1944     1769     1813     1792
+adjCV         5671     2391     2079     1944     1765     1805     1784
+
+TRAINING: % variance explained
+        1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+X         63.28    83.61    90.16    94.01    98.54   100.00
+Y_test    83.13    87.00    88.80    90.65    91.03    91.21
+Response Y_test (4 comps):
+    Estimate Std. Error Df t value  Pr(>|t|)    
+Ti  4579.609    906.996  9  5.0492 0.0006911 ***
+Ca -1515.305    599.381  9 -2.5281 0.0323352 *  
+Mn   826.774    297.063  9  2.7832 0.0212904 *  
+Fe   -79.832    207.377  9 -0.3850 0.7092061    
+Sr  1869.295    423.533  9  4.4136 0.0016868 ** 
+Zr   -40.650    292.028  9 -0.1392 0.8923590    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+[1] "/Users/sjro/Library/CloudStorage/Dropbox/BAS/Data/R"
+null device 
+          1 
+[[1]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[2]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[3]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[4]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[5]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[6]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[7]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[8]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[9]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[10]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[11]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[12]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[13]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[14]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+[[15]]
+ [1] "caret"        "lattice"      "pls"          "itraxR"       "grid"         "viridis"      "viridisLite" 
+ [8] "wesanderson"  "glue"         "broom"        "boot"         "compositions" "ggsci"        "ggpubr"      
+[15] "tidypaleo"    "lubridate"    "forcats"      "stringr"      "dplyr"        "purrr"        "readr"       
+[22] "tidyr"        "tibble"       "ggplot2"      "tidyverse"    "stats"        "graphics"     "grDevices"   
+[29] "utils"        "datasets"     "methods"      "base"        
+
+indexing ACE_subsample_xrf_icp_matched_log_inc.csv [===========================================] 69.92GB/s, eta:  0s                                                                                                                    # A tibble: 265 × 111
+   Location    Site  Section sample min_depth max_depth midpoint depth depth_err SH20_min_age_95CI SH20_max_age_95CI
+   <chr>       <chr> <chr>    <dbl>     <dbl>     <dbl>    <dbl> <dbl>     <dbl>             <dbl>             <dbl>
+ 1 Bird Island BI10  BI10.1       1       0         1.1      0.6   0.6     0.55                -67               -52
+ 2 Bird Island BI10  BI10.1       4       3.9       5        4.5   4.5     0.55                -62                41
+ 3 Bird Island BI10  BI10.1      10      11.7      12.8     12.3  12.3     0.55                -33               189
+ 4 Bird Island BI10  BI10.1      22      26.7      27.8     27.2  27.2     0.525                82               372
+ 5 Bird Island BI10  BI10.1      30      36.3      37.2     36.7  36.7     0.475               182               468
+ 6 Bird Island BI10  BI10.1      34      40.9      41.9     41.4  41.4     0.5                 244               520
+ 7 Bird Island BI10  BI10.2      51      45.9      46.9     46.4  46.4     0.5                 374               544
+ 8 Bird Island BI10  BI10.2      54      49.3      50.3     49.8  49.8     0.5                 431               612
+ 9 Bird Island BI10  BI10.2      62      58.4      59.4     58.9  58.9     0.5                 517              1000
+10 Bird Island BI10  BI10.2      67      64.1      65.2     64.6  64.6     0.525               707              1112
+# ℹ 255 more rows
+# ℹ 100 more variables: SH20_median_age <dbl>, SH20_mean_age <dbl>, SH20_mean_95CI <dbl>, accrate <dbl>,
+#   accrate_err <dbl>, kcps <dbl>, cps <dbl>, MSE <dbl>, K <dbl>, K_sd <dbl>, Ca <dbl>, Ca_sd <dbl>, Ti <dbl>,
+#   Ti_sd <dbl>, Mn <dbl>, Mn_sd <dbl>, Fe <dbl>, Fe_sd <dbl>, Co <dbl>, Co_sd <dbl>, Ni <dbl>, Ni_sd <dbl>,
+#   Cu <dbl>, Cu_sd <dbl>, Zn <dbl>, Zn_sd <dbl>, Rb <dbl>, Rb_sd <dbl>, Sr <dbl>, Sr_sd <dbl>, Zr <dbl>,
+#   Zr_sd <dbl>, Mo_inc <dbl>, Mo_coh <dbl>, inc_coh <dbl>, Ln_inc_coh <dbl>, coh_inc <dbl>, Ln_coh_inc <dbl>,
+#   Total_scatter <dbl>, kcps_sd <dbl>, cps_sd <dbl>, MSE_sd <dbl>, Mo_inc_sd <dbl>, Mo_coh_sd <dbl>, …
+# ℹ Use `print(n = ...)` to see more rows
+# A tibble: 265 × 111
+   Location    Site  Section sample min_depth max_depth midpoint depth depth_err SH20_min_age_95CI SH20_max_age_95CI
+   <chr>       <chr> <chr>    <dbl>     <dbl>     <dbl>    <dbl> <dbl>     <dbl>             <dbl>             <dbl>
+ 1 Bird Island BI10  BI10.1       1       0         1.1      0.6   0.6     0.55                -67               -52
+ 2 Bird Island BI10  BI10.1       4       3.9       5        4.5   4.5     0.55                -62                41
+ 3 Bird Island BI10  BI10.1      10      11.7      12.8     12.3  12.3     0.55                -33               189
+ 4 Bird Island BI10  BI10.1      22      26.7      27.8     27.2  27.2     0.525                82               372
+ 5 Bird Island BI10  BI10.1      30      36.3      37.2     36.7  36.7     0.475               182               468
+ 6 Bird Island BI10  BI10.1      34      40.9      41.9     41.4  41.4     0.5                 244               520
+ 7 Bird Island BI10  BI10.2      51      45.9      46.9     46.4  46.4     0.5                 374               544
+ 8 Bird Island BI10  BI10.2      54      49.3      50.3     49.8  49.8     0.5                 431               612
+ 9 Bird Island BI10  BI10.2      62      58.4      59.4     58.9  58.9     0.5                 517              1000
+10 Bird Island BI10  BI10.2      67      64.1      65.2     64.6  64.6     0.525               707              1112
+# ℹ 255 more rows
+# ℹ 100 more variables: SH20_median_age <dbl>, SH20_mean_age <dbl>, SH20_mean_95CI <dbl>, accrate <dbl>,
+#   accrate_err <dbl>, kcps <dbl>, cps <dbl>, MSE <dbl>, K <dbl>, K_sd <dbl>, Ca <dbl>, Ca_sd <dbl>, Ti <dbl>,
+#   Ti_sd <dbl>, Mn <dbl>, Mn_sd <dbl>, Fe <dbl>, Fe_sd <dbl>, Co <dbl>, Co_sd <dbl>, Ni <dbl>, Ni_sd <dbl>,
+#   Cu <dbl>, Cu_sd <dbl>, Zn <dbl>, Zn_sd <dbl>, Rb <dbl>, Rb_sd <dbl>, Sr <dbl>, Sr_sd <dbl>, Zr <dbl>,
+#   Zr_sd <dbl>, Mo_inc <dbl>, Mo_coh <dbl>, inc_coh <dbl>, Ln_inc_coh <dbl>, coh_inc <dbl>, Ln_coh_inc <dbl>,
+#   Total_scatter <dbl>, kcps_sd <dbl>, cps_sd <dbl>, MSE_sd <dbl>, Mo_inc_sd <dbl>, Mo_coh_sd <dbl>, …
+# ℹ Use `print(n = ...)` to see more rows
+# A tibble: 265 × 27
+   Site  depth SH20_mean_age SH20_mean_95CI     K K_ICP    Ca Ca_ICP    Ti Ti_ICP    Mn Mn_ICP    Fe Fe_ICP     Zn
+   <chr> <dbl>         <dbl>          <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl>  <dbl> <dbl>  <dbl> <dbl>  <dbl>  <dbl>
+ 1 BI10    0.6           -61              7 -8.39  7.49 -6.81   7.35 -7.82   4.90 -7.76   3.54 -1.95   9.54  -8.47
+ 2 BI10    4.5           -20             52 -8.38  7.19 -6.96   7.24 -8.17   4.38 -7.15   3.33 -2.19   9.14 -11.3 
+ 3 BI10   12.3            60            111 -8.36  7.34 -6.61   7.84 -8.12   5.83 -8.09   3.62 -3.58   8.28  -9.18
+ 4 BI10   27.2           214            145 -8.19  8.51 -5.79   8.76 -7.15   6.98 -7.27   4.09 -3.31   8.43  -6.11
+ 5 BI10   36.7           340            143 -7.29  9.71 -5.18   9.04 -6.24   7.58 -6.77   5.00 -1.57   9.83  -6.25
+ 6 BI10   41.4           404            138 -8.21  9.29 -5.47   9.04 -7.11   7.34 -7.02   5.00 -1.34  10.4   -7.75
+ 7 BI10   46.4           467             85 -8.28  7.82 -5.22   8.85 -6.74   5.71 -6.98   4.02 -1.65  10.2   -5.37
+ 8 BI10   49.8           509             91 -8.15 10.1  -5.31   8.90 -7.27   7.55 -7.22   5.46 -2.29   9.93  -8.00
+ 9 BI10   58.9           731            242 -9.09  6.77 -5.49   8.67 -7.86   5.42 -7.01   3.60 -3.72   7.76  -5.73
+10 BI10   64.6           891            203 -7.74  8.96 -5.09   9.11 -6.62   7.27 -6.72   4.48 -2.76   8.74  -4.48
+# ℹ 255 more rows
+# ℹ 12 more variables: Zn_ICP <dbl>, Rb <dbl>, Rb_ICP <dbl>, Sr <dbl>, Sr_ICP <dbl>, Zr <dbl>, Zr_ICP <dbl>,
+#   Mo_inc <dbl>, Mo_coh <dbl>, inc_coh <dbl>, coh_inc <dbl>, Dry_mass <dbl>
+# ℹ Use `print(n = ...)` to see more rows
+Data: 	X dimension: 265 4 
+	Y dimension: 265 4
+Fit method: kernelpls
+Number of components considered: 4
+
+VALIDATION: RMSEP
+Cross-validated using 10 random segments.
+
+Response: Ti_ICP 
+       (Intercept)  1 comps  2 comps  3 comps  4 comps
+CV           1.242   0.6948   0.6845   0.6252   0.6230
+adjCV        1.242   0.6945   0.6839   0.6244   0.6224
+
+Response: Ca_ICP 
+       (Intercept)  1 comps  2 comps  3 comps  4 comps
+CV          0.7176   0.4687   0.4383   0.4381   0.4372
+adjCV       0.7176   0.4684   0.4380   0.4377   0.4368
+
+Response: Sr_ICP 
+       (Intercept)  1 comps  2 comps  3 comps  4 comps
+CV          0.6222   0.4569   0.3866   0.3818   0.3810
+adjCV       0.6222   0.4566   0.3863   0.3813   0.3805
+
+Response: Zr_ICP 
+       (Intercept)  1 comps  2 comps  3 comps  4 comps
+CV           1.305    1.030   0.7619   0.7082   0.7038
+adjCV        1.305    1.029   0.7611   0.7071   0.7027
+
+TRAINING: % variance explained
+        1 comps  2 comps  3 comps  4 comps
+X         82.06    96.44    98.28   100.00
+Ti_ICP    69.20    70.36    75.44    75.57
+Ca_ICP    58.07    63.62    63.71    64.09
+Sr_ICP    46.52    62.40    63.63    64.09
+Zr_ICP    38.25    67.12    72.12    72.44
+Response Ti_ICP (4 comps):
+    Estimate Std. Error Df t value  Pr(>|t|)    
+Ti  1.009723   0.117099  9  8.6228 0.0000121 ***
+Ca -0.604523   0.101877  9 -5.9338 0.0002197 ***
+Sr  0.520711   0.106925  9  4.8699 0.0008837 ***
+Zr  0.208576   0.066786  9  3.1231 0.0122581 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Response Ca_ICP (4 comps):
+    Estimate Std. Error Df t value  Pr(>|t|)    
+Ti -0.011221   0.044223  9 -0.2537 0.8054045    
+Ca  0.192436   0.064461  9  2.9853 0.0153177 *  
+Sr  0.344306   0.065893  9  5.2252 0.0005454 ***
+Zr  0.091888   0.059633  9  1.5409 0.1577289    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Response Sr_ICP (4 comps):
+    Estimate Std. Error Df t value  Pr(>|t|)    
+Ti -0.197129   0.067294  9 -2.9294 0.0167739 *  
+Ca  0.327466   0.079108  9  4.1395 0.0025235 ** 
+Sr  0.323609   0.056623  9  5.7151 0.0002887 ***
+Zr  0.029956   0.067670  9  0.4427 0.6684451    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Response Zr_ICP (4 comps):
+    Estimate Std. Error Df t value   Pr(>|t|)    
+Ti  1.152225   0.166589  9  6.9166 0.00006938 ***
+Ca -1.061633   0.127802  9 -8.3068 0.00001637 ***
+Sr  0.136650   0.192465  9  0.7100     0.4957    
+Zr  0.685562   0.091703  9  7.4759 0.00003787 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+    Type        CV     adjCV
+1 Ti_ICP 0.6229615 0.6223616
+2 Ca_ICP 0.4372432 0.4367850
+3 Sr_ICP 0.3809877 0.3804884
+4 Zr_ICP 0.7037839 0.7026541
+[1] TRUE
+Ti_R² = 0.76 
+Ti_RMSE = 0.6115 
+Ti_RMSEP: 
+CV = 0.623
+adjCV = 0.6224[1] TRUE
+Ca_R² = 0.64 
+Ca_RMSE = 0.4284 
+Ca_RMSEP: 
+CV = 0.4372
+adjCV = 0.4368[1] TRUE
+Sr_R² = 0.64 
+Sr_RMSE = 0.3714 
+Sr_RMSEP: 
+CV = 0.381
+adjCV = 0.3805[1] TRUE
+Zr_R² = 0.72 
+Zr_RMSE = 0.6827 
+Zr_RMSEP: 
+CV = 0.7038
+adjCV = 0.7027, , 4 comps
+
+       Ti_ICP      Ca_ICP      Sr_ICP     Zr_ICP
+Ti  1.0097227 -0.01122080 -0.19712859  1.1522249
+Ca -0.6045228  0.19243575  0.32746609 -1.0616331
+Sr  0.5207114  0.34430574  0.32360903  0.1366501
+Zr  0.2085759  0.09188831  0.02995617  0.6855619
+
+Ti[ICP-MS_pred] =  1.0097*Ti + -0.6045*Ca + 0.5207*Sr + 0.2086*Zr 
+Ca[ICP-MS_pred] =  -0.0112*Ti + 0.1924*Ca + 0.3443*Sr + 0.0919*Zr 
+Sr[ICP-MS_pred] =  -0.1971*Ti + 0.3275*Ca + 0.3236*Sr + 0.03*Zr 
+Zr[ICP-MS_pred] =  1.1522*Ti + -1.0616*Ca + 0.1367*Sr + 0.6856*Zr 
+# A tibble: 265 × 31
+   Site  depth SH20_mean_age SH20_mean_95CI     K K_ICP    Ca Ca_ICP    Ti Ti_ICP    Mn Mn_ICP    Fe Fe_ICP     Zn
+   <chr> <dbl>         <dbl>          <dbl> <dbl> <dbl> <dbl>  <dbl> <dbl>  <dbl> <dbl>  <dbl> <dbl>  <dbl>  <dbl>
+ 1 BI10    0.6           -61              7 -8.39  7.49 -6.81   7.35 -7.82   4.90 -7.76   3.54 -1.95   9.54  -8.47
+ 2 BI10    4.5           -20             52 -8.38  7.19 -6.96   7.24 -8.17   4.38 -7.15   3.33 -2.19   9.14 -11.3 
+ 3 BI10   12.3            60            111 -8.36  7.34 -6.61   7.84 -8.12   5.83 -8.09   3.62 -3.58   8.28  -9.18
+ 4 BI10   27.2           214            145 -8.19  8.51 -5.79   8.76 -7.15   6.98 -7.27   4.09 -3.31   8.43  -6.11
+ 5 BI10   36.7           340            143 -7.29  9.71 -5.18   9.04 -6.24   7.58 -6.77   5.00 -1.57   9.83  -6.25
+ 6 BI10   41.4           404            138 -8.21  9.29 -5.47   9.04 -7.11   7.34 -7.02   5.00 -1.34  10.4   -7.75
+ 7 BI10   46.4           467             85 -8.28  7.82 -5.22   8.85 -6.74   5.71 -6.98   4.02 -1.65  10.2   -5.37
+ 8 BI10   49.8           509             91 -8.15 10.1  -5.31   8.90 -7.27   7.55 -7.22   5.46 -2.29   9.93  -8.00
+ 9 BI10   58.9           731            242 -9.09  6.77 -5.49   8.67 -7.86   5.42 -7.01   3.60 -3.72   7.76  -5.73
+10 BI10   64.6           891            203 -7.74  8.96 -5.09   9.11 -6.62   7.27 -6.72   4.48 -2.76   8.74  -4.48
+# ℹ 255 more rows
+# ℹ 16 more variables: Zn_ICP <dbl>, Rb <dbl>, Rb_ICP <dbl>, Sr <dbl>, Sr_ICP <dbl>, Zr <dbl>, Zr_ICP <dbl>,
+#   Mo_inc <dbl>, Mo_coh <dbl>, inc_coh <dbl>, coh_inc <dbl>, Dry_mass <dbl>, Ti_ICP_pred <dbl>, Ca_ICP_pred <dbl>,
+#   Sr_ICP_pred <dbl>, Zr_ICP_pred <dbl>
+# ℹ Use `print(n = ...)` to see more rows
+# A tibble: 4 × 3
+  Element    R2  RMSE
+  <chr>   <dbl> <dbl>
+1 Ti_act  0.756 0.611
+2 Ca_act  0.641 0.428
+3 Sr_act  0.641 0.371
+4 Zr_act  0.724 0.683
+# A tibble: 4 × 12
+  Element    R2  RMSE Type      CV adjCV CI_lower CI_upper label_R2 label_RMSE  label_RMSEP_CV    label_RMSEP_adjCV 
+  <chr>   <dbl> <dbl> <chr>  <dbl> <dbl>    <dbl>    <dbl> <chr>    <chr>       <chr>             <chr>             
+1 Ti      0.756 0.611 Ti_ICP 0.623 0.622   -0.946    1.02  R^2:0.76 RMSE: 0.611 RMSEP_CV[4]:0.623 RMSEP_adjCV[4]:0.…
+2 Ca      0.641 0.428 Ca_ICP 0.437 0.437   -0.689    0.623 R^2:0.64 RMSE: 0.428 RMSEP_CV[4]:0.437 RMSEP_adjCV[4]:0.…
+3 Sr      0.641 0.371 Sr_ICP 0.381 0.38    -0.622    0.489 R^2:0.64 RMSE: 0.371 RMSEP_CV[4]:0.381 RMSEP_adjCV[4]:0.…
+4 Zr      0.724 0.683 Zr_ICP 0.704 0.703   -1.03     1.07  R^2:0.72 RMSE: 0.683 RMSEP_CV[4]:0.704 RMSEP_adjCV[4]:0.…
+wrote 1.00TB in  0s, 524.29PB/s                                                                                                                  # A tibble: 265 × 4
+   Ti_ICP_pred_ppm Ca_ICP_pred_ppm Sr_ICP_pred_ppm Zr_ICP_pred_ppm
+             <dbl>           <dbl>           <dbl>           <dbl>
+ 1           328.            3003.            42.0           23.4 
+ 2            82.7           1297.            19.7           13.8 
+ 3           151.            2317.            34.9           15.0 
+ 4           647.            6704.            96.9           15.1 
+ 5           955.            8472.           119.            15.8 
+ 6           429.            6170.            94.0            9.94
+ 7           640.            7908.           117.            11.4 
+ 8           430.            7236.           112.             9.52
+ 9           294.            6643.           111.             5.65
+10           891.           10041.           146.            13.5 
+# ℹ 255 more rows
+# ℹ Use `print(n = ...)` to see more rows
+indexing ACE_subsample_icp_xrf_matched_cps.csv [===============================================] 77.50GB/s, eta:  0s                                                                                                                    # A tibble: 265 × 99
+   Location    Site  Section sample min_depth max_depth midpoint depth depth_err SH20_min_age_95CI SH20_max_age_95CI
+   <chr>       <chr> <chr>    <dbl>     <dbl>     <dbl>    <dbl> <dbl>     <dbl>             <dbl>             <dbl>
+ 1 Bird Island BI10  BI10.1       1       0         1.1      0.6   0.6     0.55                -67               -52
+ 2 Bird Island BI10  BI10.1       4       3.9       5        4.5   4.5     0.55                -62                41
+ 3 Bird Island BI10  BI10.1      10      11.7      12.8     12.3  12.3     0.55                -33               189
+ 4 Bird Island BI10  BI10.1      22      26.7      27.8     27.2  27.2     0.525                82               372
+ 5 Bird Island BI10  BI10.1      30      36.3      37.2     36.7  36.7     0.475               182               468
+ 6 Bird Island BI10  BI10.1      34      40.9      41.9     41.4  41.4     0.5                 244               520
+ 7 Bird Island BI10  BI10.2      51      45.9      46.9     46.4  46.4     0.5                 374               544
+ 8 Bird Island BI10  BI10.2      54      49.3      50.3     49.8  49.8     0.5                 431               612
+ 9 Bird Island BI10  BI10.2      62      58.4      59.4     58.9  58.9     0.5                 517              1000
+10 Bird Island BI10  BI10.2      67      64.1      65.2     64.6  64.6     0.525               707              1112
+# ℹ 255 more rows
+# ℹ 88 more variables: SH20_median_age <dbl>, SH20_mean_age <dbl>, SH20_mean_95CI <dbl>, accrate <dbl>,
+#   accrate_err <dbl>, kcps <dbl>, cps <dbl>, MSE <dbl>, K <dbl>, Ca <dbl>, Ti <dbl>, Mn <dbl>, Fe <dbl>, Co <dbl>,
+#   Ni <dbl>, Cu <dbl>, Zn <dbl>, Rb <dbl>, Sr <dbl>, Zr <dbl>, Mo_inc <dbl>, Mo_coh <dbl>, inc_coh <dbl>,
+#   Ln_inc_coh <dbl>, coh_inc <dbl>, Ln_coh_inc <dbl>, Total_scatter <dbl>, kcps_sd <dbl>, cps_sd <dbl>,
+#   MSE_sd <dbl>, K_sd <dbl>, Ca_sd <dbl>, Ti_sd <dbl>, Mn_sd <dbl>, Fe_sd <dbl>, Co_sd <dbl>, Ni_sd <dbl>,
+#   Cu_sd <dbl>, Zn_sd <dbl>, Rb_sd <dbl>, Sr_sd <dbl>, Zr_sd <dbl>, Mo_inc_sd <dbl>, Mo_coh_sd <dbl>, …
+# ℹ Use `print(n = ...)` to see more rows
+# A tibble: 4 × 3
+  Element    R2   RMSE
+  <chr>   <dbl>  <dbl>
+1 Ti_ICP  0.875 2132. 
+2 Ca_ICP  0.756 5523. 
+3 Sr_ICP  0.773   55.8
+4 Zr_ICP  0.681   70.4
+# A tibble: 4 × 8
+  Element    R2   RMSE  RMSEP CI_lower CI_upper label_R2 label_RMSE
+  <chr>   <dbl>  <dbl>  <dbl>    <dbl>    <dbl> <chr>    <chr>     
+1 Ti_ICP  0.875 2132.  2132.   -1106.    4269.  R^2:0.88 RMSE: 2132
+2 Ca_ICP  0.756 5523.  5523.   -6590.    9578.  R^2:0.76 RMSE: 5523
+3 Sr_ICP  0.773   55.8   55.8    -66.7    128.  R^2:0.77 RMSE: 56  
+4 Zr_ICP  0.681   70.4   70.4    -21.4     81.0 R^2:0.68 RMSE: 70  
+wrote 1.00TB in  0s, 349.53PB/s                                                                                                                  indexed 0B in  0s, 0B/sindexed 1.00TB in  0s, 72.89TB/s                                                                                                                  # A tibble: 14,519 × 26
+   Location    Site  label   ID    section_depth field_depth depth SH20_age surface validity qc     kcps   cps   MSE
+   <chr>       <chr> <chr>   <chr>         <dbl>       <dbl> <dbl>    <dbl>   <dbl>    <dbl> <lgl> <dbl> <dbl> <dbl>
+ 1 Bird Island BI10  BI10.01 ACE_…           0.1         0.1   0.1    -66.0    7.46        1 TRUE  19704 50127  1.34
+ 2 Bird Island BI10  BI10.01 ACE_…           0.2         0.2   0.2    -65.0    7.48        1 TRUE  19718 50612  1.39
+ 3 Bird Island BI10  BI10.01 ACE_…           0.3         0.3   0.3    -64.0    7.5         1 TRUE  19924 50481  1.2 
+ 4 Bird Island BI10  BI10.01 ACE_…           0.4         0.4   0.4    -63.0    7.52        1 TRUE  20433 52629  1.37
+ 5 Bird Island BI10  BI10.01 ACE_…           0.5         0.5   0.5    -61.9    7.52        1 TRUE  20192 50683  1.31
+ 6 Bird Island BI10  BI10.01 ACE_…           0.6         0.6   0.6    -60.9    7.51        1 TRUE  20422 51345  1.32
+ 7 Bird Island BI10  BI10.01 ACE_…           0.7         0.7   0.7    -59.9    7.48        1 TRUE  21569 53000  1.27
+ 8 Bird Island BI10  BI10.01 ACE_…           0.8         0.8   0.8    -58.9    7.48        1 TRUE  22053 54850  1.38
+ 9 Bird Island BI10  BI10.01 ACE_…           0.9         0.9   0.9    -57.9    7.51        1 TRUE  20675 52835  1.33
+10 Bird Island BI10  BI10.01 ACE_…           1           1     1      -56.9    7.53        1 TRUE  20757 52197  1.39
+# ℹ 14,509 more rows
+# ℹ 12 more variables: K <dbl>, Ca <dbl>, Ti <dbl>, Mn <dbl>, Fe <dbl>, Zn <dbl>, Rb <dbl>, Sr <dbl>, Zr <dbl>,
+#   Total_scatter <dbl>, inc_coh <dbl>, coh_inc <dbl>
+# ℹ Use `print(n = ...)` to see more rows
+indexed 0B in  0s, 0B/sindexed 1.00TB in  0s, 67.69TB/s                                                                                                                  # A tibble: 14,519 × 26
+   Location    Site  label   ID    section_depth field_depth depth SH20_age surface validity qc     kcps   cps   MSE
+   <chr>       <chr> <chr>   <chr>         <dbl>       <dbl> <dbl>    <dbl>   <dbl>    <dbl> <lgl> <dbl> <dbl> <dbl>
+ 1 Bird Island BI10  BI10.01 ACE_…           0.1         0.1   0.1    -66.0    7.46        1 TRUE  19704 50127  1.34
+ 2 Bird Island BI10  BI10.01 ACE_…           0.2         0.2   0.2    -65.0    7.48        1 TRUE  19718 50612  1.39
+ 3 Bird Island BI10  BI10.01 ACE_…           0.3         0.3   0.3    -64.0    7.5         1 TRUE  19924 50481  1.2 
+ 4 Bird Island BI10  BI10.01 ACE_…           0.4         0.4   0.4    -63.0    7.52        1 TRUE  20433 52629  1.37
+ 5 Bird Island BI10  BI10.01 ACE_…           0.5         0.5   0.5    -61.9    7.52        1 TRUE  20192 50683  1.31
+ 6 Bird Island BI10  BI10.01 ACE_…           0.6         0.6   0.6    -60.9    7.51        1 TRUE  20422 51345  1.32
+ 7 Bird Island BI10  BI10.01 ACE_…           0.7         0.7   0.7    -59.9    7.48        1 TRUE  21569 53000  1.27
+ 8 Bird Island BI10  BI10.01 ACE_…           0.8         0.8   0.8    -58.9    7.48        1 TRUE  22053 54850  1.38
+ 9 Bird Island BI10  BI10.01 ACE_…           0.9         0.9   0.9    -57.9    7.51        1 TRUE  20675 52835  1.33
+10 Bird Island BI10  BI10.01 ACE_…           1           1     1      -56.9    7.53        1 TRUE  20757 52197  1.39
+# ℹ 14,509 more rows
+# ℹ 12 more variables: K <dbl>, Ca <dbl>, Ti <dbl>, Mn <dbl>, Fe <dbl>, Zn <dbl>, Rb <dbl>, Sr <dbl>, Zr <dbl>,
+#   Total_scatter <dbl>, inc_coh <dbl>, coh_inc <dbl>
+# ℹ Use `print(n = ...)` to see more rows
+# A tibble: 14,519 × 26
+   Location    Site  label   ID    section_depth field_depth depth SH20_age surface validity qc     kcps   cps   MSE
+   <chr>       <chr> <chr>   <chr>         <dbl>       <dbl> <dbl>    <dbl>   <dbl>    <dbl> <lgl> <dbl> <dbl> <dbl>
+ 1 Bird Island BI10  BI10.01 ACE_…           0.1         0.1   0.1    -66.0    7.46        1 TRUE  19704 50127  1.34
+ 2 Bird Island BI10  BI10.01 ACE_…           0.2         0.2   0.2    -65.0    7.48        1 TRUE  19718 50612  1.39
+ 3 Bird Island BI10  BI10.01 ACE_…           0.3         0.3   0.3    -64.0    7.5         1 TRUE  19924 50481  1.2 
+ 4 Bird Island BI10  BI10.01 ACE_…           0.4         0.4   0.4    -63.0    7.52        1 TRUE  20433 52629  1.37
+ 5 Bird Island BI10  BI10.01 ACE_…           0.5         0.5   0.5    -61.9    7.52        1 TRUE  20192 50683  1.31
+ 6 Bird Island BI10  BI10.01 ACE_…           0.6         0.6   0.6    -60.9    7.51        1 TRUE  20422 51345  1.32
+ 7 Bird Island BI10  BI10.01 ACE_…           0.7         0.7   0.7    -59.9    7.48        1 TRUE  21569 53000  1.27
+ 8 Bird Island BI10  BI10.01 ACE_…           0.8         0.8   0.8    -58.9    7.48        1 TRUE  22053 54850  1.38
+ 9 Bird Island BI10  BI10.01 ACE_…           0.9         0.9   0.9    -57.9    7.51        1 TRUE  20675 52835  1.33
+10 Bird Island BI10  BI10.01 ACE_…           1           1     1      -56.9    7.53        1 TRUE  20757 52197  1.39
+# ℹ 14,509 more rows
+# ℹ 12 more variables: K <dbl>, Ca <dbl>, Ti <dbl>, Mn <dbl>, Fe <dbl>, Zn <dbl>, Rb <dbl>, Sr <dbl>, Zr <dbl>,
+#   Total_scatter <dbl>, inc_coh <dbl>, coh_inc <dbl>
+# ℹ Use `print(n = ...)` to see more rows

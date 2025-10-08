@@ -1,0 +1,37 @@
+
+Call:
+lm(formula = Dry_mass ~ coh_inc, data = BI10_Subsample_xrf_matched, 
+    weights = BI10_wt_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.0466 -0.9707 -0.3567  0.7103  7.1954 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  -38.758      3.504  -11.06   <2e-16 ***
+coh_inc      360.829     22.711   15.89   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.387 on 416 degrees of freedom
+Multiple R-squared:  0.3776,	Adjusted R-squared:  0.3762 
+F-statistic: 252.4 on 1 and 416 DF,  p-value: < 2.2e-16
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.378         0.376  1.39      252. 9.15e-45     1 -1144. 2294. 2306.     800.         416   418
+# Indices of model performance
+
+AIC      |     AICc |      BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+------------------------------------------------------------------
+2294.218 | 2294.276 | 2306.325 | 0.378 |     0.376 | 4.100 | 1.387
+
+	studentized Breusch-Pagan test
+
+data:  BI10_wls_wt
+BP = 4.279, df = 1, p-value = 0.03859
+
+OK: Error variance appears to be homoscedastic (p = 0.083).
+NULL

@@ -1,0 +1,15 @@
+Data: 	X dimension: 265 6 
+	Y dimension: 265 1
+Fit method: kernelpls
+Number of components considered: 6
+
+VALIDATION: RMSEP
+Cross-validated using 265 leave-one-out segments.
+       (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+CV            5671     2383     2088     1987     1786     1804     1784
+adjCV         5671     2383     2087     1987     1786     1804     1784
+
+TRAINING: % variance explained
+        1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+X         63.28    83.61    90.16    94.01    98.54   100.00
+Y_test    83.13    87.00    88.80    90.65    91.03    91.21

@@ -1,0 +1,36 @@
+
+Call:
+lm(formula = Ca_ICP ~ Ca, data = POB4_xrf_icp_matched, weights = POB4_Ca_wt_wt)
+
+Weighted Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.1625 -0.7434 -0.3562  0.7649  3.0990 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 6678.100    876.432   7.620 4.36e-08 ***
+Ca             5.937      1.680   3.534  0.00156 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.241 on 26 degrees of freedom
+Multiple R-squared:  0.3245,	Adjusted R-squared:  0.2985 
+F-statistic: 12.49 on 1 and 26 DF,  p-value: 0.001555
+
+# A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>   <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.324         0.299  1.24      12.5 0.00156     1  -256.  518.  522.     40.0          26    28
+# Indices of model performance
+
+AIC     |    AICc |     BIC |    R2 | R2 (adj.) |     RMSE | Sigma
+------------------------------------------------------------------
+518.060 | 519.060 | 522.056 | 0.324 |     0.299 | 2336.692 | 1.241
+
+	studentized Breusch-Pagan test
+
+data:  POB4_Ca_wls_wt
+BP = 1.8902e-06, df = 1, p-value = 0.9989
+
+OK: Error variance appears to be homoscedastic (p = 0.356).
+NULL
