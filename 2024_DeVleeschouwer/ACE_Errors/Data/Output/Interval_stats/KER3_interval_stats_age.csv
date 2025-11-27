@@ -1,0 +1,2 @@
+"Site","n_rows","mean_accrate","sd_accrate","se_accrate","mean_max_95CI_range","sd_max_95CI_range","se_max_95CI_range","mean_interval_yrs","mean_interval_yrs_err","sd_interval_yrs","se_interval_yrs","min_interval_yrs","max_interval_yrs"
+"KER3",51,0.0326249019607843,0.0243194856337505,0.00340540913867461,853.039215686274,640.302489790078,89.6602824206594,220.4,121.68,185.374304187666,25.9575946244538,25,727
