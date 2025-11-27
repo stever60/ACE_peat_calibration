@@ -23,10 +23,9 @@ lapply(packages, library, character.only=TRUE)
 
 
 # Depth Intervals --------------------------------------------------------------
-
 # ACE - Depth & interval stats -------------------------------------------------
 ACE_xrf_icpms_matched_depth <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
-  select(Site, sample, min_depth, max_depth, depth, depth_err, SH20_mean_age, SH20_mean_95CI) %>% 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, SH20_mean_age, SH20_mean_95CI) %>% 
   mutate(thickness_cm = max_depth - min_depth) %>% 
 # calculate depth difference to next subsample in row and its propagated error
   arrange(Site, sample) %>% # ensure proper ordering
@@ -64,7 +63,7 @@ write.csv(ACE_xrf_icpms_depth_stats,"Papers_R/2024_DeVleeschouwer/ACE_Errors/Dat
 # BI10 - Depth & interval stats ------------------------------------------------
 BI10_xrf_icpms_matched_depth <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
   filter(Site == "BI10") %>% 
-  select(Site, sample, min_depth, max_depth, depth, depth_err, 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, 
          SH20_mean_age, SH20_mean_95CI) %>% 
   mutate(thickness_cm = max_depth - min_depth) %>% 
   # calculate depth difference to next subsample in row and its propagated error
@@ -103,7 +102,7 @@ write.csv(BI10_xrf_icpms_depth_stats,"Papers_R/2024_DeVleeschouwer/ACE_Errors/Da
 # HER42PB - Depth & interval stats ------------------------------------------------
 HER42PB_xrf_icpms_matched_depth <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
   filter(Site == "HER42PB") %>% 
-  select(Site, sample, min_depth, max_depth, depth, depth_err, 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, 
          SH20_mean_age, SH20_mean_95CI) %>% 
   mutate(thickness_cm = max_depth - min_depth) %>% 
   # calculate depth difference to next subsample in row and its propagated error
@@ -141,7 +140,7 @@ write.csv(HER42PB_xrf_icpms_depth_stats,"Papers_R/2024_DeVleeschouwer/ACE_Errors
 # KER1 - Depth & interval stats ------------------------------------------------
 KER1_xrf_icpms_matched_depth <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
   filter(Site == "KER1") %>% 
-  select(Site, sample, min_depth, max_depth, depth, depth_err, 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, 
          SH20_mean_age, SH20_mean_95CI) %>% 
   mutate(thickness_cm = max_depth - min_depth) %>% 
   # calculate depth difference to next subsample in row and its propagated error
@@ -180,7 +179,7 @@ write.csv(KER1_xrf_icpms_depth_stats,"Papers_R/2024_DeVleeschouwer/ACE_Errors/Da
 # KER3 - Depth & interval stats ------------------------------------------------
 KER3_xrf_icpms_matched_depth <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
   filter(Site == "KER3") %>% 
-  select(Site, sample, min_depth, max_depth, depth, depth_err, 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, 
          SH20_mean_age, SH20_mean_95CI) %>% 
   mutate(thickness_cm = max_depth - min_depth) %>% 
   # calculate depth difference to next subsample in row and its propagated error
@@ -219,7 +218,7 @@ write.csv(KER3_xrf_icpms_depth_stats,"Papers_R/2024_DeVleeschouwer/ACE_Errors/Da
 # PB1 - Depth & interval stats ------------------------------------------------
 PB1_xrf_icpms_matched_depth <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
   filter(Site == "PB1") %>% 
-  select(Site, sample, min_depth, max_depth, depth, depth_err, 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, 
          SH20_mean_age, SH20_mean_95CI) %>% 
   mutate(thickness_cm = max_depth - min_depth) %>% 
   # calculate depth difference to next subsample in row and its propagated error
@@ -279,10 +278,9 @@ write.csv(ACE_depth_interval_stats_all,"Papers_R/2024_DeVleeschouwer/ACE_Errors/
 
 
 # Age Intervals ----------------------------------------------------------------
-
 # ACE - Age & interval stats  --------------------------------------------------
 ACE_xrf_icpms_matched_age <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
-  select(Site, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, SH20_max_age_95CI, SH20_mean_age, SH20_mean_95CI, accrate, accrate_err) %>% 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, SH20_max_age_95CI, SH20_mean_age, SH20_mean_95CI, accrate, accrate_err) %>% 
   mutate(max_95CI_range_yrs = SH20_max_age_95CI - SH20_min_age_95CI) %>% 
   # calculate age difference to next subsample in row and its propagated error
   arrange(Site, sample) %>% # ensure proper ordering
@@ -324,7 +322,7 @@ write.csv(ACE_xrf_icpms_age_stats,"Papers_R/2024_DeVleeschouwer/ACE_Errors/Data/
 # BI10 - Age & interval stats  -------------------------------------------------
 BI10_xrf_icpms_matched_age <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
   filter(Site == "BI10") %>% 
-  select(Site, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, 
          SH20_max_age_95CI, SH20_mean_age, SH20_mean_95CI, accrate, accrate_err) %>% 
   mutate(max_95CI_range_yrs = SH20_max_age_95CI - SH20_min_age_95CI) %>% 
   # calculate age difference to next subsample in row and its propagated error
@@ -366,7 +364,7 @@ write.csv(BI10_xrf_icpms_age_stats,"Papers_R/2024_DeVleeschouwer/ACE_Errors/Data
 # HER42PB - Age & interval stats  -------------------------------------------------
 HER42PB_xrf_icpms_matched_age <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
   filter(Site == "HER42PB") %>% 
-  select(Site, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, 
          SH20_max_age_95CI, SH20_mean_age, SH20_mean_95CI, accrate, accrate_err) %>% 
   mutate(max_95CI_range_yrs = SH20_max_age_95CI - SH20_min_age_95CI) %>% 
   # calculate age difference to next subsample in row and its propagated error
@@ -409,7 +407,7 @@ write.csv(HER42PB_xrf_icpms_age_stats,"Papers_R/2024_DeVleeschouwer/ACE_Errors/D
 # KER1 - Age & interval stats  -------------------------------------------------
 KER1_xrf_icpms_matched_age <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
   filter(Site == "KER1") %>% 
-  select(Site, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, 
          SH20_max_age_95CI, SH20_mean_age, SH20_mean_95CI, accrate, accrate_err) %>% 
   mutate(max_95CI_range_yrs = SH20_max_age_95CI - SH20_min_age_95CI) %>% 
   # calculate age difference to next subsample in row and its propagated error
@@ -452,7 +450,7 @@ write.csv(KER1_xrf_icpms_age_stats,"Papers_R/2024_DeVleeschouwer/ACE_Errors/Data
 # KER3 - Age & interval stats  -------------------------------------------------
 KER3_xrf_icpms_matched_age <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
   filter(Site == "KER3") %>% 
-  select(Site, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, 
          SH20_max_age_95CI, SH20_mean_age, SH20_mean_95CI, accrate, accrate_err) %>% 
   mutate(max_95CI_range_yrs = SH20_max_age_95CI - SH20_min_age_95CI) %>% 
   # calculate age difference to next subsample in row and its propagated error
@@ -495,7 +493,7 @@ write.csv(KER3_xrf_icpms_age_stats,"Papers_R/2024_DeVleeschouwer/ACE_Errors/Data
 # PB1 - Age & interval stats  -------------------------------------------------
 PB1_xrf_icpms_matched_age <- read_csv("Papers_R/2024_DeVleeschouwer/Figure2/Data/Output/ACE_subsample_icp_xrf_matched_cps.csv") %>%
   filter(Site == "PB1") %>% 
-  select(Site, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, 
+  select(Site, Section, sample, min_depth, max_depth, depth, depth_err, SH20_min_age_95CI, 
          SH20_max_age_95CI, SH20_mean_age, SH20_mean_95CI, accrate, accrate_err) %>% 
   mutate(max_95CI_range_yrs = SH20_max_age_95CI - SH20_min_age_95CI) %>% 
   # calculate age difference to next subsample in row and its propagated error
