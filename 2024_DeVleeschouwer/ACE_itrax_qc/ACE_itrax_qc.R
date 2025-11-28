@@ -27,17 +27,6 @@ packages <- c('tidyverse', 'tidypaleo', 'dplyr', 'readr', 'ggpubr', 'patchwork',
 lapply(packages, library, character.only=TRUE)
 options(scipen = 999)
 
-# Set up ------------------------------------------------------------------
-
-# Set working directory - Macbook Pro 2013
-#setwd("/Users/Steve/Dropbox/BAS/Data/R/")
-# Set working directory - Macbook Pro M2
-setwd("/Users/sjro/Dropbox/BAS/Data/R/")
-getwd()
-# clear plot window
-dev.off()
-
-
 # SECTION 2A: IMPORT ALL ACE_SHW DATA -----------------------------------------------------
 
 # Import existing composite datasets where validity = 1
@@ -53,7 +42,7 @@ allelements <- c(symb(1:117))
 rm(periodicTable)
 
 # # Import an existing composite Site and change column names to match itrax.R names/formatting
-ACE_COMP <- read_csv("Papers_R/2024_DeVleeschouwer/Data/ACE_SHW_ITRAX_Composite_raw_cps.csv") 
+ACE_COMP <- read_csv("Papers_R/2024_DeVleeschouwer/Data/ACE_SHW_ITRAX_Mo_Peat_Composite_raw_cps.csv") 
 ACE_COMP 
 
 ACE_xrf <- ACE_COMP %>% 
@@ -69,7 +58,6 @@ ACE_xrf <- ACE_COMP %>%
   rename(`Fe a*2` = D1, SH20_age = SH20_mean_age, label = Section, surface = `sample_surface`) %>% 
   relocate(cps, .before = MSE) %>% 
   relocate(`Fe a*2` , .after = coh_inc)
-  
 ACE_xrf
 write.csv(ACE_xrf,"Papers_R/2024_DeVleeschouwer/ACE_itrax_qc/Output/itrax_Composite/qc_acf/Section2/ACE_xrf_cps.csv", row.names = FALSE)
 
@@ -108,8 +96,17 @@ ACE_xrf <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_itrax_qc/Output/itrax_Comp
   filter(!(Site == 'KH4')) %>% # measured under different ITRAX conditions
   filter(!(Site =='BI5')) %>% #site not in the matched dataset
   filter(!(Site =='DRPB')) %>% #site not in the matched dataset
+  filter(!(Site =='MPB1')) %>% #site not in the matched dataset
   select(Location:MSE, any_of(ACE_elements), `Fe a*2`, Total_scatter:coh_inc)
 ACE_xrf
+
+
+ACE_xrf <- ACE_xrf %>% 
+  filter(Site == 'BI10')
+#  filter(Site == 'HER42PB')
+#  filter(Site == 'KER1')
+#  filter(Site == 'KER3')
+#  filter(Site == 'PB1')
 
 # SECTION 3A: Quality control
 
