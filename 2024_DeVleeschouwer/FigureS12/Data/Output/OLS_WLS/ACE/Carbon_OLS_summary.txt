@@ -4,33 +4,33 @@ lm(formula = C_org_pc ~ inc_coh, data = ACE_Subsample_xrf_matched_no_PB1)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--37.491  -4.443   0.808   5.530  56.988 
+-33.176  -4.247   0.829   5.180  31.525 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept) -78.1285     3.1029  -25.18   <2e-16 ***
-inc_coh      18.5788     0.4956   37.48   <2e-16 ***
+(Intercept) -84.5097     2.8795  -29.35   <2e-16 ***
+inc_coh      19.6059     0.4599   42.63   <2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 8.291 on 1035 degrees of freedom
-Multiple R-squared:  0.5758,	Adjusted R-squared:  0.5754 
-F-statistic:  1405 on 1 and 1035 DF,  p-value: < 2.2e-16
+Residual standard error: 7.682 on 1039 degrees of freedom
+Multiple R-squared:  0.6362,	Adjusted R-squared:  0.6359 
+F-statistic:  1817 on 1 and 1039 DF,  p-value: < 2.2e-16
 
 # A tibble: 1 × 12
   r.squared adj.r.squared sigma statistic   p.value    df logLik   AIC   BIC deviance df.residual  nobs
       <dbl>         <dbl> <dbl>     <dbl>     <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
-1     0.576         0.575  8.29     1405. 5.81e-195     1 -3664. 7334. 7348.   71141.        1035  1037
+1     0.636         0.636  7.68     1817. 2.21e-230     1 -3599. 7203. 7218.   61315.        1039  1041
 # Indices of model performance
 
 AIC      |     AICc |      BIC |    R2 | R2 (adj.) |  RMSE | Sigma
 ------------------------------------------------------------------
-7333.655 | 7333.678 | 7348.487 | 0.576 |     0.575 | 8.283 | 8.291
+7203.181 | 7203.204 | 7218.025 | 0.636 |     0.636 | 7.675 | 7.682
 
 	studentized Breusch-Pagan test
 
 data:  ACE_C_lm
-BP = 37.84, df = 1, p-value = 7.681e-10
+BP = 8.3647, df = 1, p-value = 0.003826
 
 Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
 NULL

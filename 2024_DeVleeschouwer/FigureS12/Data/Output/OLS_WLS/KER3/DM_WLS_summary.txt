@@ -5,33 +5,33 @@ lm(formula = Dry_mass ~ coh_inc, data = KER3_Subsample_xrf_matched,
 
 Weighted Residuals:
     Min      1Q  Median      3Q     Max 
--2.7109 -0.7742 -0.3640  0.3294 10.1717 
+-3.4889 -0.7760 -0.3122  0.5346  7.8848 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)   -34.74      11.18  -3.109  0.00225 ** 
-coh_inc       341.38      74.47   4.584 9.63e-06 ***
+(Intercept)  -44.340      8.483  -5.227 5.65e-07 ***
+coh_inc      402.453     56.592   7.111 4.29e-11 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 1.476 on 148 degrees of freedom
-Multiple R-squared:  0.1243,	Adjusted R-squared:  0.1184 
-F-statistic: 21.01 on 1 and 148 DF,  p-value: 9.632e-06
+Residual standard error: 1.398 on 151 degrees of freedom
+Multiple R-squared:  0.2509,	Adjusted R-squared:  0.2459 
+F-statistic: 50.57 on 1 and 151 DF,  p-value: 4.286e-11
 
 # A tibble: 1 × 12
-  r.squared adj.r.squared sigma statistic    p.value    df logLik   AIC   BIC deviance df.residual  nobs
-      <dbl>         <dbl> <dbl>     <dbl>      <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
-1     0.124         0.118  1.48      21.0 0.00000963     1  -480.  966.  975.     322.         148   150
+  r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC deviance df.residual  nobs
+      <dbl>         <dbl> <dbl>     <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>       <int> <int>
+1     0.251         0.246  1.40      50.6 4.29e-11     1  -436.  877.  886.     295.         151   153
 # Indices of model performance
 
 AIC     |    AICc |     BIC |    R2 | R2 (adj.) |  RMSE | Sigma
 ---------------------------------------------------------------
-966.341 | 966.506 | 975.373 | 0.124 |     0.118 | 8.000 | 1.476
+877.211 | 877.372 | 886.302 | 0.251 |     0.246 | 5.153 | 1.398
 
 	studentized Breusch-Pagan test
 
 data:  KER3_wls
-BP = 0.60373, df = 1, p-value = 0.4372
+BP = 0.801, df = 1, p-value = 0.3708
 
-Warning: Heteroscedasticity (non-constant error variance) detected (p < .001).
+OK: Error variance appears to be homoscedastic (p = 0.216).
 NULL

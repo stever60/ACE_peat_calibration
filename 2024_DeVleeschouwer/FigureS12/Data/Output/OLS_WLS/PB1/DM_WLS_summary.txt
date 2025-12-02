@@ -15,6 +15,7 @@ coh_inc      375.630     10.713   35.06   <2e-16 ***
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 1.405 on 72 degrees of freedom
+  (20 observations deleted due to missingness)
 Multiple R-squared:  0.9447,	Adjusted R-squared:  0.9439 
 F-statistic:  1229 on 1 and 72 DF,  p-value: < 2.2e-16
 
