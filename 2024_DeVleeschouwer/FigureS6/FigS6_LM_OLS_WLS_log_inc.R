@@ -1,4 +1,5 @@
-# Figure S6a - Linear models, ordinary and weighted least squares regression analysis (OLS, WLS)
+# Figure S6a - OLS & WLS Linear models, ordinary and weighted least squares regression analysis
+# Updated to include validation and performance test for weighted WLS
 
 # Log_inc
 
@@ -20,7 +21,8 @@ packages <- c('tidyverse', 'tidypaleo', 'dplyr', 'readr', 'ggpubr', 'patchwork',
               'bestNormalize','sjmisc', 'chemometrics', 'compositions', 
               'RColorBrewer', 'ggsci', 'wesanderson', 'viridis',
               'ggrepel', 'itraxR', 'PeriodicTable', 'errors', 'forecast', 'broom',
-              'directlabels', 'performance', 'lmtest', 'ggpmisc', 'cowplot', 'Hmisc')
+              'directlabels', 'performance', 'lmtest', 'ggpmisc', 'cowplot')
+#              'Hmisc' 'rmarkdown', 'knitr', 'tinytex') # for reports
 lapply(packages, library, character.only=TRUE)
 options(scipen = 999)
 
@@ -101,8 +103,306 @@ itrax_dataset <- " / inc"
 icp_dataset <- " [Ln]"
 ACE_dataset$Site <- as.factor(ACE_dataset$Site) # Convert Site as a grouping variable
 
+
+# *** FUNCTIONS for WLS_wt validation tests ***
+# Function for Cross-validated RMSEP – 60% train, 40% test split & 100% training model  --------
+
+# Independent Test-Set RMSEP – then external validation on held-out data
+
+validate_element <- function(formula, data, sd_col, train_frac = 0.6, k = 10) {
+  # formula: e.g., Ti_ICP ~ Ti
+  # data: dataset
+  # sd_col: string, column name for measurement SD (e.g., "Ti_ICP_sd")
+  # train_frac: fraction of data for training
+  # k: number of folds for CV on training
+  
+  set.seed(123)
+  
+  n <- nrow(data)
+  train_index <- sample(seq_len(n), size = floor(train_frac * n))
+  train_data <- data[train_index, ]
+  test_data  <- data[-train_index, ]
+  
+  # -------------------------
+  # K-fold CV on training set
+  # -------------------------
+  n_train <- nrow(train_data)
+  if(k > n_train) k <- n_train
+  folds <- sample(rep(1:k, length.out = n_train))
+  
+  RMSEP_CV <- numeric(k)
+  R2_CV    <- numeric(k)
+  
+  for (i in 1:k) {
+    cv_train <- train_data[folds != i, ]
+    cv_test  <- train_data[folds == i, ]
+    
+    # Stage 1
+    cv_train$w1 <- 1 / cv_train[[sd_col]]^2
+    stage1 <- lm(formula, data = cv_train, weights = w1)
+    
+    # Stage 2
+    abs_res <- abs(stage1$residuals)
+    fit_vals <- stage1$fitted.values
+    cv_train$stage2_wt <- 1 / lm(abs_res ~ fit_vals)$fitted.values^2
+    
+    # Final WLS
+    model <- lm(formula, data = cv_train, weights = stage2_wt)
+    
+    # Predictions
+    preds <- predict(model, newdata = cv_test)
+    obs   <- model.response(model.frame(formula, cv_test))
+    
+    RMSEP_CV[i] <- sqrt(mean((obs - preds)^2))
+    SSE <- sum((obs - preds)^2)
+    SST <- sum((obs - mean(obs))^2)
+    R2_CV[i] <- 1 - SSE/SST
+  }
+  
+  CV_RMSEP <- mean(RMSEP_CV)
+  CV_R2    <- mean(R2_CV)
+  
+  # -------------------------
+  # Final model on full training set
+  # -------------------------
+  train_data$w1 <- 1 / train_data[[sd_col]]^2
+  stage1_final <- lm(formula, data = train_data, weights = w1)
+  abs_res_final <- abs(stage1_final$residuals)
+  fit_vals_final <- stage1_final$fitted.values
+  train_data$stage2_wt <- 1 / lm(abs_res_final ~ fit_vals_final)$fitted.values^2
+  
+  final_model <- lm(formula, data = train_data, weights = stage2_wt)
+  
+  # Independent test-set performance
+  test_preds <- predict(final_model, newdata = test_data)
+  test_obs   <- model.response(model.frame(formula, test_data))
+  
+  Test_RMSEP <- sqrt(mean((test_obs - test_preds)^2))
+  SSE_test <- sum((test_obs - test_preds)^2)
+  SST_test <- sum((test_obs - mean(test_obs))^2)
+  Test_R2 <- 1 - SSE_test / SST_test
+  
+  # -------------------------
+  # LOOCV on full dataset
+  # -------------------------
+  n_total <- nrow(data)
+  pred_LOO <- numeric(n_total)
+  
+  for (i in 1:n_total) {
+    train_LOO <- data[-i, ]
+    test_LOO  <- data[i, , drop = FALSE]
+    
+    # Stage 1
+    train_LOO$w1 <- 1 / train_LOO[[sd_col]]^2
+    stage1 <- lm(formula, data = train_LOO, weights = w1)
+    
+    # Stage 2
+    abs_res <- abs(stage1$residuals)
+    fit_vals <- stage1$fitted.values
+    train_LOO$stage2_wt <- 1 / lm(abs_res ~ fit_vals)$fitted.values^2
+    
+    # Final WLS
+    model <- lm(formula, data = train_LOO, weights = stage2_wt)
+    
+    # Predict left-out sample
+    pred_LOO[i] <- predict(model, newdata = test_LOO)
+  }
+  
+  RMSEP_full <- sqrt(mean((model.response(model.frame(formula, data)) - pred_LOO)^2))
+  SSE_cv <- sum((model.response(model.frame(formula, data)) - pred_LOO)^2)
+  SST_cv <- sum((model.response(model.frame(formula, data)) - mean(model.response(model.frame(formula, data))))^2)
+  R2_cv  <- 1 - SSE_cv / SST_cv
+  
+  # -------------------------
+  # Return results
+  # -------------------------
+  return(list(
+    final_model = final_model,
+    CV_RMSEP = CV_RMSEP,
+    CV_R2 = CV_R2,
+    Test_RMSEP = Test_RMSEP,
+    Test_R2 = Test_R2,
+    RMSEP_LOOCV = RMSEP_full,
+    R2_LOOCV = R2_cv
+  ))
+}
+
+
+# Ti example inputs
+results_Ti <- validate_element(
+  Ti_ICP ~ Ti,
+  data = ACE_dataset,
+  sd_col = "Ti_ICP_sd",
+  train_frac = 0.6,
+  k = 10
+)
+
+results_Ti$CV_RMSEP
+results_Ti$CV_R2
+results_Ti$Test_RMSEP
+results_Ti$Test_R2
+results_Ti$RMSEP_LOOCV
+results_Ti$R2_LOOCV
+
+# Function to undertake Observed vs. Predicted plots (training & model) without splitting dataset --------
+# Using k-fold cross-validation
+# Prediction intervals for the final model
+# Training metrics (R², RMSE), k-fold CV metrics (RMSEP, R²cv), Prediction intervals
+# ggplot objects (training plot + CV plot)
+# Plot them with print(results$plot_train) or print(results$plot_cv)
+
+library(ggplot2)
+
+validate_two_stage_wls_kfold <- function(
+    formula, 
+    data, 
+    var_sd_col, 
+    k = 10, 
+    alpha = 0.05
+) {
+  # Extract observed values
+  mf <- model.frame(formula, data)
+  obs <- model.response(mf)
+  
+  # -------------------------
+  # Stage 1 — initial weighted regression
+  # -------------------------
+  data$w1 <- 1 / data[[var_sd_col]]^2      # <- Stage 1 weights column
+  stage1 <- lm(formula, data = data, weights = w1)
+  
+  # -------------------------
+  # Stage 2 — residual-based weights
+  # -------------------------
+  abs_resid <- abs(stage1$residuals)
+  fit_vals  <- stage1$fitted.values
+  data$stage2_wt <- 1 / lm(abs_resid ~ fit_vals)$fitted.values^2  # <- Stage 2 weights column
+  
+  # Final weighted LS model
+  final_model <- lm(formula, data = data, weights = stage2_wt)
+  pred_train  <- predict(final_model)
+  
+  # -------------------------
+  # Training-fit statistics
+  # -------------------------
+  SSE  <- sum((obs - pred_train)^2)
+  SST  <- sum((obs - mean(obs))^2)
+  R2   <- 1 - SSE/SST
+  RMSE <- sqrt(mean((obs - pred_train)^2))
+  
+  # -------------------------
+  # Prediction intervals
+  # -------------------------
+  pred_intervals <- predict(final_model, interval = "prediction", level = 1 - alpha)
+  intervals_df <- as.data.frame(pred_intervals)
+  
+  # -------------------------
+  # K-FOLD CROSS-VALIDATION
+  # -------------------------
+  n <- nrow(data)
+  if(k > n) k <- n  # prevent empty folds
+  set.seed(123)
+  folds <- sample(rep(1:k, length.out = n))
+  pred_cv <- numeric(n)
+  
+  for (i in 1:k) {
+    train_idx <- which(folds != i)
+    test_idx  <- which(folds == i)
+    
+    train_set <- data[train_idx, ]
+    test_set  <- data[test_idx, , drop = FALSE]
+    
+    # Stage 1 inside CV
+    train_set$w1 <- 1 / train_set[[var_sd_col]]^2
+    stage1_cv <- lm(formula, data = train_set, weights = w1)
+    
+    # Stage 2 inside CV
+    abs_res_cv <- abs(stage1_cv$residuals)
+    fit_cv     <- stage1_cv$fitted.values
+    train_set$stage2_wt <- 1 / lm(abs_res_cv ~ fit_cv)$fitted.values^2
+    
+    # Final WLS model for this fold
+    model_cv <- lm(formula, data = train_set, weights = stage2_wt)
+    
+    # Predict for test fold
+    pred_cv[test_idx] <- predict(model_cv, newdata = test_set)
+  }
+  
+  # CV statistics
+  RMSEP <- sqrt(mean((obs - pred_cv)^2))
+  SSEcv <- sum((obs - pred_cv)^2)
+  SSTcv <- sum((obs - mean(obs))^2)
+  R2_cv <- 1 - SSEcv / SSTcv
+  
+  # -------------------------
+  # Plots
+  # -------------------------
+  df_train <- data.frame(obs = obs, pred = pred_train)
+  df_cv    <- data.frame(obs = obs, pred = pred_cv)
+  
+  plot_train <- ggplot(df_train, aes(x = obs, y = pred)) +
+    geom_point(color = "blue") +
+    geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+    labs(title = "Training Fit: Observed vs Predicted",
+         x = "Observed", y = "Predicted") +
+    theme_bw()
+  
+  plot_cv <- ggplot(df_cv, aes(x = obs, y = pred)) +
+    geom_point(color = "red") +
+    geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+    labs(title = paste0(k, "-Fold CV: Observed vs Predicted"),
+         x = "Observed", y = "Predicted") +
+    theme_bw()
+  
+  # -------------------------
+  # Return results
+  # -------------------------
+  return(list(
+    final_model = final_model,
+    R2 = R2,
+    RMSE = RMSE,
+    RMSEP = RMSEP,
+    R2_cv = R2_cv,
+    prediction_intervals = intervals_df,
+    plot_train = plot_train,
+    plot_cv = plot_cv
+  ))
+}
+
+
+
+# Run for Ti- as an example - but needs to be run after WLS wt model has been run 
+
+results_Ti <- validate_two_stage_wls_kfold(
+  Ti_ICP ~ Ti,
+  data = ACE_dataset,
+  var_sd_col = "Ti_ICP_sd",
+  k = 10
+)
+
+# View summary
+results_Ti$R2
+results_Ti$RMSE
+results_Ti$RMSEP
+results_Ti$R2_cv
+
+# Plots
+print(results_Ti$plot_train)
+print(results_Ti$plot_cv)
+
+# Prediction intervals
+head(results_Ti$prediction_intervals)
+
+
+
+
+
+
+
+
 # Primary Matched Elements Ca, Ti, Mn, Fe, Sr, Zr (major good correlation - & Zr) ----------------------------------------------------
-# ACE_Ca LM -----------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
+# ACE_Ca initial LM -----------------------------------------------------------------------
 
 # 1) Unweighted OLS (Ordinary LEast Squares) - linear model & checks
 ACE_Ca_lm <- lm(Ca_ICP ~ Ca, data = ACE_dataset)
@@ -145,6 +445,8 @@ model_performance(ACE_Ca_wls_wt) # AIC - Akaike information criterion; BIC Bayes
 check_model(ACE_Ca_wls_wt) # summary check plots
 ggsave("Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ca/Ca_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
+
+# Outlier tests
 
 # Leverage & Cooks distance
 
@@ -481,8 +783,10 @@ ACE_Ca_predict
 ggsave("Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ca/Ca_OLS_WLS_predict.pdf", 
        height = c(16), width = c(16), dpi = 600, units = "cm")
 
-# ACE_Ti LM -----------------------------------------------------------------------
+# -------------------------------------------------------------------------
 
+# -------------------------------------------------------------------------
+# ACE_Ti LM -----------------------------------------------------------------------
 # 1) Unweighted OLS (Ordinary LEast Squares) - linear model & checks
 ACE_Ti_lm <- lm(Ti_ICP ~ Ti, data = ACE_dataset)
 summary(ACE_Ti_lm)
@@ -525,6 +829,8 @@ check_model(ACE_Ti_wls_wt) # summary check plots
 ggsave("Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/Ti_WLS_wt_performance.pdf", 
        height = c(30), width = c(30), dpi = 600, units = "cm")
 
+# Outlier tests  --------------------------------------------------------
+
 # Leverage & Cooks distance
 
 # 1) OLS (Ordinary Least Squares): Leverage & Cooks distance - influence tests
@@ -540,47 +846,7 @@ ACE_Ti_lm_outliers <- ACE_dataset[ACE_Ti_lm_influential_names,] # outliers only 
 ACE_Ti_lm_no_outliers <- ACE_dataset %>% anti_join(ACE_Ti_lm_outliers) # generates a new dataset with outliers removed
 write.csv(ACE_Ti_lm_no_outliers,"Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/ACE_Ti_OLS_no_outliers.csv", row.names = FALSE)
 
-# 2) Weighted OLS linear model: Leverage & Cooks distance - influence tests
-# Leverage - 2x difference from mean consider removal due to high leverage
-ACE_Ti_wlm_hats <- as.data.frame(hatvalues(ACE_Ti_wlm))
-ACE_Ti_wlm_hats
-# Cooks distance - 2-3 x difference from mean 
-ACE_Ti_wlm_cooksD <- cooks.distance(ACE_Ti_wlm)
-ACE_Ti_wlm_influential <- ACE_Ti_wlm_cooksD[(ACE_Ti_wlm_cooksD > (3 * mean(ACE_Ti_wlm_cooksD, na.rm = TRUE)))]
-ACE_Ti_wlm_influential
-ACE_Ti_wlm_influential_names <- names(ACE_Ti_wlm_influential)
-ACE_Ti_wlm_outliers <- ACE_dataset[ACE_Ti_wlm_influential_names,] # outliers only using of index values
-ACE_Ti_wlm_no_outliers <- ACE_dataset %>% anti_join(ACE_Ti_wlm_outliers) # generates a new dataset with outliers removed
-write.csv(ACE_Ti_wlm_no_outliers,"Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/ACE_Ti_OLS_wt_no_outliers.csv", row.names = FALSE)
-
-# 3) Weighted Linear Regression (WLS) model: Leverage & Cooks distance - influence tests
-# Leverage - 2x difference from mean consider removal due to high leverage
-ACE_Ti_wls_hats <- as.data.frame(hatvalues(ACE_Ti_wls))
-ACE_Ti_wls_hats
-# Cooks distance - 2-3 x difference from mean 
-ACE_Ti_wls_cooksD <- cooks.distance(ACE_Ti_wls)
-ACE_Ti_wls_influential <- ACE_Ti_wls_cooksD[(ACE_Ti_wls_cooksD > (3 * mean(ACE_Ti_wls_cooksD, na.rm = TRUE)))]
-ACE_Ti_wls_influential
-ACE_Ti_wls_influential_names <- names(ACE_Ti_wls_influential)
-ACE_Ti_wls_outliers <- ACE_dataset[ACE_Ti_wls_influential_names,] # outliers only using of index values
-ACE_Ti_wls_no_outliers <- ACE_dataset %>% anti_join(ACE_Ti_wls_outliers) # generates a new dataset with outliers removed
-write.csv(ACE_Ti_wls_no_outliers,"Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/ACE_Ti_WLS_no_outliers.csv", row.names = FALSE)
-
-# 4) Error weighted eighted Linear Regression (WLS): Leverage & Cooks distance - influence tests
-# Leverage - 2x difference from mean consider removal due to high leverage
-ACE_Ti_wls_wt_hats <- as.data.frame(hatvalues(ACE_Ti_wls_wt))
-ACE_Ti_wls_wt_hats
-# Cooks distance - 2-3 x difference from mean 
-ACE_Ti_wls_wt_cooksD <- cooks.distance(ACE_Ti_wls_wt)
-ACE_Ti_wls_wt_influential <- ACE_Ti_wls_wt_cooksD[(ACE_Ti_wls_wt_cooksD > (3 * mean(ACE_Ti_wls_wt_cooksD, na.rm = TRUE)))]
-ACE_Ti_wls_wt_influential
-ACE_Ti_wls_wt_influential_names <- names(ACE_Ti_wls_wt_influential)
-ACE_Ti_wls_wt_outliers <- ACE_dataset[ACE_Ti_wls_wt_influential_names,] # outliers only using of index values
-ACE_Ti_wls_wt_no_outliers <- ACE_dataset %>% anti_join(ACE_Ti_wls_wt_outliers) # generates a new dataset with outliers removed
-write.csv(ACE_Ti_wls_wt_no_outliers,"Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/ACE_Ti_WLS_wt_no_outliers.csv", row.names = FALSE)
-
 # Write stats to file
-# 1) OLS - write to file
 sink(file = "Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/Ti_OLS_summary.txt")
 summary(ACE_Ti_lm)
 glance(ACE_Ti_lm)
@@ -601,7 +867,21 @@ pdf(file = "Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/T
 par(mfrow = c(2, 2))
 plot(ACE_Ti_lm)
 dev.off()
-# 2) OLS weighted - write to file
+
+# 2) Weighted OLS linear model: Leverage & Cooks distance - influence tests
+# Leverage - 2x difference from mean consider removal due to high leverage
+ACE_Ti_wlm_hats <- as.data.frame(hatvalues(ACE_Ti_wlm))
+ACE_Ti_wlm_hats
+# Cooks distance - 2-3 x difference from mean 
+ACE_Ti_wlm_cooksD <- cooks.distance(ACE_Ti_wlm)
+ACE_Ti_wlm_influential <- ACE_Ti_wlm_cooksD[(ACE_Ti_wlm_cooksD > (3 * mean(ACE_Ti_wlm_cooksD, na.rm = TRUE)))]
+ACE_Ti_wlm_influential
+ACE_Ti_wlm_influential_names <- names(ACE_Ti_wlm_influential)
+ACE_Ti_wlm_outliers <- ACE_dataset[ACE_Ti_wlm_influential_names,] # outliers only using of index values
+ACE_Ti_wlm_no_outliers <- ACE_dataset %>% anti_join(ACE_Ti_wlm_outliers) # generates a new dataset with outliers removed
+write.csv(ACE_Ti_wlm_no_outliers,"Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/ACE_Ti_OLS_wt_no_outliers.csv", row.names = FALSE)
+
+# Write to file
 sink(file = "Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/Ti_OLS_wt_summary.txt")
 summary(ACE_Ti_wlm)
 glance(ACE_Ti_wlm)
@@ -622,7 +902,21 @@ pdf(file = "Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/T
 par(mfrow = c(2, 2))
 plot(ACE_Ti_wlm)
 dev.off()
-# 3) WLS - write to file
+
+# 3) Weighted Linear Regression (WLS) model: Leverage & Cooks distance - influence tests
+# Leverage - 2x difference from mean consider removal due to high leverage
+ACE_Ti_wls_hats <- as.data.frame(hatvalues(ACE_Ti_wls))
+ACE_Ti_wls_hats
+# Cooks distance - 2-3 x difference from mean 
+ACE_Ti_wls_cooksD <- cooks.distance(ACE_Ti_wls)
+ACE_Ti_wls_influential <- ACE_Ti_wls_cooksD[(ACE_Ti_wls_cooksD > (3 * mean(ACE_Ti_wls_cooksD, na.rm = TRUE)))]
+ACE_Ti_wls_influential
+ACE_Ti_wls_influential_names <- names(ACE_Ti_wls_influential)
+ACE_Ti_wls_outliers <- ACE_dataset[ACE_Ti_wls_influential_names,] # outliers only using of index values
+ACE_Ti_wls_no_outliers <- ACE_dataset %>% anti_join(ACE_Ti_wls_outliers) # generates a new dataset with outliers removed
+write.csv(ACE_Ti_wls_no_outliers,"Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/ACE_Ti_WLS_no_outliers.csv", row.names = FALSE)
+
+# Write to file
 sink(file = "Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/Ti_WLS_summary.txt")
 summary(ACE_Ti_wls)
 glance(ACE_Ti_wls)
@@ -643,7 +937,21 @@ pdf(file = "Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/T
 par(mfrow = c(2, 2))
 plot(ACE_Ti_wls)
 dev.off()
-# 4) WLS weighted - write to file
+
+# 4) Error weighted eighted Linear Regression (WLS): Leverage & Cooks distance - influence tests
+# Leverage - 2x difference from mean consider removal due to high leverage
+ACE_Ti_wls_wt_hats <- as.data.frame(hatvalues(ACE_Ti_wls_wt))
+ACE_Ti_wls_wt_hats
+# Cooks distance - 2-3 x difference from mean 
+ACE_Ti_wls_wt_cooksD <- cooks.distance(ACE_Ti_wls_wt)
+ACE_Ti_wls_wt_influential <- ACE_Ti_wls_wt_cooksD[(ACE_Ti_wls_wt_cooksD > (3 * mean(ACE_Ti_wls_wt_cooksD, na.rm = TRUE)))]
+ACE_Ti_wls_wt_influential
+ACE_Ti_wls_wt_influential_names <- names(ACE_Ti_wls_wt_influential)
+ACE_Ti_wls_wt_outliers <- ACE_dataset[ACE_Ti_wls_wt_influential_names,] # outliers only using of index values
+ACE_Ti_wls_wt_no_outliers <- ACE_dataset %>% anti_join(ACE_Ti_wls_wt_outliers) # generates a new dataset with outliers removed
+write.csv(ACE_Ti_wls_wt_no_outliers,"Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/ACE_Ti_WLS_wt_no_outliers.csv", row.names = FALSE)
+
+# Write to file
 sink(file = "Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/Ti_WLS_wt_summary.txt")
 summary(ACE_Ti_wls_wt)
 glance(ACE_Ti_wls_wt)
@@ -860,6 +1168,600 @@ ACE_Ti_predict
 ggsave("Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Ti/Ti_OLS_WLS_predict.pdf", 
        height = c(16), width = c(16), dpi = 600, units = "cm")
 
+
+# Validation tests & final prediction model  -----------------------------------
+# Apply to 4) WLS weighted model from initial LM  ----------------------------------------------
+
+
+# This is a single, self-contained function that includes:
+# train/test split (or an external test)
+# k-fold CV or LOOCV
+# final two-stage WLS fit (w1, stage2_wt stored safely)
+# training / CV / test metrics (R², RMSE, RMSEP)
+# training, CV, test plots (obs vs pred with LOESS)
+# residual diagnostics (residuals vs fitted + LOESS, Q–Q)
+# residual bands (±2σ)
+# bootstrap prediction uncertainty for train/test/newdata (user-controlled boot_iter)
+# helper predict_new() attached to results, returns predictions, PIs, bootstrap intervals, saves CSV if requested
+# automatic saving of plots (PNG/PDF)
+# automatic PDF/HTML report: prefer RMarkdown (A), fallback to base-R PDF (B) — user chose C (both)
+# tidy summary table returned and saved if requested
+
+# Full, integrated validation + reporting function (Option C: rmarkdown preferred, fallback to base PDF)
+# Requires: ggplot2, gridExtra, utils. rmarkdown optional (auto-detected).
+
+# WLS weighted Validation and Prediction Function  ----------------------
+
+# Full master function: validate_and_export
+# Dependencies: ggplot2, gridExtra, utils. rmarkdown/knitr optional.
+
+validate_and_export <- function(
+    element,                    # string, e.g. "Ti"
+    formula,                    # e.g. Ti_ICP ~ Ti
+    data,                       # training/calibration dataset (data.frame)
+    sd_col,                     # string, name of SD column for response, e.g. "Ti_ICP_sd"
+    output_base = "Papers_R/2024_DeVleeschouwer/FigureS6/Data/Output/Validation",
+    cv_method = c("kfold", "LOOCV"),
+    k = 10,
+    train_frac = 0.6,
+    external_test = NULL,
+    boot_iter = 2000,            # increase to 2000+ for production
+    boot_seed = 123,
+    save_plots = TRUE,
+    save_summary_pdf = TRUE,
+    save_bootstrap_files = TRUE,
+    report_file = NULL,         # if NULL -> <output_dir>/<element>_Model_Report.pdf
+    report_format = c("pdf", "html"),
+    save_individual_plots = TRUE,
+    verbose = TRUE
+) {
+  # --- libs
+  if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Install ggplot2 first.")
+  if (!requireNamespace("gridExtra", quietly = TRUE)) stop("Install gridExtra first.")
+  report_format <- match.arg(report_format)
+  cv_method <- match.arg(cv_method)
+  
+  # Prepare paths
+  output_dir <- file.path(output_base, element)
+  plots_dir  <- file.path(output_dir, "plots")
+  tables_dir <- file.path(output_dir, "tables")
+  bootstrap_dir <- file.path(output_dir, "bootstrap")
+  dirs <- c(output_dir, plots_dir, tables_dir, bootstrap_dir)
+  for (d in dirs) if (!dir.exists(d)) dir.create(d, recursive = TRUE, showWarnings = FALSE)
+  
+  # default report file
+  if (is.null(report_file)) {
+    report_file <- file.path(output_dir, paste0(element, "_Model_Report.pdf"))
+  }
+  
+  # helper to optionally print messages
+  msg <- function(...) if (verbose) message(...)
+  
+  # safe model.frame extraction
+  mf_all <- model.frame(formula, data)
+  response_name <- all.vars(formula)[1]
+  predictor_name <- all.vars(formula)[2]
+  
+  # 1) Train/test split or external_test
+  if (!is.null(external_test)) {
+    train_data <- data
+    test_data <- external_test
+  } else {
+    set.seed(123)
+    n <- nrow(data)
+    train_index <- sample(seq_len(n), size = floor(train_frac * n))
+    train_data <- data[train_index, , drop = FALSE]
+    test_data <- data[-train_index, , drop = FALSE]
+  }
+  
+  # internal fit function (two-stage wls)
+  fit_two_stage_wls <- function(form, df, sd_col_name) {
+    df <- as.data.frame(df)
+    if (!(sd_col_name %in% names(df))) stop(paste0("sd_col '", sd_col_name, "' not found in data frame."))
+    df$w1 <- 1 / (df[[sd_col_name]]^2)
+    stage1 <- lm(form, data = df, weights = w1)
+    abs_res <- abs(stage1$residuals)
+    fit_vals <- stage1$fitted.values
+    if (length(abs_res) <= 1) {
+      df$stage2_wt <- rep(1, nrow(df))
+    } else {
+      # if the lm(abs_res ~ fit_vals) fails or returns Inf, have a fallback
+      tmp <- try(lm(abs_res ~ fit_vals), silent = TRUE)
+      if (inherits(tmp, "try-error")) {
+        df$stage2_wt <- rep(1, nrow(df))
+      } else {
+        df$stage2_wt <- 1 / fitted(tmp)^2
+        # handle Inf/NAs
+        if (!any(is.finite(df$stage2_wt))) df$stage2_wt <- rep(1, nrow(df))
+        df$stage2_wt[!is.finite(df$stage2_wt)] <- median(df$stage2_wt[is.finite(df$stage2_wt)], na.rm = TRUE)
+      }
+    }
+    final <- lm(form, data = df, weights = stage2_wt)
+    attr(final, "data_with_weights") <- df
+    return(final)
+  }
+  
+  # 2) Cross-validation (k-fold or LOOCV) on training set
+  if (cv_method == "kfold") {
+    n_train <- nrow(train_data)
+    if (k > n_train) {
+      warning("k > n_train; setting k = n_train")
+      k <- n_train
+    }
+    set.seed(123)
+    folds <- sample(rep(1:k, length.out = n_train))
+    preds_cv <- rep(NA, n_train)
+    rmse_folds <- numeric(k)
+    r2_folds <- numeric(k)
+    for (i in seq_len(k)) {
+      tr <- train_data[folds != i, , drop = FALSE]
+      te <- train_data[folds == i, , drop = FALSE]
+      mod_i <- fit_two_stage_wls(formula, tr, sd_col)
+      p <- predict(mod_i, newdata = te)
+      obs <- model.response(model.frame(formula, te))
+      preds_cv[which(folds == i)] <- p
+      rmse_folds[i] <- sqrt(mean((obs - p)^2))
+      SSE <- sum((obs - p)^2)
+      SST <- sum((obs - mean(obs))^2)
+      r2_folds[i] <- ifelse(SST == 0, NA, 1 - SSE/SST)
+    }
+    CV_RMSEP <- mean(rmse_folds, na.rm = TRUE)
+    CV_R2 <- mean(r2_folds, na.rm = TRUE)
+    train_data$cv_pred <- preds_cv
+  } else {
+    n_train <- nrow(train_data)
+    preds_loo <- numeric(n_train)
+    for (i in seq_len(n_train)) {
+      tr <- train_data[-i, , drop = FALSE]
+      te <- train_data[i, , drop = FALSE]
+      mod_i <- fit_two_stage_wls(formula, tr, sd_col)
+      preds_loo[i] <- predict(mod_i, newdata = te)
+    }
+    obs_train <- model.response(model.frame(formula, train_data))
+    CV_RMSEP <- sqrt(mean((obs_train - preds_loo)^2))
+    SSE_cv <- sum((obs_train - preds_loo)^2)
+    SST_cv <- sum((obs_train - mean(obs_train))^2)
+    CV_R2 <- ifelse(SST_cv == 0, NA, 1 - SSE_cv / SST_cv)
+    train_data$cv_pred <- preds_loo
+  }
+  
+  # 3) Final model on training set
+  final_model <- fit_two_stage_wls(formula, train_data, sd_col)
+  train_pred_mat <- predict(final_model, newdata = train_data, interval = "prediction")
+  train_obs <- model.response(model.frame(formula, train_data))
+  Train_RMSE <- sqrt(mean((train_obs - train_pred_mat[,1])^2))
+  SSE_train <- sum((train_obs - train_pred_mat[,1])^2)
+  SST_train <- sum((train_obs - mean(train_obs))^2)
+  Train_R2 <- ifelse(SST_train == 0, NA, 1 - SSE_train/SST_train)
+  
+  # 4) Test predictions
+  test_pred_mat <- predict(final_model, newdata = test_data, interval = "prediction")
+  test_pred <- test_pred_mat[,1]
+  if (response_name %in% names(test_data)) {
+    test_obs <- model.response(model.frame(formula, test_data))
+    Test_RMSEP <- sqrt(mean((test_obs - test_pred)^2))
+    SSE_test <- sum((test_obs - test_pred)^2)
+    SST_test <- sum((test_obs - mean(test_obs))^2)
+    Test_R2 <- ifelse(SST_test == 0, NA, 1 - SSE_test / SST_test)
+  } else {
+    test_obs <- rep(NA, length(test_pred))
+    Test_RMSEP <- NA
+    Test_R2 <- NA
+  }
+  
+  # 5) LOOCV on full dataset for RMSEP_full & R2_LOOCV
+  n_total <- nrow(data)
+  pred_LOO_full <- numeric(n_total)
+  for (i in seq_len(n_total)) {
+    tr <- data[-i, , drop = FALSE]
+    te <- data[i, , drop = FALSE]
+    mod_i <- fit_two_stage_wls(formula, tr, sd_col)
+    pred_LOO_full[i] <- predict(mod_i, newdata = te)
+  }
+  full_obs <- model.response(model.frame(formula, data))
+  RMSEP_LOOCV <- sqrt(mean((full_obs - pred_LOO_full)^2))
+  SSE_loocv <- sum((full_obs - pred_LOO_full)^2)
+  SST_loocv <- sum((full_obs - mean(full_obs))^2)
+  R2_LOOCV <- ifelse(SST_loocv == 0, NA, 1 - SSE_loocv/SST_loocv)
+  
+  # 6) Model equation text
+  coefs <- coef(final_model)
+  if (length(coefs) >= 2) {
+    intercept <- round(coefs[1], 6)
+    slope <- round(coefs[2], 6)
+    model_equation <- paste0(response_name, " = ", intercept, " + ", slope, " * ", predictor_name)
+  } else {
+    model_equation <- paste0(response_name, " = ", paste(round(coefs,6), collapse = " + "))
+  }
+  
+  # 7) Plots: training, CV, test, residuals, QQ
+  library(ggplot2)
+  library(gridExtra)
+  # training plot
+  df_train_plot <- data.frame(obs = train_obs, pred = train_pred_mat[,1], lwr = train_pred_mat[,2], upr = train_pred_mat[,3])
+  p_train <- ggplot(df_train_plot, aes(x = obs, y = pred)) +
+    geom_point(color = "blue") +
+    geom_smooth(method = "lm", se = TRUE) +
+    geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.15) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+    labs(title = paste0(element, " Training: Observed vs Predicted"), x = "Observed", y = "Predicted") + theme_bw()
+  if (save_individual_plots) {
+    pdf(file.path(plots_dir, paste0(element, "_training_plot.pdf")), width = 7, height = 6)
+    print(p_train); dev.off()
+    msg("Saved:", file.path(plots_dir, paste0(element, "_training_plot.pdf")))
+  }
+  
+  # CV plot
+  if ("cv_pred" %in% names(train_data)) {
+    df_cv_plot <- data.frame(obs = model.response(model.frame(formula, train_data)), pred = train_data$cv_pred)
+  } else {
+    df_cv_plot <- df_train_plot
+  }
+  p_cv <- ggplot(df_cv_plot, aes(x = obs, y = pred)) +
+    geom_point(color = "red") +
+    geom_smooth(method = "lm", se = TRUE) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+    labs(title = paste0(element, " CV: Observed vs Predicted"), x = "Observed", y = "Predicted") + theme_bw()
+  if (save_individual_plots) {
+    pdf(file.path(plots_dir, paste0(element, "_cv_plot.pdf")), width = 7, height = 6)
+    print(p_cv); dev.off()
+    msg("Saved:", file.path(plots_dir, paste0(element, "_cv_plot.pdf")))
+  }
+  
+  # test plot
+  df_test_plot <- data.frame(obs = test_obs, pred = test_pred, lwr = test_pred_mat[,2], upr = test_pred_mat[,3])
+  p_test <- ggplot(df_test_plot, aes(x = obs, y = pred)) +
+    geom_point(color = "darkgreen") +
+    geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.12) +
+    geom_smooth(method = "lm", se = TRUE) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+    labs(title = paste0(element, " Test: Observed vs Predicted"), x = "Observed", y = "Predicted") + theme_bw()
+  if (save_individual_plots) {
+    pdf(file.path(plots_dir, paste0(element, "_test_plot.pdf")), width = 7, height = 6)
+    print(p_test); dev.off()
+    msg("Saved:", file.path(plots_dir, paste0(element, "_test_plot.pdf")))
+  }
+  
+  # residuals vs fitted + bands and QQ
+  final_df <- attr(final_model, "data_with_weights")
+  final_pred <- predict(final_model, newdata = final_df)
+  final_resid <- final_df[[response_name]] - final_pred
+  df_diag <- data.frame(fitted = final_pred, residuals = final_resid)
+  p_res_fit <- ggplot(df_diag, aes(x = fitted, y = residuals)) +
+    geom_point() +
+    geom_smooth(method = "loess", se = TRUE) +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    labs(title = paste0(element, " Residuals vs Fitted (LOESS)"), x = "Fitted", y = "Residuals") + theme_bw()
+  if (save_individual_plots) {
+    pdf(file.path(plots_dir, paste0(element, "_residuals_vs_fitted.pdf")), width = 7, height = 6)
+    print(p_res_fit); dev.off()
+    msg("Saved:", file.path(plots_dir, paste0(element, "_residuals_vs_fitted.pdf")))
+  }
+  resid_sd <- sd(final_resid, na.rm = TRUE)
+  p_res_band <- p_res_fit + geom_hline(yintercept = c(2*resid_sd, -2*resid_sd), linetype = "dotdash", color = "red")
+  if (save_individual_plots) {
+    pdf(file.path(plots_dir, paste0(element, "_residuals_bands.pdf")), width = 7, height = 6)
+    print(p_res_band); dev.off()
+    msg("Saved:", file.path(plots_dir, paste0(element, "_residuals_bands.pdf")))
+  }
+  p_qq <- ggplot(df_diag, aes(sample = residuals)) + stat_qq() + stat_qq_line() + labs(title = paste0(element, " Q-Q Plot")) + theme_bw()
+  if (save_individual_plots) {
+    pdf(file.path(plots_dir, paste0(element, "_qq_plot.pdf")), width = 7, height = 6)
+    print(p_qq); dev.off()
+    msg("Saved:", file.path(plots_dir, paste0(element, "_qq_plot.pdf")))
+  }
+  
+  # 8) Bootstrap: produce train/test bootstrap distributions & summary
+  boot_train_mean <- boot_train_lwr <- boot_train_upr <- NULL
+  boot_test_mean <- boot_test_lwr <- boot_test_upr <- NULL
+  boot_train_matrix <- boot_test_matrix <- NULL
+  boot_test_rmsep <- NA
+  if (!is.null(boot_iter) && boot_iter > 0) {
+    set.seed(boot_seed)
+    n_train <- nrow(train_data)
+    n_test <- nrow(test_data)
+    boot_train_matrix <- matrix(NA, nrow = n_train, ncol = boot_iter)
+    boot_test_matrix  <- matrix(NA, nrow = n_test,  ncol = boot_iter)
+    msg("Starting bootstrap (", boot_iter, " iterations)...")
+    for (b in seq_len(boot_iter)) {
+      idx <- sample(seq_len(n_train), replace = TRUE)
+      boot_tr <- train_data[idx, , drop = FALSE]
+      mod_b <- tryCatch(fit_two_stage_wls(formula, boot_tr, sd_col), error = function(e) NULL)
+      if (!is.null(mod_b)) {
+        boot_train_matrix[,b] <- predict(mod_b, newdata = train_data)
+        boot_test_matrix[,b]  <- predict(mod_b, newdata = test_data)
+      } else {
+        boot_train_matrix[,b] <- NA
+        boot_test_matrix[,b]  <- NA
+      }
+    }
+    # summaries
+    boot_train_mean <- apply(boot_train_matrix, 1, mean, na.rm = TRUE)
+    boot_train_lwr  <- apply(boot_train_matrix, 1, quantile, probs = 0.025, na.rm = TRUE)
+    boot_train_upr  <- apply(boot_train_matrix, 1, quantile, probs = 0.975, na.rm = TRUE)
+    boot_test_mean  <- apply(boot_test_matrix, 1, mean, na.rm = TRUE)
+    boot_test_lwr   <- apply(boot_test_matrix, 1, quantile, probs = 0.025, na.rm = TRUE)
+    boot_test_upr   <- apply(boot_test_matrix, 1, quantile, probs = 0.975, na.rm = TRUE)
+    if (!all(is.na(test_obs))) {
+      boot_test_rmsep <- sqrt(mean((test_obs - boot_test_mean)^2, na.rm = TRUE))
+    } else {
+      boot_test_rmsep <- NA
+    }
+    # save bootstrap matrices and summary CSVs
+    if (save_bootstrap_files) {
+      # Summary CSV
+      boot_sum_df <- data.frame(
+        id = seq_len(n_train),
+        train_mean = boot_train_mean,
+        train_lwr = boot_train_lwr,
+        train_upr = boot_train_upr
+      )
+      write.csv(boot_sum_df, file.path(bootstrap_dir, paste0(element, "_BootstrapTrainSummary.csv")), row.names = FALSE)
+      msg("Saved:", file.path(bootstrap_dir, paste0(element, "_BootstrapTrainSummary.csv")))
+      # Distribution CSV (wide)
+      boot_train_df_wide <- data.frame(id = seq_len(n_train), boot_train_matrix)
+      names(boot_train_df_wide) <- c("id", paste0("boot_iter_", seq_len(boot_iter)))
+      write.csv(boot_train_df_wide, file.path(bootstrap_dir, paste0(element, "_BootstrapTrainDistribution.csv")), row.names = FALSE)
+      msg("Saved:", file.path(bootstrap_dir, paste0(element, "_BootstrapTrainDistribution.csv")))
+      
+      # Test bootstrap CSVs
+      boot_test_sum_df <- data.frame(
+        id = seq_len(n_test),
+        test_mean = boot_test_mean,
+        test_lwr = boot_test_lwr,
+        test_upr = boot_test_upr
+      )
+      write.csv(boot_test_sum_df, file.path(bootstrap_dir, paste0(element, "_BootstrapTestSummary.csv")), row.names = FALSE)
+      msg("Saved:", file.path(bootstrap_dir, paste0(element, "_BootstrapTestSummary.csv")))
+      boot_test_df_wide <- data.frame(id = seq_len(n_test), boot_test_matrix)
+      names(boot_test_df_wide) <- c("id", paste0("boot_iter_", seq_len(boot_iter)))
+      write.csv(boot_test_df_wide, file.path(bootstrap_dir, paste0(element, "_BootstrapTestDistribution.csv")), row.names = FALSE)
+      msg("Saved:", file.path(bootstrap_dir, paste0(element, "_BootstrapTestDistribution.csv")))
+    }
+    # bootstrap plots: train mean vs observed with ribbon
+    df_boot_train_plot <- data.frame(obs = train_obs, pred = train_pred_mat[,1], boot_mean = boot_train_mean, boot_lwr = boot_train_lwr, boot_upr = boot_train_upr)
+    p_boot_train <- ggplot(df_boot_train_plot, aes(x = obs, y = boot_mean)) +
+      geom_point(color = "blue") +
+      geom_line(aes(y = boot_mean), color = "orange") +
+      geom_ribbon(aes(ymin = boot_lwr, ymax = boot_upr), alpha = 0.15, fill = "orange") +
+      geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+      labs(title = paste0(element, " Bootstrap (train): mean & 95% PI")) + theme_bw()
+    if (save_individual_plots) {
+      pdf(file.path(bootstrap_dir, paste0(element, "_BootstrapTrainPlot.pdf")), width = 7, height = 6)
+      print(p_boot_train); dev.off()
+      msg("Saved:", file.path(bootstrap_dir, paste0(element, "_BootstrapTrainPlot.pdf")))
+    }
+    df_boot_test_plot <- data.frame(obs = test_obs, pred = test_pred, boot_mean = boot_test_mean, boot_lwr = boot_test_lwr, boot_upr = boot_test_upr)
+    p_boot_test <- ggplot(df_boot_test_plot, aes(x = obs, y = boot_mean)) +
+      geom_point(color = "darkgreen") +
+      geom_line(aes(y = boot_mean), color = "orange") +
+      geom_ribbon(aes(ymin = boot_test_lwr, ymax = boot_test_upr), alpha = 0.15, fill = "orange") +
+      geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+      labs(title = paste0(element, " Bootstrap (test): mean & 95% PI")) + theme_bw()
+    if (save_individual_plots) {
+      pdf(file.path(bootstrap_dir, paste0(element, "_BootstrapTestPlot.pdf")), width = 7, height = 6)
+      print(p_boot_test); dev.off()
+      msg("Saved:", file.path(bootstrap_dir, paste0(element, "_BootstrapTestPlot.pdf")))
+    }
+    # combine bootstrap plots into single PDF
+    pdf(file.path(bootstrap_dir, paste0(element, "_BootstrapPlots.pdf")), width = 8, height = 10)
+    gridExtra::grid.arrange(ggplotGrob(p_boot_train), ggplotGrob(p_boot_test), ncol = 1)
+    dev.off()
+    msg("Saved:", file.path(bootstrap_dir, paste0(element, "_BootstrapPlots.pdf")))
+  } # end bootstrap
+  
+  # 9) Summary table combined
+  summary_table <- data.frame(
+    Metric = c("Training R2", "Training RMSE", "CV R2", "CV RMSEP",
+               "Test R2", "Test RMSEP", "LOOCV RMSEP (full)", "LOOCV R2 (full)", "Bootstrap test RMSEP (mean)"),
+    Value = c(Train_R2, Train_RMSE, CV_R2, CV_RMSEP,
+              Test_R2, Test_RMSEP, RMSEP_LOOCV, R2_LOOCV, ifelse(exists("boot_test_rmsep"), boot_test_rmsep, NA))
+  )
+  # save combined summary table CSV and PDF (one combined PDF with tables)
+  summary_csv_file <- file.path(tables_dir, paste0(element, "_SummaryTables.csv"))
+  write.csv(summary_table, summary_csv_file, row.names = FALSE)
+  msg("Saved:", summary_csv_file)
+  # create simple pdf with the single table
+  summary_pdf_file <- file.path(tables_dir, paste0(element, "_SummaryTables.pdf"))
+  pdf(summary_pdf_file, width = 8, height = 6)
+  gridExtra::grid.table(summary_table)
+  dev.off()
+  msg("Saved:", summary_pdf_file)
+  
+  # also save model equation & coefficients as CSV
+  coef_df <- data.frame(term = names(coefs), estimate = as.numeric(coefs))
+  write.csv(coef_df, file.path(tables_dir, paste0(element, "_ModelCoefficients.csv")), row.names = FALSE)
+  msg("Saved:", file.path(tables_dir, paste0(element, "_ModelCoefficients.csv")))
+  
+  # 10) Attach predict_new helper (with bootstrap option to regenerate boot predictions if requested)
+  predict_new <- function(newdata,
+                          predictor_col = NULL,
+                          unit = "ppm",
+                          save_results = FALSE,
+                          output_csv = NULL,
+                          include_boot = FALSE,
+                          boot_iter_local = boot_iter) {
+    
+    # Determine predictor column from formula if not supplied
+    if (is.null(predictor_col)) predictor_col <- predictor_name
+    
+    if (!predictor_col %in% names(newdata))
+      stop("predictor_col not found in newdata")
+    
+    # --- 1. Linear model prediction on ORIGINAL (log) scale ---
+    pred_mat <- predict(final_model,
+                        newdata = newdata,
+                        interval = "prediction")
+    
+    # extract fitted and PI bounds on log scale
+    log_fit <- pred_mat[, "fit"]
+    log_lwr <- pred_mat[, "lwr"]
+    log_upr <- pred_mat[, "upr"]
+    
+    # --- 2. Identify response name dynamically ---
+    resp <- response_name   # e.g. "Ti_ICP"
+    
+    # --- 3. Back-transform to ppm ---
+    newdata[[paste0(resp, "_pred_ppm")]]       <- exp(log_fit)
+    newdata[[paste0(resp, "_ppm_PI_lower")]]   <- exp(log_lwr)
+    newdata[[paste0(resp, "_ppm_PI_upper")]]   <- exp(log_upr)
+    
+    # --- 4. OPTIONAL: attach bootstrap uncertainty ---
+    if (include_boot && boot_iter_local > 0) {
+      
+      set.seed(boot_seed)
+      n_new <- nrow(newdata)
+      boot_mat <- matrix(NA, nrow = n_new, ncol = boot_iter_local)
+      
+      for (b in seq_len(boot_iter_local)) {
+        idx <- sample(seq_len(nrow(train_data)), replace = TRUE)
+        boot_tr <- train_data[idx, , drop = FALSE]
+        
+        mb <- tryCatch(fit_two_stage_wls(formula, boot_tr, sd_col), error = function(e) NULL)
+        
+        if (!is.null(mb)) {
+          boot_log <- predict(mb, newdata = newdata)
+          boot_mat[, b] <- exp(boot_log)  # back-transform
+        }
+      }
+      
+      # bootstrap summaries
+      newdata[[paste0(resp, "_boot_mean_ppm")]]  <- rowMeans(boot_mat, na.rm = TRUE)
+      newdata[[paste0(resp, "_boot_lwr_ppm")]]   <- apply(boot_mat, 1, quantile, probs = 0.025, na.rm = TRUE)
+      newdata[[paste0(resp, "_boot_upr_ppm")]]   <- apply(boot_mat, 1, quantile, probs = 0.975, na.rm = TRUE)
+      
+      # optionally save full bootstrap matrix
+      if (save_results && !is.null(output_csv)) {
+        boot_df <- data.frame(id = seq_len(n_new), boot_mat)
+        names(boot_df) <- c("id", paste0("boot_iter_", seq_len(boot_iter_local)))
+        write.csv(boot_df, output_csv, row.names = FALSE)
+        message("Saved bootstrap matrix for new predictions to: ", output_csv)
+      }
+    }
+    
+    # --- 5. Save results if needed ---
+    if (save_results & !is.null(output_csv)) {
+      write.csv(newdata, output_csv, row.names = FALSE)
+      message("Saved prediction file: ", output_csv)
+    }
+    
+    return(newdata)
+  }
+  
+  
+  # 11) assemble returned result object
+  out <- list(
+    model = final_model,
+    equation = model_equation,
+    summary_table = summary_table,
+    Train_R2 = Train_R2,
+    Train_RMSE = Train_RMSE,
+    CV_R2 = CV_R2,
+    CV_RMSEP = CV_RMSEP,
+    Test_R2 = Test_R2,
+    Test_RMSEP = Test_RMSEP,
+    RMSEP_LOOCV = RMSEP_LOOCV,
+    R2_LOOCV = R2_LOOCV,
+    plots = list(
+      train = p_train,
+      cv = p_cv,
+      test = p_test,
+      residuals = p_res_fit,
+      qq = p_qq
+    ),
+    bootstrap = list(
+      iter = boot_iter,
+      seed = boot_seed,
+      train_boot_mean = if (!is.null(boot_train_mean)) boot_train_mean else NULL,
+      train_boot_lwr = if (!is.null(boot_train_lwr)) boot_train_lwr else NULL,
+      train_boot_upr = if (!is.null(boot_train_upr)) boot_train_upr else NULL,
+      test_boot_mean = if (!is.null(boot_test_mean)) boot_test_mean else NULL,
+      test_boot_lwr = if (!is.null(boot_test_lwr)) boot_test_lwr else NULL,
+      test_boot_upr = if (!is.null(boot_test_upr)) boot_test_upr else NULL,
+      train_boot_matrix = if (!is.null(boot_train_matrix)) boot_train_matrix else NULL,
+      test_boot_matrix = if (!is.null(boot_test_matrix)) boot_test_matrix else NULL
+    ),
+    predict_new = predict_new,
+    parameters = list(
+      element = element,
+      cv_method = cv_method,
+      k = ifelse(cv_method == "kfold", k, NA),
+      train_frac = train_frac,
+      external_test_used = !is.null(external_test),
+      boot_iter = boot_iter,
+      output_dir = output_dir
+    )
+  )
+  class(out) <- "validate_element_export"
+  return(out)
+}
+
+
+# Run for Ti & produce predicted outputs in ppm  -------------------------------
+
+# 1. Load ACE data (already done)
+ACE_dataset <- ACE_dataset
+
+# 2. Example: Titanium with internal split, k-fold CV, bootstrap 500 iterations
+Ti_results <- validate_and_export(
+  element = "Ti",
+  formula = Ti_ICP ~ Ti,
+  data = ACE_dataset,
+  sd_col = "Ti_ICP_sd",
+  cv_method = "kfold",
+  k = 10,
+  train_frac = 0.6,
+  boot_iter = 500,
+  save_plots = TRUE,
+  save_individual_plots = TRUE,
+  save_summary_pdf = TRUE,
+  save_bootstrap_files = TRUE,
+  verbose = TRUE
+)
+
+# 3. Predict new XRF inputs
+
+# Define predictor ITRAX variables & ICPMS response variable for calibration model tests
+main_elements_xrf <- c("K", "Ca", "Ti", "Mn","Fe", "Zn", "Rb", "Sr","Zr")
+key_elements_xrf <- c("Ti", "Ca", "Mn", "Fe", "Sr", "Zr")
+main_elements_icp <- c("K_ICP", "Ca_ICP", "Ti_ICP", "Mn_ICP","Fe_ICP", "Zn_ICP", "Rb_ICP", "Sr_ICP","Zr_ICP")
+key_elements_icp <- c("Ti_ICP", "Ca_ICP", "Mn_ICP", "Fe_ICP", "Sr_ICP", "Zr_ICP")
+final_elements_xrf <- c("Ti", "Ca", "Sr", "Zr")
+final_elements_icp <- c("Ti_ICP", "Ca_ICP", "Sr_ICP", "Zr_ICP")
+
+# Import ACE Ti XRF-CS log_inc data & tidy
+ACE_xrf_log_inc <- read_csv("Papers_R/2024_DeVleeschouwer/FigureS6/Data/Input/ACE_ITRAX_qc_acf_log_inc.csv") %>% 
+  filter(Site == "BI10"| Site == "HER42PB" | Site == "KER1" | Site == "KER3" | Site == "PB1") %>% 
+  select(Location:MSE, all_of(main_elements_xrf), Total_scatter, inc_coh, coh_inc) %>%
+  filter(qc == "TRUE") %>% 
+  filter(validity == "1") %>% 
+  mutate(across(all_of(main_elements_xrf), ~ ifelse(. <=-10, NA, .))) # remove outliers > -10 log ICPMS value
+ACE_xrf_log_inc
+
+Ti_XRF_input <- ACE_xrf_log_inc %>%
+  select(Site, depth, SH20_age, Ti)
+Ti_XRF_input
+
+
+# Predict on new XRF file (data.frame Ti_XRF_input)
+
+Ti_preds <- Ti_results$predict_new(
+  newdata = Ti_XRF_input,
+  include_boot = TRUE,
+  save_results = TRUE,
+  output_csv = "Ti_Preds_with_ppm.csv"
+)
+
+# Combine with XRF_input file for plotting later on
+write.csv(Ti_preds,"Papers_R/2024_DeVleeschouwer/FigureS6/Data/Output/Validation/Ti/Ti_preds_output.csv", row.names = FALSE)
+
+
+
+
+
+# -------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
 # ACE_Mn LM  -----------------------------------------------------------------------
 
 # 1) Unweighted OLS (Ordinary LEast Squares) - linear model & checks
@@ -1240,7 +2142,13 @@ ggsave("Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Mn/Mn
        height = c(16), width = c(16), dpi = 600, units = "cm")
 
 
-# ACE_Fe LM  -----------------------------------------------------------------------
+# -------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
+# ACE_Fe LM  -------------------------------------------------------------------
+
+
+
 
 # 1) Unweighted OLS (Ordinary LEast Squares) - linear model & checks
 ACE_Fe_lm <- lm(Fe_ICP ~ Fe, data = ACE_dataset)
@@ -1618,6 +2526,9 @@ ACE_Fe_predict <- ACE_Fe_final +
 ACE_Fe_predict
 ggsave("Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Fe/Fe_OLS_WLS_predict.pdf", 
        height = c(16), width = c(16), dpi = 600, units = "cm")
+# -------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
 # ACE_Sr LM -----------------------------------------------------------------------
 
 # 1) Unweighted OLS (Ordinary LEast Squares) - linear model & checks
@@ -1998,6 +2909,9 @@ ggsave("Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Sr/Sr
        height = c(16), width = c(16), dpi = 600, units = "cm")
 
 
+# -------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
 # ACE_Zr LM  -----------------------------------------------------------------------
 
 # 1) Unweighted OLS (Ordinary LEast Squares) - linear model & checks
@@ -2376,8 +3290,9 @@ ACE_Zr_predict <- ACE_Zr_final +
 ACE_Zr_predict
 ggsave("Papers_R/2024_DeVleeschouwer/FigureS6/Plots/FigS6a_OLS_WLS_log_inc/Zr/Zr_OLS_WLS_predict.pdf", 
        height = c(16), width = c(16), dpi = 600, units = "cm")
-# Figure S6a - Primary matched elements -------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 
+# Figure S6a - Primary matched elements ----------------------------------------
 # Summary 2x3 matrix plots of ITRAX-acf primary matched elements
 # OLS & WLS summary - unweighted stats on plot
 ggarrange(ACE_Ca_predict, ACE_Ti_predict, ACE_Mn_predict, 
