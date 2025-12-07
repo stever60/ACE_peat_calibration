@@ -54,10 +54,10 @@
 # — sequential R that works on a Mac.
 
 # Key features for each element:
-# OLS, WLS, weighted OLS, 2-step weighted WLS
-# Bayesian regression (bayesglm)
-# Random Forest
-# PLS (LOO and 10-fold CV)
+# OLS, WLS, weighted OLS, 2-step weighted WLS - based on code by Steve Roberts
+# Bayesian regression - from bayesglm.R package
+# Random Forest - from randomForest.R
+# PLS (LOO and 10-fold CV) - from pls.r package 
 # Residual plots, normality tests, heteroscedasticity tests, influence plots
 # Predicted vs observed plots colored by Site using a JCO palette
 # RF variable importance, PLS RMSEP validation plots
