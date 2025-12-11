@@ -3906,7 +3906,7 @@ run_full_regressions <- function(
 # Run it all ... --------------------------------------------------------
 
 run_full_regressions(
-  elements = c("Ca", "Ti","Fe","Mn","Sr","Zr"),
+  elements = c("Ca", "Ti","Sr","Zr"),
   data     = ACE_dataset,   # calibration (log-space)
   XRF_new  = XRF_pred,      # predictors (log-space)
   ICP_ppm  = ICP_obs,       # observed matched ICP data in ppm: Ti_ICP, Ti_ICP_sd, Site, SH20_age, etc., XRF in cps (don't use as input)
