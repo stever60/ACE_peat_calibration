@@ -3906,11 +3906,11 @@ run_full_regressions <- function(
 # Run it all ... --------------------------------------------------------
 
 run_full_regressions(
-  elements = c("Ca", "Ti","Sr","Zr"),
-  data     = ACE_dataset,   # calibration (log-space)
-  XRF_new  = XRF_pred,      # predictors (log-space)
-  ICP_ppm  = ICP_obs,       # observed matched ICP data in ppm: Ti_ICP, Ti_ICP_sd, Site, SH20_age, etc., XRF in cps (don't use as input)
-  save_dir = "/Users/sjro/Desktop"  # function will create /Desktop/Regression_Multivariate
+  elements = c( "Ca", "Ti", "Fe", "Mn", "Sr", "Zr" ), # choose elements to include 
+  data     = ACE_dataset,   # dataset for calibration model (log-space as log(element) ICP-MS & XRF-CS log(element/inc))
+  XRF_new  = XRF_pred,      # predictors (log-space) for conversion to ppm across 8 models and for elements defined above
+  ICP_ppm  = ICP_obs,       # matched ICP data in ppm: Ti_ICP, Ti_ICP_sd, Site, SH20_age, etc., (XRF in cps not used as an input)
+  save_dir = "/Users/sjro/Desktop"  # function will create /Desktop/Regression_Multivariate - copy this to output folder elsewhere
 )
 
 # -------------------------------------------------------------------------
