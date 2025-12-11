@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
-# Regression Comparison Multivariate function
-# Matched XRF-CS log_inc & log ICP-MS matched dataset
+# Calibration Model Comparison - Multivariate function
+# Using Matched XRF-CS log_inc & log ICP-MS matched dataset
 # -------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------
@@ -111,10 +111,27 @@
 # generating some preliminary code The final implementations of the code and 
 # functions were produced and verified independently by the authors.
 
-# Improvements in v1.2-1.8  ---------------------------------------------------
+# Improvements in v1.2-1.9  ---------------------------------------------------
 
-# To fix in v1.9
+# To fix in v1.10
 # Error bars on ACE element plots mssing - probaly due to square not extending to max range
+
+# v. 1.9
+# Relabled axes and plots for predicted vs obs
+
+# Caption example for Training Model
+# Summary predicted (measured XRF-CS matched Ln[Ti/inc.]) vs observed 
+# (measured ICP-MS matched Ln[Ti]) log-space plots for 8 training models 
+# (response variable y = Ln ICP-MS; predictors x = Ln XRF-CS) 
+# – 4 univariate (OLS, WLS, and weighted OLS, WLS), and 4 multivariate 
+# Bayes GLM (Bayes), Random Forest (RF) and PLS (k-fold and LOO CV) based on 
+# Ti individually for univariate models and 6-elements (Ca, Ti, Fe, Mn, Sr, Zr) 
+# for multivariate models (n = 268).
+# 
+# Caption example for Prediction model 
+# Predicted (XRF-CS in mg kg-1) vs observed (measured XRF-CS matched Ln[Ti/inc.]) 
+# prediction model plots for Ti, applied to the ACE dataset to produce predicted 
+# concentrations in mg kg-1 (see Methods for further details) (n = 268).
 
 # v.1.8
 # Global summary tables now include %based error summaries - not used for ranking
@@ -1261,14 +1278,14 @@ run_full_regressions <- function(
         ) +
         labs(
           x = expression("Observed ICP-MS [Ln(mg kg"^{-1}*")]"),
-          y = expression("Predicted [Ln(mg kg"^{-1}*")]"),
-          title = paste(el, mname, "- Predicted vs Observed")
+          y = expression("Predicted [XRF-CS Ln(el/inc)]"),
+          title = paste(el, mname, "- Pred vs Obs Training")
         ) +
         theme_bw() + theme_small +
         ggtitle(paste(el, mname, "- Predicted vs Observed ("))
       
       ggsave(
-        file.path(element_dir, paste0(el, "_", mname, "_PredVsObs.pdf")),
+        file.path(element_dir, paste0(el, "_", mname, "_PredVsObs_train.pdf")),
         p_po, width = 13, height = 9, units = "cm"
       )
       
@@ -1294,8 +1311,8 @@ run_full_regressions <- function(
         ) +
         labs(
           x = expression("Observed ICP-MS [Ln(mg kg"^{-1}*")]"),
-          y = expression("Predicted [Ln(mg kg"^{-1}*")]"),
-          title = paste(el, mname, "- Predicted vs Observed")
+          y = expression("Predicted [XRF-CS Ln(el/inc)]"),
+          title = paste(el, mname, "- Pred vs Obs Training")
         ) +
         theme_bw() + theme_small +
         coord_fixed()   # <-- square panel
@@ -2929,9 +2946,9 @@ run_full_regressions <- function(
                    hjust = ann_hjust, vjust = ann_vjust,
                    label = stats_label, size = 2.9) +
           labs(
-            x = expression("Observed ICP-MS (mg kg"^{-1}*")"),
-            y = expression("Predicted (mg kg"^{-1}*")"),
-            title = paste(el, mname, "- ACE Pred vs Obs")
+            x = expression("Observed XRF-CS"),
+            y = expression("Predicted XRF-CS (mg kg"^{-1}*")"),
+            title = paste(el, mname, "- Pred vs Obs (Prediction)")
           ) +
           theme_bw() + theme_small +
           coord_fixed()
@@ -2971,11 +2988,11 @@ run_full_regressions <- function(
             annotate("text", x = ann_x, y = ann_y,
                      hjust = ann_hjust, vjust = ann_vjust,
                      label = stats_label, size = 2.9) +
-            labs(
-              x = expression("Observed ICP-MS (mg kg"^{-1}*")"),
-              y = expression("Predicted (mg kg"^{-1}*")"),
-              title = paste(el, mname, "- ACE Pred vs Ob (abs err)")
-            ) +
+              labs(
+                x = expression("Observed XRF-CS"),
+                y = expression("Predicted XRF-CS (mg kg"^{-1}*")"),
+                title = paste(el, mname, "- Pred vs Obs (Prediction)")
+              ) +
             theme_bw() + theme_small +
             coord_fixed()
           
@@ -3007,9 +3024,9 @@ run_full_regressions <- function(
                      hjust = ann_hjust, vjust = ann_vjust,
                      label = stats_label, size = 2.9) +
             labs(
-              x = expression("Observed ICP-MS (mg kg"^{-1}*")"),
-              y = expression("Predicted (mg kg"^{-1}*")"),
-              title = paste(el, mname, "- ACE Pred vs Ob (% err)")
+              x = expression("Observed XRF-CS"),
+              y = expression("Predicted XRF-CS (mg kg"^{-1}*")"),
+              title = paste(el, mname, "- Pred vs Obs (Prediction)")
             ) +
             theme_bw() + theme_small +
             coord_fixed()
