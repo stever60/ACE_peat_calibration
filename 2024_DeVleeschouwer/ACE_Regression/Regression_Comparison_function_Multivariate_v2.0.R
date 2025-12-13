@@ -111,14 +111,81 @@
 # generating some preliminary code The final implementations of the code and 
 # functions were produced and verified independently by the authors.
 
-# Improvements in v.2 ----------------------------------------------------
 
-# Fixed ranking issue - rank now appears in g;obal summary csv files 
+# To fix in v. 2.1
+# Radar plots print to screen but not to pdf even though pdf created 
+# - couldnt resolve issue but not a big deal .. just nice to have 
+
+# Improvements in v.2.0 ----------------------------------------------------
+# Model robustness was evaluated using a composite signal-to-noise framework 
+# incorporating prediction uncertainty, downcore smoothness, and calibration 
+# performance. Signal-to-noise ratios were calculated from prediction confidence 
+# intervals and profile roughness, scaled within each element, and combined with
+# R² into a weighted robustness score overall and per site. 
+# Overall robustness across the whole calibration dataset was useful, but models 
+# exhibiting unstable downcore behaviour were assessed on a per site basis and 
+# excluded from selection if classified as unstable (robustness <0.75). 
+# For each element, and at each site, the highest-ranked 
+# stable model was designated as the production model and used for subsequent 
+# interpretation.
+
+# Metrics used
+# 
+# Quantity	Definition
+# Signal 	  Variability of predicted concentrations
+# Noise 	  Model uncertainty + downcore roughness
+# Scale	    ppm (mg kg⁻¹), not log
+# 
+# Metrics computed per element × model:
+# 1.	SNR_model = mean predicted ppm / RMSE_ppm
+# 2.	SNR_CI (preferred) = sd(predicted ppm) / mean(U95 - L95)
+# 3.	SNR_smooth (downcore stability) = sd(predicted ppm) / sd(diff(predicted ppm)
+# 
+# 
+# For each element × model, robustness is derived from:
+# 1.	Accuracy
+# •	R² (calibration or validation performance)
+# 2.	Noise / uncertainty
+# •	SNR_CI
+# Signal-to-noise ratio based on prediction uncertainty
+# (signal variability ÷ mean CI width)
+# 3.	Downcore stability
+# •	SNR_smooth
+# Penalises high point-to-point roughness (spiky profiles)
+# 
+# 
+# Robustness score
+# 
+# Each metric is scaled 0–1 within each element, then combined:
+#   
+# Robustness Score = 0.4 × SNR_CI_scaled + 0.3 × SNR_smooth_scaled + 0.3 × R²_scaled
+# 
+# Models are ranked per element by:
+# 1.	Highest SNR_CI
+# 2.	Highest SNR_smooth
+# 3.	Highest R²
+# 
+# This ensures:
+# •	Models with narrow CIs,
+# •	smooth downcore behaviour, and
+# •	high explanatory power
+# are favoured.
+# 
+# Class	Definition
+# Preferred:	Highest robustness score and not flagged unstable
+# Acceptable:	Rank 2–3 robustness, stable but slightly noisier
+# Unstable:	High roughness or poor SNR despite reasonable R²
+# 
+# Unstable models are never selected as production models, even if R² is high.
+# 
+# Generated a summary Heatmap matrix for visualising robustness quickly for all
+# models vs elements and radar plots for each element
+
+# Fixed performace ranking issue - rank now appears in global summary csv files 
 # Small bug fixes and pacthes to make plotting include full error bar range
 # Major change to ensure erro bars are cources and plpotted correctly in 
 # Sections 8 and 15 
 
-# Summary AI generated description for fixes 
 # Prediction uncertainty in Predicted vs Observed plots (Sections 8 & 15)
 # Predicted vs Observed (Pred–Obs) plots include uncertainty information that
 # reflects both measurement error and model prediction uncertainty, handled
@@ -588,7 +655,7 @@ dev.off()
 install.packages(c(
   "broom", "performance", "see", "ggplot2", "dplyr", "purrr",
   "boot", "psych", "lmtest", "arm", "randomForest", "pls", "ggpubr", 
-  "qqplotr", "future", "progressr"
+  "qqplotr", "future", "progressr", "fmsb"
 ))
 
 
@@ -1611,7 +1678,9 @@ run_full_regressions <- function(
       "",
       "Models: OLS, WLS, OLS(wt), WLS(wt), Bayes, RF, PLS(LOO), PLS(k).",
       "Ranking: highest R², then lowest RMSEP, then lowest RMSE.",
-      "Plots show predicted concentrations (Y-axis) versus observed ICP-MS values (X-axis); horizontal error bars represent ICP analytical uncertainty, vertical error bars represent model prediction uncertainty (95% CI)."
+      "Plots show predicted concentrations (Y-axis) versus observed ICP-MS values (X-axis); horizontal error bars represent ICP analytical uncertainty, vertical error bars represent model prediction uncertainty (95% CI).",
+      "Model robustness was evaluated using a composite signal-to-noise framework incorporating prediction uncertainty, downcore smoothness, and calibration performance. Signal-to-noise ratios were calculated from prediction confidence intervals and profile roughness, scaled within each element, and combined with R² into a weighted robustness score. Models exhibiting unstable downcore behaviour were excluded from selection. For each element, the highest-ranked stable model was designated as the production model and used for subsequent interpretation.
+      "
     )
     
     writeLines(readme_txt, file.path(element_dir, "README.txt"))
@@ -2793,6 +2862,787 @@ run_full_regressions <- function(
     message("=== Section 11 summaries written successfully ===")
   }
   
+  # ===============================================================  
+  # SECTION 11A: ROBUSTNESS of XRF_pred predictions file
+  # XRF_pred SNR, robustness, stability flags, production model
+  # Ranked by Robustness score & Global Rank Priority:
+  #   1) Robustness_score (overall)
+  #   2) R2 (overall)
+  #   3) RMSE (log-space) (overall)
+  #   4) RMSEP (RMSE_ppm) (overall)
+  # ===============================================================
+  
+  # CREATE ROBUSTNESS OUTPUT DIRECTORY
+  
+  robust_root <- file.path(all_base, "Robustness")
+  
+  if (!dir.exists(robust_root)) {
+    dir.create(robust_root, recursive = TRUE, showWarnings = FALSE)
+  }
+  
+  stopifnot(dir.exists(robust_root))
+  
+  # Set up SNR calucaltions 
+  
+  scale01 <- function(x) {
+    rng <- range(x, na.rm = TRUE)
+    if (!is.finite(diff(rng)) || diff(rng) == 0)
+      return(rep(NA_real_, length(x)))
+    (x - rng[1]) / diff(rng)
+  }
+  
+  snr_rows <- list()
+  
+  # 1. Compute SNR + stability metrics (XRF_pred ONLY)
+  
+  for (el in elements) {
+    
+    df <- preds_store[[el]]
+    if (is.null(df)) next
+    
+    for (mname in names(model_store[[el]])) {
+      
+      pred_col <- paste0(mname, "_", el, "_Pred_ppm")
+      l_col    <- paste0(mname, "_", el, "_L95_ppm")
+      u_col    <- paste0(mname, "_", el, "_U95_ppm")
+      
+      if (!all(c(pred_col, l_col, u_col) %in% names(df))) next
+      
+      pred <- df[[pred_col]]
+      l95  <- df[[l_col]]
+      u95  <- df[[u_col]]
+      
+      ok <- !is.na(pred) & !is.na(l95) & !is.na(u95)
+      if (sum(ok) < 6) next
+      
+      pred <- pred[ok]
+      ci_w <- u95[ok] - l95[ok]
+      
+      rmse_ppm <- global_summary %>%
+        dplyr::filter(Element == el, Model == mname) %>%
+        dplyr::pull(RMSE_ppm)
+      
+      roughness <- sd(diff(pred), na.rm = TRUE)
+      
+      snr_rows[[length(snr_rows) + 1]] <- data.frame(
+        Element        = el,
+        Model          = mname,
+        Mean_ppm       = mean(pred, na.rm = TRUE),
+        RMSE_ppm       = rmse_ppm,
+        Mean_CI_width  = mean(ci_w, na.rm = TRUE),
+        SD_pred        = sd(pred, na.rm = TRUE),
+        Roughness      = roughness,
+        SNR_model      = mean(pred, na.rm = TRUE) / rmse_ppm,
+        SNR_CI         = sd(pred, na.rm = TRUE) / mean(ci_w, na.rm = TRUE),
+        SNR_smooth     = sd(pred, na.rm = TRUE) / roughness
+      )
+    }
+  }
+  
+  snr_df <- dplyr::bind_rows(snr_rows)
+  
+  # 2. Merge SNR metrics into global_summary
+  
+  global_summary <- global_summary %>%
+    dplyr::left_join(
+      snr_df %>%
+        dplyr::select(
+          Element, Model,
+          Mean_ppm, Mean_CI_width,
+          SNR_model, SNR_CI, SNR_smooth,
+          Roughness
+        ),
+      by = c("Element", "Model")
+    )
+  
+  # 3. Robustness score (scaled SNR + R²)
+  
+  global_summary <- global_summary %>%
+    dplyr::group_by(Element) %>%
+    dplyr::mutate(
+      SNR_CI_s      = scale01(SNR_CI),
+      SNR_smooth_s = scale01(SNR_smooth),
+      R2_s         = scale01(R2),
+      
+      Robustness_Score =
+        0.4 * SNR_CI_s +
+        0.3 * SNR_smooth_s +
+        0.3 * R2_s
+    ) %>%
+    dplyr::arrange(dplyr::desc(Robustness_Score), .by_group = TRUE) %>%
+    dplyr::mutate(
+      Robust_Rank = dplyr::row_number()
+    ) %>%
+    dplyr::ungroup()
+  
+  # PATCH 3.1: GLOBAL_RANK using same priority as Section 11
+  global_summary <- global_summary %>%
+    dplyr::group_by(Element) %>%
+    dplyr::arrange(
+      dplyr::desc(Robustness_Score),
+      dplyr::desc(R2),
+      RMSE_ppm,
+      RMSEP,
+      .by_group = TRUE
+    ) %>%
+    dplyr::mutate(
+      Global_Rank = dplyr::row_number()
+    ) %>%
+    dplyr::ungroup()
+  
+  # 4. Flag unstable downcore behaviour
+  
+  global_summary <- global_summary %>%
+    dplyr::group_by(Element) %>%
+    dplyr::mutate(
+      Roughness_norm = scale01(Roughness),
+      Unstable_flag  = ifelse(
+        is.na(Roughness_norm), NA,
+        Roughness_norm > 0.7
+      )
+    ) %>%
+    dplyr::ungroup()
+  
+  # 5. Auto-select ONE production model per element
+  
+  production_models <- global_summary %>%
+    dplyr::filter(
+      Robust_Rank == 1,
+      Unstable_flag == FALSE | is.na(Unstable_flag)
+    ) %>%
+    dplyr::group_by(Element) %>%
+    dplyr::slice(1) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      Production_Model = Model
+    )
+  
+  global_summary <- global_summary %>%
+    dplyr::left_join(
+      production_models %>%
+        dplyr::select(Element, Production_Model),
+      by = "Element"
+    ) %>%
+    dplyr::mutate(
+      Is_Production_Model = Model == Production_Model
+    )
+  
+  # 6. Robustness class (for colour-coding)
+  
+  global_summary <- global_summary %>%
+    dplyr::mutate(
+      Robustness_Class = dplyr::case_when(
+        Global_Rank == 1 & !Unstable_flag ~ "Preferred 1",
+        Global_Rank <= 2 & !Unstable_flag ~ "Acceptable 2",
+        Global_Rank <= 3 & !Unstable_flag ~ "Acceptable 3",
+        Global_Rank <= 4 & !Unstable_flag ~ "Acceptable 4",
+        TRUE                              ~ "Unstable"
+      )
+    )
+  
+  # 7. Write updated global summary
+  
+  write.csv(
+    global_summary,
+    file.path(all_base, "AllElements_ModelSummary.csv"),
+    row.names = FALSE
+  )
+  
+  # 8. Supplementary audit table (reviewers)
+  
+  audit_table <- global_summary %>%
+    dplyr::select(
+      Element, Model,
+      R2, RMSE_ppm,
+      Mean_ppm, Mean_CI_width,
+      SNR_model, SNR_CI, SNR_smooth,
+      Roughness,
+      Robustness_Score, Robust_Rank,
+      Robustness_Class,
+      Unstable_flag,
+      Is_Production_Model
+    ) %>%
+    dplyr::arrange(Element, Robust_Rank)
+  
+  write.csv(
+    audit_table,
+    file.path(all_base, "AllElementsModel_Robustness.csv"),
+    row.names = FALSE
+  )
+  
+  # ===============================================================
+  # SECTION 11B: ROBUSTNESS VISUAL SUMMARY - OVERALL & PER SITE
+  # Heatmap (all elements × models) + Radar plots (per element)
+  # ===============================================================
+  
+  pdf(
+    file = file.path(robust_root, "Robustness.pdf"),
+    width = 11,
+    height = 8.5
+  )
+  
+  # 1. SNR HEATMAP (white → red)
+  
+  p_heat <- ggplot(
+    global_summary,
+    aes(x = Model, y = Element, fill = SNR_CI_s)
+  ) +
+    geom_tile(colour = "white", linewidth = 0.3) +
+    scale_fill_gradient(
+      low  = "white",
+      high = "red",
+      limits = c(0, 1),
+      name = "Scaled SNR\n(CI-based)",
+      na.value = "grey90"
+    ) +
+    labs(
+      title = "Model signal-to-noise robustness (ppm scale)",
+      x = "Model",
+      y = "Element"
+    ) +
+    theme_minimal(base_size = 9) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      plot.title  = element_text(face = "bold")
+    )
+  
+  print(p_heat)
+  
+  
+  # 2. RADAR PLOTS — ONE PDF PER ELEMENT (3×3 GRID OF SITES)
+  
+  sites_order <- c("ALL", "BI10", "HERPB42", "KER1", "KER3", "PB1")
+  sites_order <- sites_order[sites_order %in% snr_df$Site]
+  
+  for (el in elements) {
+    
+    radar_pdf <- file.path(
+      robust_root,
+      paste0("Robustness_Radar_", el, ".pdf")
+    )
+    
+    pdf(radar_pdf, width = 11, height = 11)
+    
+    layout(matrix(1:9, nrow = 3, byrow = TRUE))
+    par(mar = c(2, 2, 3, 2))
+    
+    plot_count <- 0
+    
+    for (s in sites_order) {
+      
+      df_r <- snr_df %>%
+        dplyr::filter(Element == el, Site == s) %>%
+        dplyr::select(
+          Model,
+          SNR_CI_s,
+          SNR_smooth_s,
+          Robustness_score
+        ) %>%
+        tidyr::drop_na()
+      
+      if (nrow(df_r) < 2) {
+        plot.new()
+        title(paste(el, "-", s, "\n(no data)"))
+        plot_count <- plot_count + 1
+        next
+      }
+      
+      radar_vals <- as.data.frame(df_r[, -1])
+      rownames(radar_vals) <- df_r$Model
+      
+      radar_mat <- rbind(
+        max = rep(1, ncol(radar_vals)),
+        min = rep(0, ncol(radar_vals)),
+        radar_vals
+      )
+      
+      radar_cols <- scales::hue_pal()(nrow(radar_vals))
+      
+      plot.new()
+      pdf(file.path(robust_root, paste0("Robustness_Radars_", el, ".pdf")),
+          width = 11, height = 11)
+      par(bg = "white", fg = "black")
+      
+      fmsb::radarchart(
+        radar_mat,
+        axistype = 1,
+        pcol  = cols,
+        pfcol = scales::alpha(cols, 0.35),
+        plwd  = 2,
+        cglcol = "grey80",
+        cglty  = 1,
+        axislabcol = "grey40",
+        vlcex = 0.7,
+        title = paste(el, "-", s)
+      )
+      
+      plot_count <- plot_count + 1
+    }
+    
+    # pad remaining panels to 3×3
+    while (plot_count < 9) {
+      plot.new()
+      plot_count <- plot_count + 1
+    }
+    
+    dev.off()
+    
+    message("✓ Radar written: ", radar_pdf)
+  }
+  
+  
+  #2.2 
+  # ADDITIONAL RADAR SET:
+  # One radar per MODEL  across ELEMENTS), 3×3 sites grid
+  
+  message("=== Creating model-centric robustness radar summaries ===")
+  
+  model_radar_dir <- file.path(robust_root, "Model_Radars")
+  dir.create(model_radar_dir, showWarnings = FALSE, recursive = TRUE)
+  
+  sites_order <- c("ALL", "BI10", "HERPB42", "KER1", "KER3", "PB1")
+  sites_order <- sites_order[sites_order %in% snr_df$Site]
+  
+  for (mname in unique(snr_df$Model)) {
+    
+    radar_grobs <- list()
+    
+    for (s in sites_order) {
+      
+      df_r <- snr_df %>%
+        dplyr::filter(Model == mname, Site == s) %>%
+        dplyr::select(
+          Element,
+          SNR_CI_s,
+          SNR_smooth_s,
+          Robustness_score
+        ) %>%
+        tidyr::drop_na()
+      
+      if (nrow(df_r) < 2) {
+        radar_grobs[[s]] <- grid::nullGrob()
+        next
+      }
+      
+      radar_vals <- as.data.frame(df_r[, -1])
+      rownames(radar_vals) <- df_r$Element
+      
+      radar_mat <- rbind(
+        max = rep(1, ncol(radar_vals)),
+        min = rep(0, ncol(radar_vals)),
+        radar_vals
+      )
+      
+      radar_cols <- scales::hue_pal()(nrow(radar_vals))
+      
+      radar_grobs[[s]] <- grid::grid.grabExpr({
+        fmsb::radarchart(
+          radar_mat,
+          axistype   = 1,
+          pcol       = radar_cols,
+          pfcol      = scales::alpha(radar_cols, 0.35),
+          plwd       = 2,
+          cglcol     = "grey80",
+          cglty      = 1,
+          axislabcol = "grey40",
+          vlcex      = 0.7,
+          title      = paste("Model:", mname, "| Site:", s)
+        )
+      })
+    }
+    
+    # Pad to 3×3
+    while (length(radar_grobs) < 9) {
+      radar_grobs[[paste0("blank_", length(radar_grobs))]] <-
+        grid::nullGrob()
+    }
+    
+    radar_file <- file.path(
+      model_radar_dir,
+      paste0("Robustness_Radar_Model_", mname, ".pdf")
+    )
+    
+    pdf(radar_file, width = 11, height = 11)
+    grid::grid.newpage()
+    gridExtra::grid.arrange(
+      grobs = radar_grobs,
+      ncol  = 3,
+      nrow  = 3
+    )
+    dev.off()
+    
+    message("✓ Model radar written: ", basename(radar_file))
+  }
+  
+  message("=== Model-centric radar summaries complete ===")
+  
+  message("✓ Robustness heatmap (white→red) + radar plots written to Robustness.pdf")
+  
+  # ===============================================================
+  # SECTION 11C:ROBUSTNESS & SNR ANALYSIS (OVERALL + PER SITE)
+  # OUTPUT: Robustness folder
+  # ===============================================================
+
+  # Output directory
+  
+  robust_root <- file.path(all_base, "Robustness")
+  
+  if (!dir.exists(robust_root)) {
+    dir.create(robust_root, recursive = TRUE, showWarnings = FALSE)
+  }
+  stopifnot(dir.exists(robust_root))
+  
+  message("Robustness outputs will be written to: ",
+          normalizePath(robust_root, winslash = "/"))
+  
+  suppressPackageStartupMessages({
+    library(dplyr)
+    library(ggplot2)
+    library(fmsb)
+    library(grid)
+    library(patchwork)
+  })
+  
+  # Helper functions
+
+  scale01 <- function(x) {
+    r <- range(x, na.rm = TRUE)
+    if (!is.finite(diff(r)) || diff(r) == 0)
+      return(rep(NA_real_, length(x)))
+    (x - r[1]) / diff(r)
+  }
+  
+  calc_snr_ci <- function(pred, lwr, upr) {
+    signal <- sd(pred, na.rm = TRUE)
+    noise  <- mean(upr - lwr, na.rm = TRUE)
+    ifelse(is.na(signal) | is.na(noise) | noise == 0,
+           NA_real_, signal / noise)
+  }
+  
+  calc_snr_smooth <- function(pred, depth = NULL) {
+    if (length(pred) < 6) return(NA_real_)
+    if (!is.null(depth)) pred <- pred[order(depth)]
+    d <- diff(pred)
+    if (all(is.na(d))) return(NA_real_)
+    1 / sd(d, na.rm = TRUE)
+  }
+  
+  # Build robustness table
+
+  rows <- list()
+  
+  for (el in elements) {
+    
+    df0 <- preds_store[[el]]
+    if (is.null(df0) || !"Site" %in% names(df0)) next
+    
+    sites <- c("ALL", sort(unique(df0$Site)))
+    
+    for (s in sites) {
+      
+      df_s <- if (s == "ALL") df0 else df0 %>% filter(Site == s)
+      if (nrow(df_s) < 6) next
+      
+      for (mname in names(model_store[[el]])) {
+        
+        pred_col <- paste0(mname, "_", el, "_Pred_ppm")
+        lwr_col  <- paste0(mname, "_", el, "_L95_ppm")
+        upr_col  <- paste0(mname, "_", el, "_U95_ppm")
+        
+        if (!all(c(pred_col, lwr_col, upr_col) %in% names(df_s))) next
+        
+        ok <- is.finite(df_s[[pred_col]]) &
+          is.finite(df_s[[lwr_col]])  &
+          is.finite(df_s[[upr_col]])
+        
+        if (sum(ok) < 6) next
+        
+        pred <- df_s[[pred_col]][ok]
+        lwr  <- df_s[[lwr_col]][ok]
+        upr  <- df_s[[upr_col]][ok]
+        
+        depth_vec <- if ("depth" %in% names(df_s)) df_s$depth[ok] else NULL
+        
+        rows[[length(rows) + 1]] <- data.frame(
+          Element    = el,
+          Site       = s,
+          Model      = mname,
+          n          = length(pred),
+          Mean_ppm   = mean(pred, na.rm = TRUE),
+          SD_pred    = sd(pred, na.rm = TRUE),
+          Mean_CI_w  = mean(upr - lwr, na.rm = TRUE),
+          SNR_CI     = calc_snr_ci(pred, lwr, upr),
+          SNR_smooth = calc_snr_smooth(pred, depth_vec),
+          stringsAsFactors = FALSE
+        )
+      }
+    }
+  }
+  
+  snr_df <- bind_rows(rows)
+  
+  if (nrow(snr_df) == 0) {
+    stop("No robustness results produced — check preds_store content.")
+  }
+  
+  # Scale + composite robustness
+
+  snr_df <- snr_df %>%
+    group_by(Element, Site) %>%
+    mutate(
+      SNR_CI_s         = scale01(SNR_CI),
+      SNR_smooth_s     = scale01(SNR_smooth),
+      Robustness_score = 0.6 * SNR_CI_s + 0.4 * SNR_smooth_s
+    ) %>%
+    arrange(desc(Robustness_score), .by_group = TRUE) %>%
+    mutate(Robustness_Rank = row_number()) %>%
+    ungroup()
+  
+  # Write CSV outputs
+
+  write.csv(
+    snr_df,
+    file.path(robust_root, "Robustness_ALL_SITES.csv"),
+    row.names = FALSE
+  )
+  
+  for (s in unique(snr_df$Site)) {
+    write.csv(
+      snr_df %>% filter(Site == s),
+      file.path(robust_root, paste0("Robustness_Site_", s, ".csv")),
+      row.names = FALSE
+    )
+  }
+  
+  message("✓ Robustness CSVs written")
+  
+  # HEATMAPS — one combined 3×3 page
+
+  sites_order <- c("ALL", "BI10", "HER42PB", "KER1", "KER3", "PB1")
+  sites_order <- sites_order[sites_order %in% snr_df$Site]
+  
+  heatmap_plots <- list()
+  
+  for (s in sites_order) {
+    
+    df_h <- snr_df %>% filter(Site == s)
+    if (nrow(df_h) == 0) next
+    
+    heatmap_plots[[s]] <- ggplot(
+      df_h,
+      aes(x = Model, y = Element, fill = Robustness_score)
+    ) +
+      geom_tile(color = "grey85", linewidth = 0.3) +
+      scale_fill_gradient(low = "white", high = "red", limits = c(0, 1)) +
+      labs(title = paste("Robustness: ", s)) +
+      theme_bw() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  }
+  
+  while (length(heatmap_plots) < 9) {
+    heatmap_plots[[paste0("blank_", length(heatmap_plots))]] <-
+      ggplot() + theme_void()
+  }
+  
+  pdf(file.path(robust_root, "Robustness_Heatmaps_AllSites.pdf"), 11, 11)
+  
+  print(
+    wrap_plots(
+      heatmap_plots,
+      ncol   = 3,
+      nrow   = 3,
+      guides = "collect"   # <<< COLLECT LEGENDS
+    ) &
+      theme(
+        legend.position  = "bottom",
+        legend.direction = "horizontal",
+        legend.box       = "horizontal"
+      )
+  )
+  
+  dev.off()
+  
+  # RADAR PLOTS — ONE PDF PER ELEMENT (3×3 grid of sites)
+  
+  cb_palette <- c(
+    "#E69F00", "#56B4E9", "#009E73",
+    "#F0E442", "#0072B2", "#D55E00", "#CC79A7"
+  )
+  
+  for (el in elements) {
+    
+    pdf(
+      file.path(robust_root, paste0("Robustness_Radars_El_", el, ".pdf")),
+      width = 11, height = 11
+    )
+    
+    layout(matrix(1:9, nrow = 3, byrow = TRUE))
+    par(mar = c(2, 2, 3, 2))
+    
+    plot_count <- 0
+    
+    for (s in sites_order) {
+      
+      df_r <- snr_df %>% filter(Element == el, Site == s)
+      
+      if (nrow(df_r) < 2) {
+        plot.new()
+        title(paste(el, "-", s, "\n(no data)"))
+        plot_count <- plot_count + 1
+        next
+      }
+      
+      radar_vals <- df_r %>%
+        dplyr::select(SNR_CI_s, SNR_smooth_s, Robustness_score) %>%
+        as.data.frame()
+      
+      rownames(radar_vals) <- df_r$Model
+      
+      radar_mat <- rbind(
+        max = rep(1, ncol(radar_vals)),
+        min = rep(0, ncol(radar_vals)),
+        radar_vals
+      )
+      
+      cols <- cb_palette[seq_len(nrow(radar_vals))]
+      
+      plot.new()
+      par(bg = "white", fg = "black")
+      
+      fmsb::radarchart(
+        radar_mat,
+        axistype = 1,
+        pcol = cols,
+        pfcol = scales::alpha(cols, 0.35),
+        plwd = 2,
+        cglcol = "grey80",
+        title = paste(el, "-", s)
+      )
+      
+      plot_count <- plot_count + 1
+      if (plot_count >= 9) break
+    }
+    
+    while (plot_count < 9) {
+      plot.new()
+      plot_count <- plot_count + 1
+    }
+    
+    dev.off()
+  }
+  
+  message("DONE — all robustness outputs saved to Robustness/")
+  
+  # ===============================================================
+  # SECTION 11D: SITE SUMMARY CSVs — RANK MODELS PER SITE × ELEMENT
+  # Priority:
+  #   1) Robustness_score (site)
+  #   2) R2_overall
+  #   3) RMSE_overall
+  #   4) RMSEP_overall
+  # ===============================================================
+  
+  if (!exists("snr_df") || nrow(snr_df) == 0) {
+    warning("snr_df missing/empty — skipping per-site robustness ranking summaries.")
+  } else if (!exists("global_summary") || nrow(global_summary) == 0) {
+    warning("global_summary missing/empty — skipping per-site robustness ranking summaries.")
+  } else {
+    
+    # Ensure Rank exists in global_summary
+    if (!"Rank" %in% names(global_summary)) {
+      global_summary <- global_summary %>%
+        dplyr::group_by(Element) %>%
+        dplyr::arrange(dplyr::desc(R2), RMSEP, RMSE, RMSE_ppm) %>%
+        dplyr::mutate(Rank = dplyr::row_number()) %>%
+        dplyr::ungroup()
+    }
+    
+    # Pull overall metrics used for ranking
+    global_metrics <- global_summary %>%
+      dplyr::select(
+        Element,
+        Model,
+        R2_overall    = R2,
+        RMSE_overall  = RMSE,
+        RMSEP_overall = RMSE_ppm
+      )
+    
+    # Summarise robustness safely
+    robust_site_model <- snr_df %>%
+      dplyr::group_by(Site, Element, Model) %>%
+      dplyr::summarise(
+        Robustness_score = mean(Robustness_score, na.rm = TRUE),
+        SNR_CI_s         = mean(SNR_CI_s, na.rm = TRUE),
+        SNR_smooth_s     = mean(SNR_smooth_s, na.rm = TRUE),
+        n_mean           = round(mean(n, na.rm = TRUE), 0),
+        .groups = "drop"
+      ) %>%
+      dplyr::left_join(global_metrics, by = c("Element", "Model"))
+    
+    # Rank models per Site × Element
+    site_ranked <- robust_site_model %>%
+      dplyr::group_by(Site, Element) %>%
+      dplyr::arrange(
+        dplyr::desc(Robustness_score),
+        dplyr::desc(R2_overall),
+        RMSE_overall,
+        RMSEP_overall
+      ) %>%
+      dplyr::mutate(Rank_site = dplyr::row_number()) %>%
+      dplyr::ungroup()
+    
+    # Write one CSV per site (including ALL)
+    sites_out <- sort(unique(site_ranked$Site))
+    
+    for (s in sites_out) {
+      
+      out_df <- site_ranked %>%
+        dplyr::filter(Site == s) %>%
+        dplyr::select(
+          Site,
+          Element,
+          Model,
+          Rank_site,
+          Robustness_score,
+          R2_overall,
+          RMSE_overall,
+          RMSEP_overall,
+          SNR_CI_s,
+          SNR_smooth_s,
+          n_mean
+        ) %>%
+        dplyr::arrange(Element, Rank_site)
+      
+      write.csv(
+        out_df,
+        file.path(robust_root, paste0("SiteModelRank_", s, ".csv")),
+        row.names = FALSE
+      )
+    }
+    
+    # Combined all-sites table
+    write.csv(
+      site_ranked %>%
+        dplyr::select(
+          Site,
+          Element,
+          Model,
+          Rank_site,
+          Robustness_score,
+          R2_overall,
+          RMSE_overall,
+          RMSEP_overall,
+          SNR_CI_s,
+          SNR_smooth_s,
+          n_mean
+        ) %>%
+        dplyr::arrange(Site, Element, Rank_site),
+      file.path(robust_root, "SiteModelRank_ALLSITES.csv"),
+      row.names = FALSE
+    )
+    
+    message("✓ Per-site model ranking CSVs written with RMSEP included")
+  }
   
   # ===============================================================
   # 12. FINISH
@@ -4137,6 +4987,67 @@ run_full_regressions <- function(
     "  * AllElements_ModelSummary_pred.csv",
     "  * BestModels_PerElement_pred.csv",
     "  * AllElements_ModelSummary_ppm_pred.csv",
+    " Model robustness was evaluated using a composite signal-to-noise framework 
+      incorporating prediction uncertainty, downcore smoothness, and calibration 
+      performance. Signal-to-noise ratios were calculated from prediction confidence 
+      intervals and profile roughness, scaled within each element, and combined with
+      R² into a weighted robustness score overall and per site.
+      Overall robustness across the whole calibration dataset was useful, but models
+      exhibiting unstable downcore behaviour were assessed on a per site basis and
+      excluded from selection if classified as unstable (robustness <0.75).
+      For each element, and at each site, the highest-ranked
+      stable model was designated as the production model and used for subsequent
+      interpretation.
+
+    Metrics used
+    
+    Quantity	Definition
+    Signal 	  Variability of predicted concentrations
+    Noise 	  Model uncertainty + downcore roughness
+    Scale	    ppm (mg kg⁻¹), not log
+    
+    Metrics computed per element × model:
+    1.	SNR_model = mean predicted ppm / RMSE_ppm
+    2.	SNR_CI (preferred) = sd(predicted ppm) / mean(U95 - L95)
+    3.	SNR_smooth (downcore stability) = sd(predicted ppm) / sd(diff(predicted ppm)
+    
+    For each element × model, robustness is derived from:
+    1.	Accuracy
+    •	R² (calibration or validation performance)
+    2.	Noise / uncertainty
+    •	SNR_CI
+    Signal-to-noise ratio based on prediction uncertainty
+    (signal variability ÷ mean CI width)
+    3.	Downcore stability
+    •	SNR_smooth
+    Penalises high point-to-point roughness (spiky profiles)
+    
+    Robustness score
+    
+    Each metric is scaled 0–1 within each element, then combined:
+    
+    Robustness Score = 0.4 × SNR_CI_scaled + 0.3 × SNR_smooth_scaled + 0.3 × R²_scaled
+    
+    Models are ranked per element by:
+    1.	Highest SNR_CI
+    2.	Highest SNR_smooth
+    3.	Highest R²
+    
+    This ensures:
+    •	Models with narrow CIs,
+    •	smooth downcore behaviour, and
+    •	high explanatory power
+    are favoured.
+    
+    Class	Definition
+    Preferred:	Highest robustness score and not flagged unstable
+    Acceptable:	Rank 2–3 robustness, stable but slightly noisier
+    Unstable:	High roughness or poor SNR despite reasonable R²
+    
+    Unstable models are never selected as production models, even if R² is high.
+    
+    Generates a summary Heatmap matrix for visualising robustness quickly for all
+    models vs elements and radar plots for each element ",
     "",
     "-------------------------------------------------------------",
     "4. Multi-element correlation diagnostics (Section 21)",
