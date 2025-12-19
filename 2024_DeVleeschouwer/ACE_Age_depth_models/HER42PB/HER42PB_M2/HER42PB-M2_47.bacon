@@ -1,0 +1,19 @@
+## Ran on Wed Mar  9 17:01:59 2022 
+
+Cal 0 : ConstCal;
+Cal 1 : IntCal20, 4;
+Cal 2 : Marine20;
+Cal 3 : SHCal20, 4;
+
+##   id.   age    std   depth  delta.R  delta.STD     t.a   t.b   cc
+Det 0 : Coring_date , -63, 1, 0,  0,  0,  3,  4,  0;
+Det 1 : HER42PB-1A-S1 , -227, 19, 0.5,  0,  0,  3,  4,  3;
+Det 2 : HER42PB-1B-S45 , 465, 40, 50.4,  0,  0,  3,  4,  3;
+Det 3 : HER42PB-1D-S136 , 1595, 30, 150,  0,  0,  3,  4,  3;
+Det 4 : HER42PB-1G-S226 , 2920, 30, 250.3,  0,  0,  3,  4,  3;
+Det 5 : HER42PB-1I-S306 , 3560, 30, 339.7,  0,  0,  3,  4,  3;
+Det 6 : Basal , 4520, 30, 403,  0,  0,  3,  4,  3;
+Det 7 : NA , 4520, 4520000, 450,  0,  0,  3,  4,  3;
+
+##		 K   MinAge   MaxAge   th0   th0p   w.a   w.b   alpha  beta  dmin  dmax seed
+Bacon 0: FixT, 47,  -322,  1e+06,  -61,  -64,  4,  16,  1.5,  0.15, 0, 470, 50558;
