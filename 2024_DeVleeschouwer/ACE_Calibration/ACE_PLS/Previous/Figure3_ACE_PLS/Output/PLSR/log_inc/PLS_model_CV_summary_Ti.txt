@@ -1,0 +1,15 @@
+Data: 	X dimension: 268 6 
+	Y dimension: 268 1
+Fit method: kernelpls
+Number of components considered: 6
+
+VALIDATION: RMSEP
+Cross-validated using 10 random segments.
+       (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+CV           1.319    1.030   0.7758   0.7584   0.7416   0.7307   0.7317
+adjCV        1.319    1.029   0.7752   0.7570   0.7383   0.7286   0.7295
+
+TRAINING: % variance explained
+        1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+X         76.39    89.39    94.10    96.31    98.03   100.00
+Y_test    39.64    66.69    69.73    72.24    72.34    72.35

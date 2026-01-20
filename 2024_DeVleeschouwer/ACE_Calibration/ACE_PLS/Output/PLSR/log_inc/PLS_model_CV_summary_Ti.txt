@@ -6,10 +6,10 @@ Number of components considered: 6
 VALIDATION: RMSEP
 Cross-validated using 10 random segments.
        (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
-CV           1.319    1.030   0.7758   0.7584   0.7416   0.7307   0.7317
-adjCV        1.319    1.029   0.7752   0.7570   0.7383   0.7286   0.7295
+CV           1.235   0.7230   0.6594   0.6261   0.6126   0.6099   0.6109
+adjCV        1.235   0.7227   0.6590   0.6254   0.6114   0.6089   0.6098
 
 TRAINING: % variance explained
         1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
-X         76.39    89.39    94.10    96.31    98.03   100.00
-Y_test    39.64    66.69    69.73    72.24    72.34    72.35
+X         77.94    89.17    92.96    96.39    98.07   100.00
+Y_test    66.16    72.26    75.40    76.84    76.90    76.91
