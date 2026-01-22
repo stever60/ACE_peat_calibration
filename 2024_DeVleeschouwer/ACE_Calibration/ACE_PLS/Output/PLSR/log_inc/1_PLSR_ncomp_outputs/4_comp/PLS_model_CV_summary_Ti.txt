@@ -1,0 +1,68 @@
+ICP element: Ti_ICP 
+XRF elements used: Ti, Ca, Sr, Zr 
+Rows used (complete cases): 268 
+ncomp_max: 4 
+
+=== LOO CV ===
+Optimal ncomp (LOO): 4 
+Min RMSEP (LOO): 0.6165121 
+
+Data: 	X dimension: 268 4 
+	Y dimension: 268 1
+Fit method: kernelpls
+Number of components considered: 4
+
+VALIDATION: RMSEP
+Cross-validated using 268 leave-one-out segments.
+       (Intercept)  1 comps  2 comps  3 comps  4 comps
+CV           1.235     0.69   0.6627   0.6184   0.6165
+adjCV        1.235     0.69   0.6627   0.6184   0.6165
+
+TRAINING: % variance explained
+        1 comps  2 comps  3 comps  4 comps
+X         81.73    95.65    98.21   100.00
+Y_test    69.04    71.71    75.62    75.78
+NULL
+
+--- Jackknife test (LOO optimum) ---
+Response Y_test (4 comps):
+    Estimate Std. Error  Df t value           Pr(>|t|)    
+Ti  1.005739   0.130871 267  7.6849 0.0000000000002928 ***
+Ca -0.609703   0.120737 267 -5.0498 0.0000008200085576 ***
+Sr  0.523074   0.110239 267  4.7449 0.0000034023575047 ***
+Zr  0.213022   0.074548 267  2.8575           0.004606 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+=== k-fold CV ===
+k: 10  segment.type: random 
+Optimal ncomp (k-fold): 4 
+Min RMSEP (k-fold): 0.6162793 
+
+Data: 	X dimension: 268 4 
+	Y dimension: 268 1
+Fit method: kernelpls
+Number of components considered: 4
+
+VALIDATION: RMSEP
+Cross-validated using 10 random segments.
+       (Intercept)  1 comps  2 comps  3 comps  4 comps
+CV           1.235   0.6919   0.6656   0.6188   0.6163
+adjCV        1.235   0.6916   0.6651   0.6182   0.6157
+
+TRAINING: % variance explained
+        1 comps  2 comps  3 comps  4 comps
+X         81.73    95.65    98.21   100.00
+Y_test    69.04    71.71    75.62    75.78
+NULL
+
+--- Jackknife test (k-fold optimum) ---
+Response Y_test (4 comps):
+    Estimate Std. Error Df t value    Pr(>|t|)    
+Ti  1.005739   0.150425  9  6.6860 0.000089964 ***
+Ca -0.609703   0.117272  9 -5.1990   0.0005648 ***
+Sr  0.523074   0.055902  9  9.3570 0.000006204 ***
+Zr  0.213022   0.068164  9  3.1251   0.0122170 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

@@ -484,8 +484,8 @@ run_plsr_cv_all_elements <- function(
 # Run it  ---------------------------------------------------------------
 out <- run_plsr_cv_all_elements(
   df = df,
-  key_elements_xrf = key_elements_xrf,
-  key_elements_icp = key_elements_icp,
+  key_elements_xrf = final_elements_xrf, # final_elements_xrf <- c("Ti", "Ca", "Sr", "Zr") or key_elements_xrf <- c("Ti", "Ca", "Mn", "Fe", "Sr", "Zr")
+  key_elements_icp = final_elements_icp, # final_elements_icp <- c("Ti_ICP", "Ca_ICP", "Sr_ICP", "Zr_ICP") or key_elements_icp <- c("Ti_ICP", "Ca_ICP", "Mn_ICP", "Fe_ICP", "Sr_ICP", "Zr_ICP")
   output_dir = "Papers_R/2024_DeVleeschouwer/ACE_Calibration/ACE_PLS/Output/PLSR/log_inc/1_PLSR_ncomp_outputs",
   newdata = XRF_new,     # new dataset with columns key_elements_xrf
   cv_k = 10,
@@ -973,7 +973,7 @@ plot(1:max_comps, bic_values, type = "b", pch = 16,
 dev.off()
 
 # ------------------------------------------------------------------------------
-# Convert to Tidyverse for calculations & plotting -----------------------------
+# Figure 3: convert to Tidyverse for calculations & Figure 3 plotting -----------------------------
 
 # Create a tibble with site name and predicted output for ggplot
 df_joined <- cbind(df, predicted_icp)
@@ -1473,7 +1473,7 @@ ggsave("Papers_R/2024_DeVleeschouwer/ACE_Calibration/ACE_PLS/Output/PLSR/log_inc
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# 4. Predicting Ti as ppm for a new xrf dataset                               
+# 4. Predictions as ppm from whole xrf dataset                               
 # ------------------------------------------------------------------------------
 # Based on pls_final training model and new Ln(Ti/inc) ITRAX dataset >14k rows
 # Define predictor ITRAX variables & ICPMS response variable for --------
@@ -1612,7 +1612,7 @@ write.csv(PB1_PLS_ppm_pred_log_inc,"Papers_R/2024_DeVleeschouwer/ACE_Calibration
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
-# 5. Site based prediction data and plots vs depth, age - START HERE 
+# 5. Figure 4 Site based prediction data and plots vs depth, age - START HERE 
 # ------------------------------------------------------------------------------
 # Import PLS ppm dataset --------------------------------------------------
 ACE_PLS_ppm_pred_log_inc <- read_csv("Papers_R/2024_DeVleeschouwer/ACE_Calibration/ACE_PLS/Output/PLSR/log_inc/ACE_PLS_ppm_pred_log_inc.csv")

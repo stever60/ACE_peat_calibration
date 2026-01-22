@@ -1,0 +1,72 @@
+ICP element: Ti_ICP 
+XRF elements used: Ti, Ca, Mn, Fe, Sr, Zr 
+Rows used (complete cases): 268 
+ncomp_max: 6 
+
+=== LOO CV ===
+Optimal ncomp (LOO): 5 
+Min RMSEP (LOO): 0.6136792 
+
+Data: 	X dimension: 268 6 
+	Y dimension: 268 1
+Fit method: kernelpls
+Number of components considered: 6
+
+VALIDATION: RMSEP
+Cross-validated using 268 leave-one-out segments.
+       (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+CV           1.235   0.7215   0.6595   0.6328    0.619   0.6137   0.6154
+adjCV        1.235   0.7215   0.6595   0.6328    0.619   0.6136   0.6153
+
+TRAINING: % variance explained
+        1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+X         77.94    89.17    92.96    96.39    98.07   100.00
+Y_test    66.16    72.26    75.40    76.84    76.90    76.91
+NULL
+
+--- Jackknife test (LOO optimum) ---
+Response Y_test (5 comps):
+    Estimate Std. Error  Df t value        Pr(>|t|)    
+Ti  1.055006   0.157317 267  6.7062 0.0000000001187 ***
+Ca -0.514575   0.157658 267 -3.2639       0.0012423 ** 
+Mn  0.127329   0.163399 267  0.7793       0.4365202    
+Fe -0.192847   0.070126 267 -2.7500       0.0063662 ** 
+Sr  0.467928   0.123182 267  3.7987       0.0001802 ***
+Zr  0.129780   0.073215 267  1.7726       0.0774391 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+=== k-fold CV ===
+k: 10  segment.type: random 
+Optimal ncomp (k-fold): 5 
+Min RMSEP (k-fold): 0.6109979 
+
+Data: 	X dimension: 268 6 
+	Y dimension: 268 1
+Fit method: kernelpls
+Number of components considered: 6
+
+VALIDATION: RMSEP
+Cross-validated using 10 random segments.
+       (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+CV           1.235   0.7242   0.6615   0.6327   0.6183    0.611   0.6125
+adjCV        1.235   0.7238   0.6609   0.6316   0.6166    0.610   0.6114
+
+TRAINING: % variance explained
+        1 comps  2 comps  3 comps  4 comps  5 comps  6 comps
+X         77.94    89.17    92.96    96.39    98.07   100.00
+Y_test    66.16    72.26    75.40    76.84    76.90    76.91
+NULL
+
+--- Jackknife test (k-fold optimum) ---
+Response Y_test (5 comps):
+    Estimate Std. Error Df t value  Pr(>|t|)    
+Ti  1.055006   0.172365  9  6.1208 0.0001748 ***
+Ca -0.514575   0.137220  9 -3.7500 0.0045546 ** 
+Mn  0.127329   0.159328  9  0.7992 0.4447739    
+Fe -0.192847   0.034273  9 -5.6268 0.0003230 ***
+Sr  0.467928   0.057571  9  8.1279 0.0000195 ***
+Zr  0.129780   0.065077  9  1.9943 0.0772656 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
