@@ -776,8 +776,34 @@ lapply(packages, library, character.only=TRUE)
 
 # -------------------------------------------------------------------------
 # Import datasets
-# • ACE_dataset  --------
-# - matched log ICP-MS & log_inc XRF-CS for calibration models
+# • ACE_datasets  --------
+# - matched ICP-MS & cps XRF-CS for calibration models
+ACE_dataset_cps <- readr::read_csv(
+  "Papers_R/2024_DeVleeschouwer/ACE_Calibration/Input/ACE_subsample_icp_xrf_matched_cps.csv",
+  name_repair = "minimal") %>%   # equivalent to check.names = FALSE 
+  rename (SH20_age = SH20_mean_age) %>% 
+  mutate(across(everything(), ~replace(., is.infinite(.), NA))) %>% # Replace infinite values with NA
+  #mutate(Site = as.factor(Site)) %>%  # Convert Site to factor
+  print()
+str(ACE_dataset_cps)
+names(ACE_dataset_cps)
+# Check dataset is loaded OK & working before running function
+c("Ti", "Ti_ICP") %in% names(ACE_dataset_cps)
+c("Ca", "Ca_ICP") %in% names(ACE_dataset_cps)
+c("Fe", "Fe_ICP") %in% names(ACE_dataset_cps)
+summary(ACE_dataset_cps$Ti)
+var(ACE_dataset_cps$Ti)
+var(ACE_dataset_cps$Ti_ICP)
+cor(ACE_dataset_cps$Ti, ACE_dataset_cps$Ti_ICP)
+c(summary(ACE_dataset_cps$Ti_ICP),
+  SD = sd(ACE_dataset_cps$Ti_ICP, na.rm = TRUE),
+  SE = sd(ACE_dataset_cps$Ti_ICP, na.rm = TRUE) / sqrt(sum(!is.na(ACE_dataset_cps$Ti_ICP))))
+c(summary(ACE_dataset_cps$Zr_ICP),
+  SD = sd(ACE_dataset_cps$Zr_ICP, na.rm = TRUE),
+  SE = sd(ACE_dataset_cps$Zr_ICP, na.rm = TRUE) / sqrt(sum(!is.na(ACE_dataset_cps$Zr_ICP))))
+
+
+# matched log ICP-MS & log_inc XRF-CS for calibration models
 ACE_dataset <- readr::read_csv(
   "Papers_R/2024_DeVleeschouwer/ACE_Calibration/Input/ACE_subsample_xrf_icp_matched_log_inc.csv",
   name_repair = "minimal") %>%   # equivalent to check.names = FALSE 
@@ -793,9 +819,10 @@ c("Ca", "Ca_ICP") %in% names(ACE_dataset)
 c("Fe", "Fe_ICP") %in% names(ACE_dataset)
 summary(ACE_dataset$Ti)
 var(ACE_dataset$Ti)
-summary(ACE_dataset$Ti_ICP)
 var(ACE_dataset$Ti_ICP)
 cor(ACE_dataset$Ti, ACE_dataset$Ti_ICP)
+summary(ACE_dataset$Ti_ICP)
+summary(ACE_dataset$Zr_ICP)
 
 # • XRF_pred  ----------------------
 # = XRF-CS log_inc dataset for new ppm predictions Section 1-12
